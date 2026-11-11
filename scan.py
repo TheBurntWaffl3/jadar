@@ -69,12 +69,12 @@ def fetch(url, body=None, check_robots=False, text=False, headers=None, tries=4)
         _throttle(host_of(url))
         try:
             with OPENER.open(urllib.request.Request(url, data=data, headers=hd), timeout=40) as r:
-                raw = r.read(25_000_001)
+                raw = r.read(100_000_001)
             break
         except urllib.error.HTTPError as e:
             if e.code in (429, 500, 502, 503) and i + 1 < tries: time.sleep(5 * (i + 1) ** 2); continue
             raise
-    if len(raw) > 25_000_000: raise RuntimeError("response too large")
+    if len(raw) > 100_000_000: raise RuntimeError("response too large")
     s = raw.decode("utf-8", "replace")
     return s if text else json.loads(s)
 
@@ -281,12 +281,11 @@ def iso(x):
     return None
 
 def a_greenhouse(s):
-    j = fetch(f"https://boards-api.greenhouse.io/v1/boards/{s['id']}/jobs")
+    j = fetch(f"https://boards-api.greenhouse.io/v1/boards/{s['id']}/jobs?content=true")
     for p in j.get("jobs", []):
-        jid = p.get("id")
         yield dict(title=p.get("title", ""), location=(p.get("location") or {}).get("name", ""), url=p.get("absolute_url"),
                    date=iso(p.get("first_published")), dateKind="posted" if p.get("first_published") else None,
-                   desc=lambda jid=jid: strip_html(fetch(f"https://boards-api.greenhouse.io/v1/boards/{s['id']}/jobs/{jid}").get("content", "")))
+                   desc=strip_html(p.get("content", "")))
 
 def a_rippling(s):
     base = f"https://api.rippling.com/platform/api/ats/v1/board/{s['id']}/jobs"
@@ -547,7 +546,7 @@ def main():
     only = set(sys.argv[1:])
     srcs = [s for s in SRC if not only or s["org"] in only]
     roles, status = [], []
-    with ThreadPoolExecutor(16) as ex:
+    with ThreadPoolExecutor(32) as ex:
         for s, rows, st in ex.map(run_source, srcs):
             status.append(st); roles += rows
     now = TODAY.isoformat()
