@@ -7,7 +7,8 @@ FIXTURE = os.path.join(ROOT, "tests", "fixtures", "radar_out.sample.json")
 
 class PageTests(unittest.TestCase):
     def setUp(self):
-        self.out = json.load(open(FIXTURE)); self.src = json.load(open(os.path.join(ROOT, "sources.json")))
+        with open(FIXTURE) as f: self.out = json.load(f)
+        with open(os.path.join(ROOT, "sources.json")) as f: self.src = json.load(f)
 
     def test_datasets(self):
         roles, orgs = build_dash.datasets(self.out, self.src)
@@ -21,11 +22,12 @@ class PageTests(unittest.TestCase):
     def test_build_page_writes_html(self):
         with tempfile.TemporaryDirectory() as d:
             data, site = os.path.join(d, "data"), os.path.join(d, "site")
-            os.makedirs(data); json.dump(self.out, open(os.path.join(data, "radar_out.json"), "w"))
+            os.makedirs(data)
+            with open(os.path.join(data, "radar_out.json"), "w") as f: json.dump(self.out, f)
             os.environ["RADAR_DATA"], os.environ["SITE_DIR"] = data, site
             try: build_page.main()
             finally: os.environ.pop("RADAR_DATA"); os.environ.pop("SITE_DIR")
-            html = open(os.path.join(site, "index.html")).read()
+            with open(os.path.join(site, "index.html")) as f: html = f.read()
         self.assertIn("Thermal Engineer, New Grad (Starship)", html)
         self.assertIn("Kratos", html)
         self.assertIn("Kevin Kyle", html)

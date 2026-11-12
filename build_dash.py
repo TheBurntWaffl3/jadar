@@ -51,7 +51,8 @@ def datasets(out, src):
 
 def main():
     data = os.environ.get("RADAR_DATA", os.path.join(ROOT, "data"))
-    out = json.load(open(os.path.join(data, "radar_out.json"))); src = json.load(open(os.path.join(ROOT, "sources.json")))
+    with open(os.path.join(data, "radar_out.json")) as f: out = json.load(f)
+    with open(os.path.join(ROOT, "sources.json")) as f: src = json.load(f)
     roles, orgs = datasets(out, src)
     json.dump(roles, open(os.path.join(data, "roles.json"), "w"), separators=(",", ":"))
     json.dump(orgs, open(os.path.join(data, "orgs.json"), "w"), separators=(",", ":"))

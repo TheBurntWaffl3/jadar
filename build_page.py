@@ -272,11 +272,12 @@ def build(out, src, profile_name=None):
 def main():
     data = os.environ.get("RADAR_DATA", os.path.join(ROOT, "data"))
     site = os.environ.get("SITE_DIR", os.path.join(ROOT, "site"))
-    out = json.load(open(os.path.join(data, "radar_out.json"))); src = json.load(open(os.path.join(ROOT, "sources.json")))
+    with open(os.path.join(data, "radar_out.json")) as f: out = json.load(f)
+    with open(os.path.join(ROOT, "sources.json")) as f: src = json.load(f)
     name = None
     try:
         prof = os.environ.get("PROFILE") or os.path.join(ROOT, "profiles", f"{out.get('profile', 'kevin')}.json")
-        name = json.load(open(prof)).get("name")
+        with open(prof) as f: name = json.load(f).get("name")
     except Exception: pass
     html = build(out, src, name)
     os.makedirs(site, exist_ok=True)

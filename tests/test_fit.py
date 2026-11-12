@@ -284,13 +284,23 @@ class TestTitles(FitCase):
         self.assertEqual(scan.discipline("Mechanical Engineer - Cable Magnets"), "Mechanical")
 
 
+class TestLocations(unittest.TestCase):
+    def test_uk_locations_are_not_us(self):
+        # GE Aerospace "Modern Engineering Apprenticeship, Prestwick, 2027 intake" leaked into the first live run
+        for loc in ("Prestwick", "Glasgow, Scotland", "Cardiff, Wales", "Cheltenham, United Kingdom", "Munich, Germany", "Kruibeke, Belgium"):
+            self.assertTrue(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
+        for loc in ("Huntsville, AL", "El Segundo, CA", "Laurel, MD", "United States - Remote", "Washington, DC"):
+            self.assertFalse(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
+        self.assertFalse(scan.in_scope("Modern Engineering Apprenticeship, Prestwick, 2027 intake"))
+        self.assertFalse(scan.in_scope("Mechanical Engineering Apprentice"))
+
 class TestSecondProfile(unittest.TestCase):
     def setUp(self):
         scan.TODAY = TODAY
-        p = json.load(open(os.path.join(ROOT, "profiles", "kevin.json")))
+        with open(os.path.join(ROOT, "profiles", "kevin.json")) as f: p = json.load(f)
         p.update(name="Test Friend", slug="friend", majors=["nuclear"], gradDate="2028-05", earliestStart="2028-06-01")
         fd, self.path = tempfile.mkstemp(suffix=".json"); os.close(fd)
-        json.dump(p, open(self.path, "w"))
+        with open(self.path, "w") as f: json.dump(p, f)
         self.p = scan.load_profile(self.path)
 
     def tearDown(self):
