@@ -21,8 +21,14 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
      (Student Developer Pack). **Kevin: enable Settings > Pages > Source "GitHub Actions" once Pro is active.**
   5. Alerts: built for both channels (`alert.py`); **Kevin picks** by adding either `NTFY_TOPIC` or the `SMTP_*`/`ALERT_TO`
      secrets (README). Until then the alert is only printed in the run log.
-  6. Parity: not started. Run both for ~3 days, compare with `tools/compare.py` (Claude dashboard data vs
-     `data/radar_out.json`); then tell Kevin so he can disable the Claude task. Don't disable it yourself.
+  6. Parity: **day 1 done (2026-11-12).** The Claude task's 00:39 UTC roles.json (asset of the "Kevin's Job Radar" artifact;
+     read it with the Artifact tool, `path` = the newest `_blob` id) vs the GitHub run 40 min later: 263/263 Yes and 584/585
+     Maybe identical, 0 fit changes on shared postings; the rest were postings listed by only one run (timing) plus one
+     explained improvement (HII "ENGINEER MODEL-BASED 4": Yes->No "senior title", the level digit is now seen because
+     "Job Details" is stripped before judging). Repeat with `tools/compare.py` for ~2 more days (the GitHub run lands on the
+     `data` branch daily), then tell Kevin so he can disable the Claude task. Don't disable it yourself.
+     Run log: first full read 4 min (4568 descriptions); incremental run 1.5 min (3056 reused, 1511 fetched, mostly
+     Greenhouse boards whose descriptions come with the list). The 40-min timeout has plenty of margin.
 - Tests: `python3 -I -m unittest discover -s tests` (fit rules, cache, page). Keep them passing; add a case for every bug.
 - Behavior differences from the original, on purpose: cached facts mean a posting's description is read once (and weekly),
   so a deadline that appears in the text later shows up by the next Sunday; `discipline()` no longer labels
