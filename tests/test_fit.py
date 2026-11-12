@@ -284,6 +284,31 @@ class TestTitles(FitCase):
         self.assertEqual(scan.discipline("Mechanical Engineer - Cable Magnets"), "Mechanical")
 
 
+class TestPreferredHeadings(unittest.TestCase):
+    def test_rocket_lab_nice_to_have_heading(self):
+        # Rocket Lab (Wallops Island) "Test and Launch Operations Engineer I": the 2+ years line sits under
+        # "THESE QUALIFICATIONS WOULD BE NICE TO HAVE" and was read as the minimum (it is 1+).
+        txt = ("QUALIFICATIONS TEST & LAUNCH OPERATIONS ENGINEER I\n"
+               "Bachelor's Degree in Engineering (preferably Aerospace, Mechanical, Electrical, Chemical, or Mechatronic Engineering)\n"
+               "1+ years of experience in engineering design, test and/or operations, electrical/software engineering\n"
+               "2+ years of relevant experience will be considered in lieu of a degree\n"
+               "THESE QUALIFICATIONS WOULD BE NICE TO HAVE\n"
+               "2+ years of experience in engineering design, test, and/or operations\n"
+               "Background in Avionics equipment design/operations\n")
+        r = scan.requirements(txt)
+        self.assertEqual(r["minYears"], 1)
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Test and Launch Operations Engineer I")[0], "Yes")
+        self.assertIn("1+ years of experience", r["reqSnippet"]); self.assertNotIn("Background in Avionics", r["reqSnippet"])
+
+    def test_other_heading_shapes_and_non_headings(self):
+        base = "Minimum Qualifications:\nBS in Mechanical Engineering\n0-1 years of experience\n"
+        for heading in ("What would be a plus:", "It would be great if you have", "Bonus points:", "NICE TO HAVE", "Desired skills"):
+            r = scan.requirements(base + heading + "\n5+ years of experience with FEA\n")
+            self.assertEqual(r["minYears"], 0, heading)
+        # a bullet that merely says 'preferred' must not cut the requirements short
+        r = scan.requirements("Minimum Qualifications:\nBS in Mechanical Engineering\nExperience with ANSYS preferred\n3+ years of experience required\n")
+        self.assertEqual(r["minYears"], 3)
+
 class TestLocations(unittest.TestCase):
     def test_uk_locations_are_not_us(self):
         # GE Aerospace "Modern Engineering Apprenticeship, Prestwick, 2027 intake" leaked into the first live run

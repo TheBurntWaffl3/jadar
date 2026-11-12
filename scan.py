@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-12.2"
+RULES_VERSION = "2026-11-12.3"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -133,6 +133,22 @@ ZERO_EXP = re.compile(r"(no (prior |professional )?experience (is )?required|\b0
 TITLE_ENTRY = re.compile(r"(?i)(new ?grad|graduate engineer|early[- ]career|entry[- ]level|university grad|college grad|recent grad|\bassociate\b[\w ,&/-]{0,50}?(engineer|scientist|analyst)|(engineer|scientist|analyst|physicist)[\w ,&/()-]{0,50}?\bassociate\b|engineer (i|1)\b|\blevel (i|1)\b|\b(i|1)\s*$|rotational|development program|\bLDP\b|\bEDP\b)")
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
 
+PREF_WORD = re.compile(r"(?i)\b(preferred|desired|nice[- ]to[- ]have|bonus|plusses|pluses|would be (a )?(plus|great|nice)|good to have)\b")
+PREF_START = re.compile(r"(?i)^\W*(preferred|desired|nice|bonus|plus|these|what|the following|it would|it'?s a plus|good to have)")
+def preferred_heading(t, start, had_required):
+    """Offset of the first 'Preferred / Nice to have' heading line after `start`, or None. A heading is a short line
+    (<= 70 chars) naming preferred/desired/nice-to-have that starts with such a word, is ALL CAPS, or ends with ':'.
+    Rocket Lab's 'THESE QUALIFICATIONS WOULD BE NICE TO HAVE' counts; a bullet like 'CFD experience preferred' does not.
+    Without a required heading before it, the line must also mention qualifications/skills/experience."""
+    pos = start
+    for line in t[start:].split("\n"):
+        l = line.strip()
+        if 0 < len(l) <= 70 and PREF_WORD.search(l) and (PREF_START.match(l) or l.isupper() or l.endswith(":")) \
+                and (had_required or re.search(r"(?i)qualif|skill|experience|requirement", l)):
+            return pos
+        pos += len(line) + 1
+    return None
+
 def requirements(text):
     t = (text or "").replace(chr(8217), "'").replace(chr(8216), "'")
     t = re.sub(r"\bU\.\s?S\.(?=\s|$)", "US", t)
@@ -140,9 +156,8 @@ def requirements(text):
     t = re.sub(r"\((\d{1,2}\s*\+?)\)", r"\1", t)
     req = t
     rq = re.search(r"(?im)^\W*(basic|minimum|required|requirements|qualifications|what you.ll need|what you.ll bring|what qualifications|you have|must have|what we.re looking for|education/experience)\b", t)
-    m = re.search(r"(?im)^\W*(preferred|desired|nice[- ]to[- ]have|bonus|plusses|pluses)\b[^\n]{0,45}$", t[rq.end() if rq else 0:])
-    if m and (rq or re.search(r"(?i)qualif|skill|experience|requirement", m.group(0))):
-        req = t[:(rq.end() if rq else 0) + m.start()]
+    cut = preferred_heading(t, rq.end() if rq else 0, bool(rq))
+    if cut is not None: req = t[:cut]
     nums = []; school_ok = False
     for mm in YRS.finditer(req):
         v = mm.group(1).lower(); v = NUMW.get(v, v)
