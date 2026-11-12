@@ -118,6 +118,37 @@ tr.detail td { padding: 0 10px 16px; background: var(--card); }
 .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--ink); color: var(--page); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 13.5px; text-decoration: none; margin-top: 12px; }
 .empty { padding: 24px 10px; color: var(--muted); }
 
+/* tabs + per-role state */
+.tabsrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
+.seg.tabs { flex-wrap: wrap; }
+.tabs button { display: inline-flex; align-items: center; gap: 6px; }
+.tabs .badge { font-size: 10.5px; letter-spacing: .04em; opacity: .7; }
+.tabs button[aria-pressed="true"] .badge { opacity: .85; }
+.state-sum { color: var(--muted); }
+.ctl.small { min-height: 32px; padding: 6px 12px; font-size: 13px; }
+.sync-status { color: var(--muted); }
+td.acts { white-space: nowrap; width: 96px; padding-left: 4px; padding-right: 4px; }
+.ic { width: 28px; height: 28px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; vertical-align: middle; }
+.ic:hover, .ic:focus-visible { background: var(--pill); color: var(--ink); outline: none; }
+.ic.on.save { color: var(--ember); } .ic.on.applied { color: var(--good); } .ic.on.hide { color: var(--crit); }
+.tag.closed { background: var(--pill); color: var(--muted); } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
+tr.row.dim td .role a, tr.row.dim td.co, tr.row.dim td.why { color: var(--muted); }
+.actrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.pbtn { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--page); color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; min-height: 32px; }
+.pbtn.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.note-in { font: inherit; font-size: 13.5px; flex: 1 1 220px; min-width: 160px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; background: var(--page); color: var(--ink); }
+.note-in::placeholder { color: var(--muted); }
+.applied-at { color: var(--muted); font-size: 13px; }
+#datapanel { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; margin: 0 0 14px; }
+#datapanel.open { display: block; }
+.dp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0; }
+.dp-row + .dp-row { margin-top: 10px; }
+.dp-head { margin: 10px 0 4px; }
+.dp-note { color: var(--muted); font-size: 12.5px; }
+.dp-row input[type="text"], .dp-row input[type="password"] { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); min-width: 140px; }
+.dp-row input.wide { flex: 1 1 220px; }
+.stats.n7 { grid-template-columns: repeat(7, 1fr); }
+
 /* boards */
 .boards-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 10px 0; }
 .boards-head .sum { color: var(--ink-2); }
@@ -156,6 +187,9 @@ footer a { color: var(--ink); }
   #roles td.kvl .kind { display: inline; margin-left: 4px; }
   #roles td.why { display: block; margin-top: 6px; max-width: none; }
   #roles td.chev { display: none; }
+  #roles td.acts { display: flex; gap: 6px; width: auto; margin-top: 8px; }
+  .seg.tabs button { padding: 6px 10px; font-size: 13px; }
+  .stats.n7 { grid-template-columns: repeat(2, 1fr); }
   #roles tr.detail td { padding: 0 0 14px; border-radius: 16px; }
   .panel { grid-template-columns: 1fr; padding: 12px; }
   #orgs .hide-sm { display: none; }
@@ -173,7 +207,37 @@ footer a { color: var(--ink); }
 <section class="stats" id="stats" aria-label="Summary"></section>
 
 <h2>Roles.</h2>
-<p class="lede">Entry-level fits across the boards. Click a row for the full requirements.</p>
+<p class="lede">Entry-level fits across the boards. Click a row for the full requirements; star, check or hide roles as you go.</p>
+<div class="tabsrow">
+  <div class="seg tabs" role="group" aria-label="List">
+    <button type="button" data-tab="inbox" aria-pressed="true">Inbox<span class="badge mono" data-badge="inbox"></span></button>
+    <button type="button" data-tab="saved" aria-pressed="false">Saved<span class="badge mono" data-badge="saved"></span></button>
+    <button type="button" data-tab="applied" aria-pressed="false">Applied<span class="badge mono" data-badge="applied"></span></button>
+    <button type="button" data-tab="hidden" aria-pressed="false">Disliked<span class="badge mono" data-badge="hidden"></span></button>
+    <button type="button" data-tab="all" aria-pressed="false">All<span class="badge mono" data-badge="all"></span></button>
+  </div>
+  <span class="state-sum mono" id="state-sum"></span>
+  <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
+  <span class="sync-status mono" id="sync-status"></span>
+</div>
+<div id="datapanel">
+  <div class="dp-row">
+    <button type="button" class="pbtn" id="export-btn">Export jadar-state.json</button>
+    <label class="pbtn" for="import-file">Import…</label><input type="file" id="import-file" accept="application/json,.json" style="display:none">
+    <button type="button" class="pbtn" id="clear-hidden">Clear hidden</button>
+    <span class="dp-note">Saved, applied and hidden roles live in this browser. Export to move them, or sync below.</span>
+  </div>
+  <div class="dp-head mono">Sync with GitHub</div>
+  <div class="dp-row">
+    <input type="text" id="sync-repo" placeholder="owner/name" value="TheBurntWaffl3/jadar-state" aria-label="Repository">
+    <input type="text" id="sync-path" placeholder="state.json" value="state.json" aria-label="File path">
+    <input type="password" id="sync-token" class="wide" placeholder="fine-grained token" aria-label="Token" autocomplete="off">
+    <button type="button" class="pbtn" id="sync-connect">Connect</button>
+    <button type="button" class="pbtn" id="sync-disconnect">Disconnect</button>
+    <button type="button" class="pbtn" id="sync-now">Sync now</button>
+  </div>
+  <div class="dp-note">The token stays in this browser only; scope it to that one private repo, Contents read/write. Nothing is sent anywhere but api.github.com.</div>
+</div>
 <div class="controls" id="controls">
   <div class="seg" role="group" aria-label="Fit">
     <button type="button" data-fit="fits" aria-pressed="true">Yes + Maybe</button>
@@ -202,6 +266,7 @@ footer a { color: var(--ink); }
       <th class="sortable" data-sort="salary">Salary<span class="arrow"></span></th>
       <th class="sortable" data-sort="date">Date<span class="arrow"></span></th>
       <th>Why</th>
+      <th></th>
       <th></th>
     </tr></thead>
     <tbody id="rows"></tbody>
@@ -238,32 +303,77 @@ footer a { color: var(--ink); }
   const FITRANK = {Yes: 0, Maybe: 1, No: 2};
   const roles = D.roles.map(r => Object.assign({}, r, {_new: NEW.has(r.url), _dt: daysTo(r.applyBy), _q: [r.company, r.title, r.location, r.why, r.discipline, r.salary].join(' ').toLowerCase()}));
 
+  // ---------- per-role state (saved / applied / hidden), kept in this browser ----------
+  const KEY = 'jadar.state.v1', SKEY = 'jadar.sync.v1';
+  const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
+  function loadState() { try { const s = JSON.parse(lsGet(KEY) || 'null'); if (s && s.v === 1 && s.roles) return s; } catch (e) {} return {v: 1, roles: {}}; }
+  let S = loadState();
+  function persist() { lsSet(KEY, JSON.stringify(S)); schedulePush(); }
+  const entry = url => S.roles[url];
+  const statusOf = url => (S.roles[url] || {}).status || null;
+  function snapOf(r) { const s = {company: r.company, title: r.title, location: r.location || '', url: r.url, fit: r.fit}; if (r.applyBy) s.applyBy = r.applyBy; return s; }
+  function setStatus(r, status) {
+    const url = r.url, cur = S.roles[url];
+    if (!status) { if (cur && cur.note) { cur.status = null; cur.at = new Date().toISOString(); } else delete S.roles[url]; }
+    else S.roles[url] = Object.assign({}, cur || {}, {status, at: new Date().toISOString(), snap: (cur && cur.snap && cur.snap.title) ? cur.snap : snapOf(r)});
+    persist();
+  }
+  function setNote(r, note) {
+    const url = r.url, cur = S.roles[url] || {status: null, snap: snapOf(r)};
+    cur.note = note || ''; cur.at = new Date().toISOString(); if (!cur.snap) cur.snap = snapOf(r);
+    if (!cur.note && !cur.status) delete S.roles[url]; else S.roles[url] = cur;
+    persist();
+  }
+  function act(r, a) {
+    const cur = statusOf(r.url);
+    if (a === 'save') setStatus(r, cur === 'saved' ? null : 'saved');
+    else if (a === 'applied') setStatus(r, cur === 'applied' ? null : 'applied');
+    else if (a === 'hide') setStatus(r, cur === 'hidden' ? null : 'hidden');
+  }
+  function mergeStates(a, b) {  // per-url newer `at` wins; returns a fresh state
+    const out = {v: 1, roles: {}}; const urls = new Set([...Object.keys(a.roles || {}), ...Object.keys(b.roles || {})]);
+    urls.forEach(u => { const x = (a.roles || {})[u], y = (b.roles || {})[u]; out.roles[u] = !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x); });
+    return out;
+  }
+  const counts = () => { const c = {saved: 0, applied: 0, hidden: 0}; Object.values(S.roles).forEach(e => { if (e.status) c[e.status] = (c[e.status] || 0) + 1; }); return c; };
+
   // hero + stats
   const sc = D.scanned ? new Date(D.scanned) : null;
   const okN = D.orgs.filter(o => o.status === 'OK').length, failN = D.orgs.filter(o => o.status === 'Failing').length, gapN = D.orgs.filter(o => o.status === 'Not covered yet').length;
   const stamp = sc ? sc.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) + ' ' + sc.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}) : D.today;
   $('#meta').innerHTML = ['Scanned ' + esc(stamp), 'rules ' + esc(D.rulesVersion || '—'), D.fullRead ? 'full re-read' : 'incremental', okN + '/' + (okN + failN) + ' boards'].join('<span class="sep">·</span>');
   if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
-  const fits = roles.filter(r => r.fit !== 'No');
-  const week = fits.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -7).length;
-  const closing = fits.filter(r => r._dt != null && r._dt >= 0 && r._dt <= 14).length;
-  const stats = [
-    ['Yes', roles.filter(r => r.fit === 'Yes').length, 'strong fits', 'good'],
-    ['Maybe', roles.filter(r => r.fit === 'Maybe').length, 'worth a look', 'ember'],
-    ['Posted 7d', week, 'Yes + Maybe', ''],
-    ['Closing 14d', closing, 'apply-by known', closing ? 'ember' : ''],
-    ['Roles', roles.length, 'in-field, US', ''],
-    ['Boards OK', okN + ' / ' + (okN + failN), failN ? failN + ' failing' : 'none failing', ''],
-  ];
-  $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+  function renderStats() {
+    const inbox = roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; });
+    const fits = inbox.filter(r => r.fit !== 'No');
+    const week = fits.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -7).length;
+    const closing = fits.filter(r => r._dt != null && r._dt >= 0 && r._dt <= 14).length;
+    const applied = counts().applied;
+    const stats = [
+      ['Yes', inbox.filter(r => r.fit === 'Yes').length, 'strong fits', 'good'],
+      ['Maybe', inbox.filter(r => r.fit === 'Maybe').length, 'worth a look', 'ember'],
+      ['Posted 7d', week, 'Yes + Maybe', ''],
+      ['Closing 14d', closing, 'apply-by known', closing ? 'ember' : ''],
+      ['Roles', roles.length, 'in-field, US', ''],
+      ['Boards OK', okN + ' / ' + (okN + failN), failN ? failN + ' failing' : 'none failing', ''],
+    ];
+    if (applied) stats.push(['Applied', applied, 'tracked here', '']);
+    $('#stats').classList.toggle('n7', stats.length === 7);
+    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+  }
 
   // controls
-  const state = {fit: 'fits', sector: '', disc: '', days: '', q: '', sort: 'fit', dir: 'asc', open: null};
+  const state = {tab: 'inbox', fit: 'fits', sector: '', disc: '', days: '', q: '', sort: 'fit', dir: 'asc', open: null};
   const fill = (sel, vals) => { vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); }); };
   fill($('#sector'), [...new Set(roles.map(r => r.sector).filter(Boolean))].sort());
   fill($('#disc'), [...new Set(roles.map(r => r.discipline).filter(Boolean))].sort());
-  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
-    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.fit = b.dataset.fit; render();
+  document.querySelectorAll('.seg:not(.tabs) button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.fit = b.dataset.fit; render();
+  }));
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.tab = b.dataset.tab; state.open = null; render();
   }));
   ['sector', 'disc', 'days'].forEach(k => $('#' + k).addEventListener('change', e => { state[k] = e.target.value; render(); }));
   $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
@@ -298,15 +408,37 @@ footer a { color: var(--ink); }
   }
 
   // rows
+  const byUrl = new Map(roles.map(r => [r.url, r]));
+  function snapRole(e) {  // a saved/applied/hidden posting that the scan no longer lists
+    const s = e.snap || {}; return Object.assign({}, s, {id: 'snap:' + s.url, _closed: true, _dt: daysTo(s.applyBy), why: '', _q: ''});
+  }
   function tagsFor(r) {
-    const t = [];
+    const t = []; const st = statusOf(r.url);
+    if (r._closed) t.push('<span class="tag closed">closed</span>');
     if (r._new) t.push('<span class="tag new">New</span>');
+    if (st && state.tab !== st && state.tab !== 'saved' && state.tab !== 'applied' && state.tab !== 'hidden') t.push(`<span class="tag status ${st}">${st === 'hidden' ? 'Hidden' : st === 'applied' ? 'Applied' : 'Saved'}</span>`);
     if (r._dt != null && r._dt >= 0 && r._dt <= 10) t.push(`<span class="tag closing">${r._dt === 0 ? 'Closes today' : 'Closes in ' + r._dt + 'd'}</span>`);
     if (r.workMode) t.push(`<span class="tag">${esc(r.workMode)}</span>`);
     if (r.employment && r.employment !== 'Full-time') t.push(`<span class="tag">${esc(r.employment)}</span>`);
     return t.length ? `<div class="tags">${t.join('')}</div>` : '';
   }
+  function icons(r) {
+    const st = statusOf(r.url);
+    return `<button type="button" class="ic save${st === 'saved' ? ' on' : ''}" data-act="save" aria-label="${st === 'saved' ? 'Unsave' : 'Save'}" title="${st === 'saved' ? 'Unsave' : 'Save'}" aria-pressed="${st === 'saved'}">${st === 'saved' ? '★' : '☆'}</button>` +
+      `<button type="button" class="ic applied${st === 'applied' ? ' on' : ''}" data-act="applied" aria-label="${st === 'applied' ? 'Mark not applied' : 'Mark applied'}" title="${st === 'applied' ? 'Mark not applied' : 'Mark applied'}" aria-pressed="${st === 'applied'}">✓</button>` +
+      `<button type="button" class="ic hide${st === 'hidden' ? ' on' : ''}" data-act="hide" aria-label="${st === 'hidden' ? 'Unhide' : 'Hide (not for me)'}" title="${st === 'hidden' ? 'Unhide' : 'Hide (not for me)'}" aria-pressed="${st === 'hidden'}">✕</button>`;
+  }
   function kv(k, v) { return v == null || v === '' ? '' : `<div><div class="k mono">${esc(k)}</div><div class="v">${esc(v)}</div></div>`; }
+  function actRow(r) {
+    const e = entry(r.url) || {}; const st = e.status;
+    const at = e.at ? fmtLong(e.at.slice(0, 10)) : '';
+    return `<div class="actrow">` +
+      `<button type="button" class="pbtn${st === 'saved' ? ' on' : ''}" data-act="save">${st === 'saved' ? '★ Saved' : '☆ Save'}</button>` +
+      `<button type="button" class="pbtn${st === 'applied' ? ' on' : ''}" data-act="applied">${st === 'applied' ? '✓ Applied' : 'Mark applied'}</button>` +
+      `<button type="button" class="pbtn${st === 'hidden' ? ' on' : ''}" data-act="hide">${st === 'hidden' ? 'Hidden · unhide' : 'Not for me'}</button>` +
+      (st === 'applied' && at ? `<span class="applied-at">Applied ${esc(at)}</span>` : '') +
+      `<input type="text" class="note-in" data-note="1" placeholder="Note (contact, referral, follow-up…)" value="${esc(e.note || '')}" aria-label="Note"></div>`;
+  }
   function detail(r) {
     const yrs = r.minYears == null ? 'not stated' : r.minYears + (r.schoolExpOk ? ' (school/internship counts)' : '');
     const pay = r.salary ? r.salary + (/\/hr$/.test(r.salary) && r.salaryMin != null ? ' · $' + num(r.salaryMin) + (r.salaryMax != null && r.salaryMax !== r.salaryMin ? '–$' + num(r.salaryMax) : '') + ' annualized' : '') : null;
@@ -315,40 +447,132 @@ footer a { color: var(--ink); }
       kv('Pay', pay), kv('Work mode', r.workMode), kv('Employment', r.employment), kv('Travel', r.travel), kv('Relocation', r.relocation === true ? 'offered' : r.relocation === false ? 'not offered' : null),
       kv('Posted', r.date ? fmtLong(r.date) + ' (' + r.dateKind + ')' : null), kv('First seen', r.firstSeen ? fmtLong(r.firstSeen) : null), kv('Sector', r.sector)].join('');
     const snip = r.reqSnippet ? `<div class="snip"><div class="k mono">Minimum qualifications</div>${esc(r.reqSnippet)}</div>` : `<div class="snip"><div class="k mono">Why</div>${esc(r.why)}</div>`;
-    return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a></div></div>`;
+    return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a></div></div>${actRow(r)}`;
+  }
+  function listFor(tab) {  // the universe of rows for a tab, before filters
+    if (tab === 'inbox') return roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; });
+    if (tab === 'all') return roles.slice();
+    const st = tab;  // saved / applied / hidden: stored entries, newest action first, closed postings as snapshots
+    return Object.values(S.roles).filter(e => e.status === st).sort((a, b) => (b.at || '').localeCompare(a.at || ''))
+      .map(e => byUrl.get(e.snap && e.snap.url) || snapRole(e));
   }
   function render() {
-    let list = roles.filter(r => state.fit === 'all' || (state.fit === 'fits' ? r.fit !== 'No' : r.fit === state.fit));
+    renderStats();
+    const c = counts(); const inboxN = roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; }).length;
+    const badges = {inbox: inboxN, saved: c.saved, applied: c.applied, hidden: c.hidden, all: roles.length};
+    document.querySelectorAll('.tabs [data-badge]').forEach(b => b.textContent = badges[b.dataset.badge] ? ' ' + badges[b.dataset.badge] : '');
+    $('#state-sum').textContent = (c.saved || c.applied || c.hidden) ? `${c.saved} saved · ${c.applied} applied · ${c.hidden} hidden` : '';
+    const base = listFor(state.tab); const listTab = ['saved', 'applied', 'hidden'].includes(state.tab);
+    let list = listTab ? base : base.filter(r => state.fit === 'all' || (state.fit === 'fits' ? r.fit !== 'No' : r.fit === state.fit));
     if (state.sector) list = list.filter(r => r.sector === state.sector);
     if (state.disc) list = list.filter(r => r.discipline === state.disc);
     if (state.days) list = list.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -Number(state.days));
-    if (state.q) list = list.filter(r => r._q.includes(state.q));
-    list = sorted(list);
-    document.querySelectorAll('th.sortable').forEach(th => th.dataset.sort === state.sort ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
-    $('#count').textContent = list.length + ' of ' + roles.length + ' roles';
-    if (!list.length) { $('#rows').innerHTML = '<tr><td colspan="8" class="empty">Nothing matches these filters.</td></tr>'; return; }
+    if (state.q) list = list.filter(r => (r._q || [r.company, r.title, r.location].join(' ').toLowerCase()).includes(state.q));
+    if (!listTab) list = sorted(list);
+    document.querySelectorAll('th.sortable').forEach(th => (!listTab && th.dataset.sort === state.sort) ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
+    $('#count').textContent = list.length + ' of ' + base.length + ' roles';
+    if (!list.length) {
+      const msg = {saved: 'Nothing saved yet. Star a role to keep it here.', applied: 'Nothing marked applied yet.', hidden: 'Nothing hidden. The ✕ on a role sends it here.'}[state.tab] || 'Nothing matches these filters.';
+      $('#rows').innerHTML = `<tr><td colspan="9" class="empty">${msg}</td></tr>`; return;
+    }
     $('#rows').innerHTML = list.map(r => {
-      const open = state.open === r.id;
-      return `<tr class="row" data-id="${esc(r.id)}" tabindex="0" aria-expanded="${open}">
+      const open = !r._closed && state.open === r.id; const st = statusOf(r.url);
+      const dim = state.tab === 'all' && (st === 'hidden');
+      return `<tr class="row${dim ? ' dim' : ''}" data-id="${esc(r.id)}" data-url="${esc(r.url)}" tabindex="0" aria-expanded="${open}">
 <td class="fitco"><span class="fit ${esc(r.fit)}">${esc(r.fit)}</span><span class="co sm-co">${esc(r.company)}</span></td>
 <td class="co">${esc(r.company)}</td>
 <td class="role"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a>${r.location ? `<div class="loc">${esc(r.location)}</div>` : ''}${tagsFor(r)}</td>
 <td class="kvl">${esc(r.discipline || '')}</td>
 <td class="kvl num">${r.salary ? esc(r.salary) : '<span style="color:var(--muted)">—</span>'}</td>
-<td class="kvl date">${esc(fmt(r.date))}<span class="kind mono">${esc(r.dateKind || '')}</span></td>
-<td class="why">${esc(r.why)}</td>
-<td class="chev" aria-hidden="true"></td></tr>` + (open ? `<tr class="detail"><td colspan="8">${detail(r)}</td></tr>` : '');
+<td class="kvl date">${r._closed ? (r.applyBy ? 'by ' + esc(fmt(r.applyBy)) : '') : esc(fmt(r.date))}<span class="kind mono">${esc(r._closed ? '' : (r.dateKind || ''))}</span></td>
+<td class="why">${esc(r.why || '')}</td>
+<td class="acts">${icons(r)}</td>
+<td class="chev" aria-hidden="true"${r._closed ? ' style="visibility:hidden"' : ''}></td></tr>` + (open ? `<tr class="detail"><td colspan="9">${detail(r)}</td></tr>` : '');
     }).join('');
   }
+  function roleFromEl(el) { const tr = el.closest('tr'); if (!tr) return null; const url = tr.dataset.url || (tr.previousElementSibling && tr.previousElementSibling.dataset.url); return byUrl.get(url) || (entry(url) ? snapRole(entry(url)) : null); }
   $('#rows').addEventListener('click', e => {
-    if (e.target.closest('a')) return;
-    const tr = e.target.closest('tr.row'); if (!tr) return;
+    const b = e.target.closest('button[data-act]');
+    if (b) { e.stopPropagation(); const r = roleFromEl(b); if (r) { act(r, b.dataset.act); render(); } return; }
+    if (e.target.closest('a') || e.target.closest('input') || e.target.closest('tr.detail')) return;
+    const tr = e.target.closest('tr.row'); if (!tr || tr.querySelector('.chev[style]')) return;
     state.open = state.open === tr.dataset.id ? null : tr.dataset.id; render();
     if (state.open) { const el = $(`tr.row[data-id="${state.open}"]`); if (el) el.focus({preventScroll: true}); }
   });
   $('#rows').addEventListener('keydown', e => {
+    if (e.target.matches('input[data-note]')) { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } return; }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('row')) { e.preventDefault(); e.target.click(); }
   });
+  $('#rows').addEventListener('change', e => {
+    if (e.target.matches('input[data-note]')) { const r = roleFromEl(e.target); if (r) { setNote(r, e.target.value.trim()); } }
+  });
+
+  // data panel: export / import / clear
+  $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('open'); e.target.setAttribute('aria-expanded', o); });
+  $('#export-btn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(S, null, 1)], {type: 'application/json'}); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'jadar-state.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+  $('#import-file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => { try { const s = JSON.parse(rd.result); if (!s || !s.roles) throw new Error('not a jadar state file'); S = mergeStates(S, s); persist(); render(); setSync('imported'); } catch (err) { alert('Import failed: ' + err.message); } e.target.value = ''; };
+    rd.readAsText(f);
+  });
+  $('#clear-hidden').addEventListener('click', () => {
+    const n = counts().hidden; if (!n) return;
+    if (confirm(`Un-hide ${n} role${n === 1 ? '' : 's'}?`)) { Object.keys(S.roles).forEach(u => { if (S.roles[u].status === 'hidden') { if (S.roles[u].note) { S.roles[u].status = null; S.roles[u].at = new Date().toISOString(); } else delete S.roles[u]; } }); persist(); render(); }
+  });
+
+  // optional sync through a private GitHub repo (token stays in this browser; only api.github.com is contacted)
+  const b64enc = s => { const u = new TextEncoder().encode(s); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
+  const b64dec = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, '')), ch => ch.charCodeAt(0)));
+  function syncCfg() { try { const c = JSON.parse(lsGet(SKEY) || 'null'); return c && c.repo && c.token ? c : null; } catch (e) { return null; } }
+  function setSync(msg) { $('#sync-status').textContent = msg || ''; }
+  function reflectSync() { const c = syncCfg(); $('#sync-connect').style.display = c ? 'none' : ''; $('#sync-disconnect').style.display = c ? '' : 'none'; $('#sync-now').style.display = c ? '' : 'none'; if (c) { $('#sync-repo').value = c.repo; $('#sync-path').value = c.path || 'state.json'; } }
+  const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
+  const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
+  async function ghGet(c) {
+    const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
+    if (r.status === 404) return {state: null, sha: null};
+    if (!r.ok) throw new Error(String(r.status));
+    const j = await r.json(); let st = null; try { st = JSON.parse(b64dec(j.content || '')); } catch (e) { st = null; }
+    return {state: st && st.roles ? st : null, sha: j.sha};
+  }
+  async function ghPut(c, st, sha) {
+    const body = {message: 'jadar state', content: b64enc(JSON.stringify(st, null, 1))}; if (sha) body.sha = sha;
+    const r = await fetch(ghUrl(c), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, ghHeaders(c)), body: JSON.stringify(body)});
+    if (!r.ok) throw new Error(String(r.status));
+  }
+  let syncing = false, pending = false, pushTimer = null;
+  async function syncNow() {
+    const c = syncCfg(); if (!c) return;
+    if (syncing) { pending = true; return; }
+    syncing = true;
+    try {
+      if (navigator.onLine === false) { setSync('offline'); return; }
+      setSync('syncing…');
+      const {state: remote, sha} = await ghGet(c);
+      const before = JSON.stringify(S);
+      const merged = remote ? mergeStates(S, remote) : S;
+      if (JSON.stringify(merged) !== before) { S = merged; lsSet(KEY, JSON.stringify(S)); render(); }
+      if (!remote || JSON.stringify(merged) !== JSON.stringify(remote)) await ghPut(c, merged, sha);
+      const now = new Date(); setSync('synced ' + now.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase());
+    } catch (err) { setSync('sync failed: ' + (err.message || 'error')); }
+    finally { syncing = false; if (pending) { pending = false; syncNow(); } }
+  }
+  function schedulePush() { if (!syncCfg()) return; clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
+  $('#sync-connect').addEventListener('click', () => {
+    const repo = $('#sync-repo').value.trim(), path = $('#sync-path').value.trim() || 'state.json', token = $('#sync-token').value.trim();
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { alert('Repository must look like owner/name'); return; }
+    if (!token) { alert('Paste a fine-grained token for that repo (Contents: read and write)'); return; }
+    if (!lsSet(SKEY, JSON.stringify({repo, path, token}))) { alert('This browser blocks storage; sync cannot be kept.'); return; }
+    $('#sync-token').value = ''; reflectSync(); syncNow();
+  });
+  $('#sync-disconnect').addEventListener('click', () => { lsDel(SKEY); reflectSync(); setSync(''); });
+  $('#sync-now').addEventListener('click', syncNow);
+  window.addEventListener('online', () => { if (syncCfg()) syncNow(); });
+  reflectSync();
 
   // boards
   $('#boards-sum').textContent = `${okN} of ${okN + failN} boards read · ${failN} failing · ${gapN} not covered`;
@@ -359,6 +583,7 @@ footer a { color: var(--ink); }
     return `<tr class="${cls === 'failing' ? 'fail' : cls === 'gap' ? 'gap' : ''}"><td>${esc(o.org)}</td><td class="hide-sm">${esc(o.sector)}</td><td>${esc(o.platform)}</td><td><span class="st ${cls}">${esc(o.status)}</span></td><td class="num">${o.roles == null ? '–' : o.roles}</td><td class="num">${o.fits == null ? '–' : o.fits}</td><td class="note">${esc(o.note || '')}</td></tr>`;
   }).join('');
   render();
+  if (syncCfg()) syncNow();
 })();
 </script>
 </body>

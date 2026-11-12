@@ -48,6 +48,18 @@ class PageTests(unittest.TestCase):
         self.assertTrue(all(r["reqSnippet"] for r in blob["roles"] if r["id"] in ("r0001", "r0002")))
         self.assertNotIn("<script src", html); self.assertNotIn("https://cdn", html)
 
+    def test_per_role_state_ui(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle")
+        for tab in ("Inbox", "Saved", "Applied", "Disliked", "All"): self.assertIn(f'>{tab}<span class="badge mono"', html)
+        self.assertIn("jadar.state.v1", html); self.assertIn("jadar.sync.v1", html)
+        self.assertIn("https://api.github.com/repos/", html); self.assertIn("jadar-state.json", html)
+        for act in ("save", "applied", "hide"): self.assertIn(f'data-act="{act}"', html)
+        self.assertIn('data-note="1"', html); self.assertIn('id="export-btn"', html); self.assertIn('id="import-file"', html); self.assertIn('id="clear-hidden"', html)
+        # nothing secret is baked into the page: no token-like strings, and the sync settings are only ever a storage key name
+        self.assertNotIn("github_pat_", html); self.assertNotIn("ghp_", html)
+        self.assertEqual(html.count("jadar.sync.v1"), 1)
+        self.assertNotIn("api.github.com/repos/TheBurntWaffl3/jadar-state", html, "the sync URL is built at runtime from the browser's own settings")
+
     def test_page_tolerates_old_data_without_extras(self):
         out = json.loads(json.dumps(self.out))
         for r in out["roles"]:
