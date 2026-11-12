@@ -1,0 +1,127 @@
+# Daily job radar. Schedule is UTC: 11:30 UTC = 6:30 AM EST (Nov-Mar) / 7:30 AM EDT (Mar-Nov). Change to "30 10 * * *"
+# for 6:30 EDT if the summer hour matters. GitHub may start scheduled runs a few minutes late.
+name: Job radar
+on:
+  schedule:
+    - cron: "30 11 * * *"
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Re-read every description (ignore the cache)
+        type: boolean
+        default: false
+      only:
+        description: Only these organizations, separated by " | " (blank = all)
+        default: ""
+  push:
+    paths: ["**.py", "sources.json", "profiles/**", ".github/workflows/radar.yml"]
+
+permissions:
+  contents: write   # commit the cache + outputs to the data branch
+  pages: write      # publish site/ to GitHub Pages
+  id-token: write   # required by actions/deploy-pages
+
+concurrency:
+  group: radar
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      scanned: ${{ steps.scan.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tests (fit rules, cache, page)
+        run: python3 -I -m unittest discover -s tests
+
+      - name: Check out the data branch (cache + history)
+        if: github.event_name != 'push'
+        run: |
+          if git fetch --depth 1 origin data; then
+            git worktree add data origin/data
+          else
+            git worktree add --orphan -b data data || { mkdir -p data; }
+          fi
+          ls -la data
+
+      # Only the scheduled run and manual runs scan the boards; a push just runs the tests.
+      - name: Scan job boards
+        id: scan
+        if: github.event_name != 'push'
+        env:
+          RADAR_DATA: data
+          FULL: ${{ inputs.full == true && '1' || '' }}
+        run: |
+          IFS='|' read -ra ONLY <<< "${{ inputs.only }}"
+          ARGS=(); for o in "${ONLY[@]}"; do o="$(echo "$o" | xargs)"; [ -n "$o" ] && ARGS+=("$o"); done
+          timeout 2100 python3 -I scan.py "${ARGS[@]}"
+
+      - name: Build dashboard page
+        if: steps.scan.outcome == 'success'
+        env:
+          RADAR_DATA: data
+          SITE_DIR: site
+        run: |
+          python3 -I build_dash.py
+          python3 -I build_page.py
+          cp site/index.html data/index.html
+
+      - name: Send alert
+        if: steps.scan.outcome == 'success' && inputs.only == ''
+        env:
+          RADAR_DATA: data
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_SERVER: ${{ secrets.NTFY_SERVER }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+          PAGE_URL: ${{ vars.PAGE_URL }}
+        run: python3 -I alert.py
+
+      - name: Commit cache and outputs to the data branch
+        if: steps.scan.outcome == 'success'
+        run: |
+          cd data
+          git add -A
+          git -c user.name="job-radar" -c user.email="job-radar@users.noreply.github.com" \
+            commit -m "Scan $(date -u +%Y-%m-%dT%H:%MZ)" || { echo "nothing changed"; exit 0; }
+          git push origin HEAD:data
+
+      - name: Keep the day's outputs as a run artifact
+        if: steps.scan.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: radar-${{ github.run_number }}
+          path: |
+            data/radar_out.json
+            site/index.html
+          retention-days: 14
+
+      - name: Upload page for GitHub Pages
+        if: steps.scan.outcome == 'success' && inputs.only == ''
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  publish:
+    # Fails harmlessly until Pages is enabled for the repo (Settings > Pages > Source: GitHub Actions;
+    # a private repo needs GitHub Pro, free with the Student Developer Pack).
+    needs: scan
+    if: needs.scan.outputs.scanned == 'success' && inputs.only == ''
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

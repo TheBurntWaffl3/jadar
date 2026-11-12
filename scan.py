@@ -1,13 +1,27 @@
 #!/usr/bin/env python3
-"""Kevin's Job Radar scanner. Read-only; fixed host allowlist from sources.json; robots.txt honored for HTML pages."""
-import json, re, sys, time, html, collections, urllib.request, urllib.parse, urllib.robotparser, datetime as dt
+"""Job Radar scanner. Read-only; fixed host allowlist from sources.json; robots.txt honored for HTML pages.
+
+Usage: python3 -I scan.py [ORG ...]
+Env:   PROFILE=profiles/kevin.json  RADAR_DATA=data (cache dir)  FULL=1 (re-read every description)  MAX_DETAIL=100000
+"""
+import json, re, sys, os, time, html, collections, urllib.request, urllib.parse, urllib.robotparser, datetime as dt
 from concurrent.futures import ThreadPoolExecutor
 
-SRC = json.load(open("sources.json"))
+# Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
+RULES_VERSION = "2026-11-12.1"
+ROOT = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
-try: SEEN = json.load(open("seen.json"))
-except Exception: SEEN = {}
-HAD_STATE = bool(SEEN)
+DATA_DIR = os.environ.get("RADAR_DATA", os.path.join(ROOT, "data"))
+CACHE_FILE = os.path.join(DATA_DIR, "cache.json")
+
+def load_profile(path=None):
+    with open(path or os.environ.get("PROFILE") or os.path.join(ROOT, "profiles", "kevin.json")) as f: p = json.load(f)
+    p["_major"] = re.compile("(?i)" + "|".join(re.escape(m) for m in p["majors"]))
+    p["_gradYear"] = int(p["gradDate"][:4])
+    p["_start"] = dt.date.fromisoformat(p["earliestStart"])
+    return p
+PROFILE = load_profile()
 
 def host_of(u): return (urllib.parse.urlparse(u).hostname or "").lower()
 ALLOWED = set()
@@ -98,7 +112,7 @@ def in_scope(title, generic=False):
 def discipline(t):
     t = t.lower()
     for k, rx in [("Thermal", r"therm|heat"), ("Propulsion", r"propul|rocket|\bengines?\b|combust|turbine"),
-                  ("Structures", r"struct|stress|loads|vibrat|dynamic"), ("Test", r"\btest"), ("Nuclear", r"nuclear|reactor|fusion|plasma|critical|radiat"),
+                  ("Structures", r"(?<!infra)struct|stress|loads|vibrat|dynamic"), ("Test", r"\btest"), ("Nuclear", r"nuclear|reactor|fusion|plasma|critical|radiat"),
                   ("Naval", r"naval|marine|\bship|hull|submarine|vessel"), ("Aero", r"aero|cfd|fluid|flight|hypersonic"),
                   ("Mechanical", r"mechanic|design")]:
         if re.search(rx, t): return k
@@ -116,7 +130,7 @@ NUMW = {"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"
 YRS = re.compile(r"(?<![\d.])(\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*(?:\(\d+\)\s*)?(?:\+|or more|plus)?\s*"
                  r"(?:(?:-|–|to)\s*\d{1,2}\s*)?\+?\s*(?:years?|yrs?)\b(?:[^.\n]{0,80}?)\b(experience|exp\b|industry|engineering|relevant|related|work)", re.I)
 ZERO_EXP = re.compile(r"(no (prior |professional )?experience (is )?required|\b0\s*(\+)?\s*years|new grad|recent grad|entry[- ]level (position|role|engineer)|early[- ]career (position|role|engineer|program))", re.I)
-TITLE_ENTRY = re.compile(r"(?i)(\b2027\b|new ?grad|graduate engineer|early[- ]career|entry[- ]level|university grad|college grad|recent grad|\bassociate\b[\w ,&/-]{0,50}?(engineer|scientist|analyst)|(engineer|scientist|analyst|physicist)[\w ,&/()-]{0,50}?\bassociate\b|engineer (i|1)\b|\blevel (i|1)\b|\b(i|1)\s*$|rotational|development program|\bLDP\b|\bEDP\b)")
+TITLE_ENTRY = re.compile(r"(?i)(new ?grad|graduate engineer|early[- ]career|entry[- ]level|university grad|college grad|recent grad|\bassociate\b[\w ,&/-]{0,50}?(engineer|scientist|analyst)|(engineer|scientist|analyst|physicist)[\w ,&/()-]{0,50}?\bassociate\b|engineer (i|1)\b|\blevel (i|1)\b|\b(i|1)\s*$|rotational|development program|\bLDP\b|\bEDP\b)")
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
 
 def requirements(text):
@@ -207,58 +221,65 @@ def requirements(text):
             apply_by = d; break
     g = re.search(r"(?i)\bgpa\b[^.\n]{0,30}?\b([23]\.\d{1,2})\b|\b([23]\.\d{1,2})\s*(?:/\s*4\.0\s*)?(?:or (?:higher|better|above)\s*)?(?:cumulative\s*)?(?:gpa|grade point)", req)
     gpa = (g.group(1) or g.group(2)) if g else None
-    return dict(minYears=min_years, schoolExpOk=school_ok, degree=deg, majorReq=major_req(req), gpaReq=gpa, startWindow=start_win, applyBy=apply_by, gradReq=grad, startReq=start, clearance=clr, citizenship=cit)
+    return dict(minYears=min_years, schoolExpOk=school_ok, degree=deg, majorSentence=major_sentence(req), gpaReq=gpa, startWindow=start_win, applyBy=apply_by, gradReq=grad, startReq=start, clearance=clr, citizenship=cit)
 
-KEVIN_MAJOR = re.compile(r"(?i)aerospace|aeronautic|astronautic|mechanical|engineering mechanics")
-OTHER_MAJOR = re.compile(r"(?i)(nuclear|electrical|electronics?|computer|chemical|civil|structural|materials?|industrial|systems|software|"
+OTHER_MAJOR = re.compile(r"(?i)(aerospace|aeronautical|astronautical|mechanical|engineering mechanics|nuclear|electrical|electronics?|computer|chemical|civil|structural|materials?|industrial|systems|software|"
     r"manufacturing|biomedical|environmental|petroleum|mining|ocean|naval architecture|marine|radiation health|health)\s*(engineering|science|physics)?|"
     r"physics|chemistry|mathematics|math\b|computer science|naval architecture|accounting|finance|business")
-def major_req(req):
+def major_sentence(req):
+    """The bachelor's-degree sentence (profile-independent; cached) that major_req() judges against a profile."""
     m = re.search(r"(?is)bachelor'?s?[^.\n]{0,220}", req) or re.search(r"(?is)\b(b\.s\.|bs|bsc|bse)\b[^.\n]{0,200}", req)
     if not m: return None
-    sent = m.group(0)
-    sent = re.split(r"(?i)\b(with|and) (a minimum of |at least |minimum )?(\d|one|two|three|four|five)", sent)[0]
-    if KEVIN_MAJOR.search(sent): return None
+    return re.split(r"(?i)\b(with|and) (a minimum of |at least |minimum )?(\d|one|two|three|four|five)", m.group(0))[0]
+
+def major_req(profile, sent):
+    """None = fine for this profile; 'related: ...' = other majors named 'or related'; 'only: ...' = other majors only."""
+    if not sent or profile["_major"].search(sent): return None
     named = sorted({re.sub(r"\s+", " ", x.group(0).strip().lower()) for x in OTHER_MAJOR.finditer(sent)})
     rest = OTHER_MAJOR.sub(" ", sent)
-    if re.search(r"(?i)\bengineering\b|\bstem\b|technical (field|discipline|degree)", rest): return None
+    if profile.get("anyEngineeringOk", True) and re.search(r"(?i)\bengineering\b|\bstem\b|technical (field|discipline|degree)", rest): return None
     if not named: return None
     if re.search(r"(?i)related|equivalent|similar|other (technical|science|engineering)", sent): return "related: " + ", ".join(named)
     return "only: " + ", ".join(named)
 
-def fit_2027(r, title):
-    f, why = _fit(r, title)
+def fit(profile, r, title):
+    """Judge extracted facts `r` (from requirements()) plus the title for a profile -> (fit, why).
+    fit is 'Yes' / 'Maybe' / 'No'. `r['majorReq']` is filled in here if missing."""
+    if "majorReq" not in r: r["majorReq"] = major_req(profile, r.get("majorSentence"))
+    f, why = _fit(profile, r, title)
     if r.get("gpaReq") and f != "No": why += f"; min GPA {r['gpaReq']}"
     if r.get("applyBy") and f != "No": why += f"; apply by {r['applyBy']}"
     sw = r.get("startWindow")
     if sw and f != "No":
         days = int(re.search(r"\d+", sw).group(0))
-        when = (dt.date(2027, 6, 1) - dt.timedelta(days=days))
+        when = profile["_start"] - dt.timedelta(days=days)
         if TODAY < when:
             return "Maybe", f"{why}; {sw} - apply after {when.strftime('%b %-d, %Y')}"
     mj = r.get("majorReq") or ""
     if f == "Yes" and mj.startswith("related:"): return "Maybe", f"{why}; major not named ({mj[9:][:30]} or related)"
     return f, why
 
-def _fit(r, title):
-    y = r["minYears"]; entry = bool(TITLE_ENTRY.search(title))
-    senior = bool(re.search(r"(?i)\b(senior|sr\.?|lead|iii|iv|v|level [3-9])\b|\b[3-9]\s*$", title)) and not re.search(r"(?i)\b2027\b", title)
-    if r["degree"] in ("MS", "PhD"): return "No", f"{r['degree']} required"
+def _fit(profile, r, title):
+    gy = profile["_gradYear"]; prev = str(gy - 1)
+    y = r["minYears"]; entry = bool(TITLE_ENTRY.search(title)) or bool(re.search(rf"\b{gy}\b", title))
+    senior = bool(re.search(r"(?i)\b(senior|sr\.?|lead|iii|iv|v|level [3-9])\b|\b[3-9]\s*$", title)) and not re.search(rf"\b{gy}\b", title)
+    if r["degree"] in ("MS", "PhD") and r["degree"] != profile.get("degree"): return "No", f"{r['degree']} required"
     mj = r.get("majorReq") or ""
     if mj.startswith("only:"): return "No", "degree must be " + mj[6:][:40]
-    if r["clearance"] and "active req" in r["clearance"]: return "No", "active clearance required"
+    if r["clearance"] and "active req" in r["clearance"] and not (profile.get("clearance") or {}).get("active"): return "No", "active clearance required"
+    if r.get("citizenship") and profile.get("citizenship", "US") != "US": return "No", r["citizenship"] + " required"
     for k in ("gradReq", "startReq"):
         s = r.get(k) or ""
         yrs = [int(x) for x in re.findall(r"20\d\d", s)]
-        if yrs and max(yrs) < 2027 and not re.search(r"(?i)between|through|or later|or after", s):
+        if yrs and max(yrs) < gy and not re.search(r"(?i)between|through|or later|or after", s):
             return "No", ("grad window ends " if k == "gradReq" else "start ") + str(max(yrs))
-    strong = bool(re.search(r"(?i)\b2027\b|new ?grad|early[- ]career|entry[- ]level|recent grad|university grad|college grad|rotational|development program", title))
+    strong = bool(re.search(rf"(?i)\b{gy}\b|new ?grad|early[- ]career|entry[- ]level|recent grad|university grad|college grad|rotational|development program", title))
     if y is not None and y >= 2:
         if r.get("schoolExpOk") and y <= 3: return "Maybe", f"{y}+ yrs, but school/internship exp counts"
         if strong and y <= 3: return "Maybe", f"new-grad title but {y}+ yrs listed"
         return "No", f"{y}+ yrs required"
-    if re.search(r"\b2026\b", title) and not re.search(r"\b2027\b|'27", title): return "Maybe", "2026 new-grad cycle - check grad window"
-    note = "2027 grads named" if re.search(r"2027", (r.get("gradReq") or "") + (r.get("startReq") or "") + title) else ""
+    if re.search(rf"\b{prev}\b", title) and not re.search(rf"\b{gy}\b|'{str(gy)[2:]}", title): return "Maybe", f"{prev} new-grad cycle - check grad window"
+    note = f"{gy} grads named" if re.search(str(gy), (r.get("gradReq") or "") + (r.get("startReq") or "") + title) else ""
     if senior and not strong: return "No", "senior title"
     if entry: return "Yes", note or "new-grad / entry title"
     if y == 0: return "Yes", note or ("school/internship exp counts" if r.get("schoolExpOk") else "0 yrs required")
@@ -470,8 +491,13 @@ def a_sitemap(s):
 
 ADAPT = dict(paylocity=a_paylocity, htmllist=a_htmllist, pinpoint=a_pinpoint, bamboo=a_bamboo, rmk=a_rmk, eightfold=a_eightfold, rippling=a_rippling, oracle=a_oracle, apl=a_apl, greenhouse=a_greenhouse, lever=a_lever, ashby=a_ashby, smartrecruiters=a_smartrecruiters, workday=a_workday, sitemap=a_sitemap)
 
-import os
 MAX_DETAIL = int(os.environ.get("MAX_DETAIL", "100000"))
+FACT_KEYS = ("minYears", "schoolExpOk", "degree", "majorSentence", "gpaReq", "startWindow", "applyBy", "gradReq", "startReq", "clearance", "citizenship")
+DESC_FIELD = re.compile(r"(?i)(thermal|structur|stress|propuls|aerodynam|aerospace|mechanical engineer|nuclear|reactor|naval|marine|hull|test engineer|fluid|heat transfer)")
+
+def needs_fetch(row):
+    """True if the description is not already in hand (an extra request per posting)."""
+    return callable(row.get("desc")) or any(row.get(k) for k in ("wd", "bamboo", "rip", "page"))
 
 def enrich(s, row):
     if row.get("wd"):
@@ -515,41 +541,95 @@ def enrich(s, row):
     row["desc"] = d() if callable(d) else (d or "")
     return row
 
-def run_source(s):
-    t0 = time.time(); rows = []; err = None; total = 0; detailed = 0
+def load_cache():
+    """{'rulesVersion', 'lastFullRead', 'postings': {url: entry}}. An entry holds the facts extracted from one posting's
+    description (never the description itself), its list data, and firstSeen/lastSeen dates."""
+    try:
+        with open(CACHE_FILE) as f: c = json.load(f)
+    except Exception: c = {}
+    c.setdefault("postings", {}); c.setdefault("rulesVersion", None); c.setdefault("lastFullRead", None)
+    if not c["postings"]:  # one-time import of the old seen.json (first-seen dates) if it is around
+        try:
+            with open(os.path.join(DATA_DIR, "seen.json")) as f: seen = json.load(f)
+            for u, first in seen.items():
+                c["postings"][u] = dict(firstSeen=first, lastSeen=first, legacy=True)
+        except Exception: pass
+    return c
+
+def full_read_due(cache, force=False):
+    if force or os.environ.get("FULL") == "1": return "forced"
+    if cache.get("rulesVersion") != RULES_VERSION: return f"rules {cache.get('rulesVersion')} -> {RULES_VERSION}"
+    if TODAY.weekday() == 6: return "weekly (Sunday)"
+    return None
+
+def run_source(s, cache=None, full=False, profile=PROFILE):
+    """Read one organization's board. Returns (source, rows, status, entries) where entries are the cache entries
+    (keyed by URL) for every in-scope posting listed this run."""
+    cache = cache if cache is not None else {}
+    t0 = time.time(); rows = []; err = None; total = 0; detailed = 0; reused = 0; entries = {}
     try:
         for row in ADAPT[s["type"]](s):
             total += 1
             title_for_scope = row.get("title") or row.get("slug") or ""
             if not in_scope(title_for_scope, s.get("generic")): continue
             u = row["url"]
-            if detailed >= MAX_DETAIL: continue
-            try:
-                row = enrich(s, row); detailed += 1
-            except Exception as e:
-                row.setdefault("desc", ""); row["detail_err"] = str(e)[:80]
-            if not row.get("title") or not in_scope(row["title"], s.get("generic")): continue
-            if NON_US.search(row.get("location") or "") and not US_HINT.search(row.get("location") or ""): continue
-            if s.get("generic") and not FIELD.search(row["title"]) and not re.search(r"(?i)(thermal|structur|stress|propuls|aerodynam|aerospace|mechanical engineer|nuclear|reactor|naval|marine|hull|test engineer|fluid|heat transfer)", (row.get("desc") or "")[:4000]):
-                continue
-            rq = requirements(row.get("desc", ""))
-            fit, why = fit_2027(rq, row["title"])
-            row["title"] = re.sub(r"(?i)\s*job details\s*$", "", row["title"]).strip()
-            rows.append(dict(company=s["org"], sector=s["sector"], title=row["title"].strip(), location=(row.get("location") or "").strip(),
-                             url=u, date=row.get("date"), dateKind=row.get("dateKind"), discipline=discipline(row["title"]),
-                             **rq, fit=fit, why=why, desc_ok=bool(row.get("desc"))))
-    except Exception as e:
-        err = f"{type(e).__name__}: {e}"[:200]
-    return s, rows, dict(org=s["org"], type=s["type"], ok=err is None, total=total, matches=len(rows), error=err, secs=round(time.time()-t0))
+            c = cache.get(u)
+            if c and not full and c.get("facts") and needs_fetch(row) and c.get("company") == s["org"]:
+                # Facts already extracted from this posting: reuse them, refresh list-level fields, skip the detail fetch.
+                e = dict(c); e["title"] = row.get("title") or c.get("title") or ""
+                e["location"] = row.get("location") or c.get("location") or ""
+                if row.get("date"): e["date"], e["dateKind"] = row["date"], row.get("dateKind")
+                reused += 1
+            else:
+                if detailed >= MAX_DETAIL: continue
+                try:
+                    row = enrich(s, row); detailed += 1
+                except Exception as ex:
+                    row.setdefault("desc", ""); row["detail_err"] = str(ex)[:80]
+                if not row.get("title"): continue
+                desc = row.get("desc") or ""
+                e = dict(title=row["title"], location=row.get("location") or "", date=row.get("date"), dateKind=row.get("dateKind"),
+                         desc_ok=bool(desc), detail_err=row.get("detail_err"), fieldInDesc=bool(DESC_FIELD.search(desc[:4000])),
+                         facts=requirements(desc), firstSeen=(c or {}).get("firstSeen"))
+            e.update(company=s["org"], sector=s["sector"], url=u, lastSeen=TODAY.isoformat()); e.pop("legacy", None)
+            e["title"] = re.sub(r"(?i)\s*job details\s*$", "", e["title"]).strip()
+            entries[u] = e
+            if not in_scope(e["title"], s.get("generic")): continue
+            if NON_US.search(e["location"]) and not US_HINT.search(e["location"]): continue
+            if s.get("generic") and not FIELD.search(e["title"]) and not e.get("fieldInDesc"): continue
+            disc = discipline(e["title"])
+            if profile.get("fields") and disc != "Other" and disc not in profile["fields"]: continue
+            rq = dict(e["facts"])
+            if rq.get("applyBy") and rq["applyBy"] < TODAY.isoformat(): rq["applyBy"] = None  # deadline passed, posting still up
+            f, why = fit(profile, rq, e["title"])
+            rows.append(dict(company=s["org"], sector=s["sector"], title=e["title"], location=e["location"].strip(), url=u,
+                             date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why,
+                             desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen")))
+    except Exception as ex:
+        err = f"{type(ex).__name__}: {ex}"[:200]
+    st = dict(org=s["org"], type=s["type"], ok=err is None, total=total, matches=len(rows), fetched=detailed, cached=reused, error=err, secs=round(time.time() - t0))
+    return s, rows, st, entries
 
-def main():
-    only = set(sys.argv[1:])
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    only = set(a for a in argv if not a.startswith("--"))
     srcs = [s for s in SRC if not only or s["org"] in only]
+    cache = load_cache()
+    had_state = bool(cache["postings"])  # first ever run: nothing is "new", just unknown
+    full = full_read_due(cache, force="--full" in argv)
+    print(f"profile {PROFILE['slug']}; rules {RULES_VERSION}; cache {len(cache['postings'])} postings; "
+          f"{'FULL re-read: ' + full if full else 'incremental'}")
     roles, status = [], []
     with ThreadPoolExecutor(32) as ex:
-        for s, rows, st in ex.map(run_source, srcs):
+        for s, rows, st, entries in ex.map(lambda s: run_source(s, cache["postings"], bool(full)), srcs):
             status.append(st); roles += rows
+            if st["ok"]:  # the board answered: postings it no longer lists are closed
+                for u in [u for u, e in cache["postings"].items() if e.get("company") == s["org"] and u not in entries]:
+                    del cache["postings"][u]
+            cache["postings"].update(entries)
     now = TODAY.isoformat()
+    stale = (TODAY - dt.timedelta(days=60)).isoformat()
+    for u in [u for u, e in cache["postings"].items() if (e.get("lastSeen") or "") < stale]: del cache["postings"][u]
     recent = {now, (TODAY - dt.timedelta(days=1)).isoformat(), (TODAY - dt.timedelta(days=2)).isoformat()}
     for st in status:
         mine = [r for r in roles if r["company"] == st["org"] and r.get("dateKind") == "posted"]
@@ -569,11 +649,12 @@ def main():
             st["refreshes"] = True
             for r in mine: r["dateKind"] = "refreshed"
     for r in roles:
-        first = SEEN.setdefault(r["url"], now)
-        r["firstSeen"] = first
+        e = cache["postings"].get(r["url"]) or {}
+        first = e.get("firstSeen") or now
+        e["firstSeen"] = r["firstSeen"] = first
         if not r.get("date"):
             r["date"], r["dateKind"] = first, "first seen"
-        r.pop("desc", None)
+        r.pop("majorSentence", None)
     fitrank = {"Yes": 0, "Maybe": 1, "No": 2}
     roles.sort(key=lambda r: (fitrank.get(r["fit"], 3), r["date"] or ""), reverse=False)
     roles.sort(key=lambda r: r["date"] or "", reverse=True)
@@ -581,15 +662,20 @@ def main():
     for i, r in enumerate(roles): r["id"] = f"r{i+1:04d}"
     yday = (TODAY - dt.timedelta(days=1)).isoformat()
     new = [r for r in roles if r["fit"] != "No" and ((r["dateKind"] == "posted" and r["date"] in (now, yday)) or
-           (r["dateKind"] in ("first seen", "refreshed") and r["firstSeen"] == now and HAD_STATE))]
-    json.dump(dict(scanned=dt.datetime.now(dt.timezone.utc).isoformat(), roles=roles, new=new, status=status),
-              open("radar_out.json", "w"), indent=1)
-    cutoff = (TODAY - dt.timedelta(days=150)).isoformat()
-    keep = {r["url"]: r["firstSeen"] for r in roles if r["dateKind"] in ("first seen", "refreshed") and r["firstSeen"] >= cutoff}
-    json.dump(keep, open("seen.json", "w"), separators=(",", ":"))
+           (r["dateKind"] in ("first seen", "refreshed") and r["firstSeen"] == now and had_state))]
+    if not only:  # a partial run (ORG args) must not count as a full read
+        cache["rulesVersion"] = RULES_VERSION
+        if full: cache["lastFullRead"] = now
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(os.path.join(DATA_DIR, "radar_out.json"), "w") as f:
+        json.dump(dict(scanned=dt.datetime.now(dt.timezone.utc).isoformat(), profile=PROFILE["slug"], rulesVersion=RULES_VERSION,
+                       fullRead=full or None, roles=roles, new=new, status=status), f, indent=1)
+    with open(CACHE_FILE, "w") as f:
+        json.dump(cache, f, separators=(",", ":"))
     ok = sum(s["ok"] for s in status)
     print(f"{len(roles)} in-field roles ({sum(r['fit']=='Yes' for r in roles)} Yes, {sum(r['fit']=='Maybe' for r in roles)} Maybe), "
-          f"{len(new)} new, {ok}/{len(status)} sources OK")
+          f"{len(new)} new, {ok}/{len(status)} sources OK, {sum(s['fetched'] for s in status)} descriptions fetched, "
+          f"{sum(s['cached'] for s in status)} reused from cache")
     for s in status:
         if not s["ok"]: print("FAIL", s["org"], s["error"])
 

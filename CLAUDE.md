@@ -2,22 +2,32 @@
 
 Daily scan of ~115 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval. US citizen; no active clearance (can obtain one).
 
-## Current state (as of 2026-11-11)
+## Current state (as of 2026-11-12)
 
-- **Production today is NOT this repo.** A Claude scheduled task ("Job radar daily scan", 6:42 AM ET daily) carries a copy of `scan.py`, `sources.json` and `build_dash.py` *inside its prompt*, writes them out, checks SHA-256 hashes, runs the scan, updates a Claude artifact dashboard and pushes a phone alert. The prompt is capped at 60 KB and is at ~59.5 KB, so it can't grow.
-- This repo mirrors that code exactly (same hashes). Keep it that way until the move below is done.
-- Why the code isn't fetched from here today: unattended Claude scheduled runs can't get GitHub access to a private repo (the access request needs a human approval), so they stall.
-
-## Goal: move Kevin's personal radar to GitHub (build this in Claude Code)
-
-Friends' versions are **on hold**; design so a second profile is easy later, but build only Kevin's.
-
-1. **Profile file.** Move everything Kevin-specific out of `scan.py` into `profiles/kevin.json`: degree (BS), accepted majors (aerospace, aeronautical, astronautical, mechanical, engineering mechanics; plus "any engineering"), grad date 2027-05, earliest start 2027-06-01, fields, citizenship (US), clearance (none active, willing to obtain), US-only locations. `fit_2027()` becomes `fit(profile, facts)`.
-2. **GitHub Actions workflow** (`.github/workflows/radar.yml`): cron daily ~6:30 AM ET (cron is UTC: `30 11 * * *` in EST, `30 10 * * *` in EDT; pick one and note it), plus `workflow_dispatch`. Python 3.11+, stdlib only. Timeout 40 min.
-3. **Incremental cache.** Store per-posting extracted facts (not full descriptions) keyed by URL on a `data` branch (or Actions cache; prefer the branch so history is kept). Each run: read every board's *list* (cheap), fetch full descriptions only for URLs not in the cache, re-judge everything with current rules, drop closed postings, refresh dates/deadlines. Force a full re-read when `RULES_VERSION` (a constant in scan.py) changes, and weekly (e.g. Sundays). Keep `firstSeen` dates in the cache (replaces the `seen.json` / `radar/state` mechanism).
-4. **Output page.** Generate a static `index.html` (single file, inline CSS/JS, data embedded or as `roles.json`) with the same content as today's dashboard: tiles (Yes / Maybe / fits posted in last 7 days / fits closing in 14 days / roles read / orgs read); a roles table (Fit, Company, Role+link+location, Field, Min yrs, Clearance, Citizenship, Date + date-kind label, Apply by with "closes in N days" when <=10, Why); filters (Yes+Maybe / Yes / All; sector; discipline; posted 7/30 days; search); an organizations table (platform, status, roles, fits, notes incl. the not-covered list). Publish with GitHub Pages. Private-repo Pages needs GitHub Pro (free via the GitHub Student Developer Pack with Kevin's UMD email); if that's not available, ask Kevin before choosing an alternative.
-5. **Alerts.** Kevin hasn't chosen email vs. a phone notification app (e.g. ntfy). Ask. Credentials go in GitHub Actions secrets, never in the repo. Alert content: new Yes/Maybe fits posted today/yesterday (Yes first, max 8, "Company: Title (Location) - fit, why" + link), feeds OK x/y with failing feeds named, a "Closing soon" line for fits with applyBy within 7 days, the page link.
-6. **Parity, then switch.** Run both systems for ~3 days; compare Yes/Maybe sets. When they match (or differences are explained improvements), tell Kevin so he can disable the Claude scheduled task. Don't disable it yourself.
+- **Production today is still the Claude scheduled task** ("Job radar daily scan", 6:42 AM ET daily). It carries its own copy
+  of the *original* `scan.py` / `sources.json` / `build_dash.py` inside its prompt (hash-checked, ~59.5 KB of a 60 KB cap).
+  Those originals are commit `3b3dbfb` on `main`; `main` stays that mirror until the GitHub version is proven.
+- Why the task can't fetch code from here: unattended Claude scheduled runs can't get GitHub access to a private repo.
+- **The GitHub version lives on branch `claude/jadar-github-migration-kn6jkk`** (see README.md for how a run works):
+  1. Profile file: done. `profiles/kevin.json`; `requirements()` extracts profile-independent facts (incl. the bachelor's
+     sentence), `fit(profile, facts, title)` judges them, `major_req(profile, sentence)` applies the major rule.
+  2. Workflow: done. `.github/workflows/radar.yml`, cron `30 11 * * *` UTC (6:30 EST / 7:30 EDT), `workflow_dispatch`
+     with `full` and `only` inputs, tests first, 40-min timeout. A push only runs the tests.
+  3. Incremental cache: done. `data/cache.json` on the `data` branch (facts per URL, firstSeen/lastSeen; never descriptions).
+     Full re-read on Sundays, when `RULES_VERSION` changes, or `--full` / the `full` input. Replaces `seen.json`
+     (imported once if present in the data dir). Tests: `tests/test_cache.py`.
+  4. Page: done. `build_page.py` -> `site/index.html`, published by the `publish` job (fails harmlessly until Pages is
+     enabled; also committed to the `data` branch and attached to each run). Pages on a private repo needs GitHub Pro
+     (Student Developer Pack). **Kevin: enable Settings > Pages > Source "GitHub Actions" once Pro is active.**
+  5. Alerts: built for both channels (`alert.py`); **Kevin picks** by adding either `NTFY_TOPIC` or the `SMTP_*`/`ALERT_TO`
+     secrets (README). Until then the alert is only printed in the run log.
+  6. Parity: not started. Run both for ~3 days, compare with `tools/compare.py` (Claude dashboard data vs
+     `data/radar_out.json`); then tell Kevin so he can disable the Claude task. Don't disable it yourself.
+- Tests: `python3 -I -m unittest discover -s tests` (fit rules, cache, page). Keep them passing; add a case for every bug.
+- Behavior differences from the original, on purpose: cached facts mean a posting's description is read once (and weekly),
+  so a deadline that appears in the text later shows up by the next Sunday; `discipline()` no longer labels
+  "...Infrastructure" titles as Structures; `OTHER_MAJOR` now also lists Kevin's own majors (no effect on Kevin, needed for
+  friend profiles); a passed `applyBy` is cleared instead of shown.
 
 ## Hard rules (Kevin's safeguards; keep them)
 
@@ -37,7 +47,7 @@ Friends' versions are **on hold**; design so a second profile is easy later, but
 
 ## Fit rules (each exists because of a real bug; keep the regression cases)
 
-`requirements()` extracts facts from the full description; `fit_2027()`/`_fit()` judge them.
+`requirements()` extracts facts from the full description; `fit(profile, facts, title)`/`_fit()` judge them (`tests/test_fit.py` covers every case below).
 - Text normalization: curly apostrophes; "U.S." -> "US" (periods ended sentences early); "two (2) years" -> "two years"; "(2+) years" -> "2+ years".
 - Minimums only: cut at a real "Preferred/Desired/Nice to have/Bonus/Plusses" heading line, never at "Additional ..." headings.
 - Years: stated years >= 2 beat entry-sounding titles ("Engineer I"). Tiered postings ("Level I: 0 yrs / Level II: 2 yrs") use the entry tier; otherwise the max of listed minimums. Skip experience that only applies to no-degree paths ("in lieu of a degree", "Associate's degree with five years", high school/GED). Do NOT skip "or an equivalent combination of education and experience" (Boeing "3+ years ... or equivalent combination" is a real 3-year minimum).
@@ -50,7 +60,7 @@ Friends' versions are **on hold**; design so a second profile is easy later, but
 - Titles: "Associate, Instrumentation and Controls ... Engineer" and "Nuclear Engineer (Associate)" are entry-level.
 - Out of field (dropped): security analyst, health and safety, full-stack, site reliability, IT infrastructure, communication systems, cable harness, etc. Keep: "Mechanical Engineer - Cable Magnets", "Nuclear Safety Analyst", "Flight Safety Analyst", "Fluid Systems Engineer, Starlink Infrastructure".
 
-First build task in Claude Code: turn the cases above into `tests/test_fit.py` and keep it passing.
+`tests/test_fit.py` holds these as regression tests (36 tests). Keep it passing.
 
 ## Organizations not covered yet (and why)
 

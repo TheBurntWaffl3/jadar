@@ -1,0 +1,8 @@
+# run outputs live on the `data` branch, not here
+data/
+site/
+seen.json
+radar_out.json
+roles.json
+orgs.json
+__pycache__/

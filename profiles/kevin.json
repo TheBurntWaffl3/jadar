@@ -1,0 +1,13 @@
+{
+  "name": "Kevin Kyle",
+  "slug": "kevin",
+  "degree": "BS",
+  "majors": ["aerospace", "aeronautic", "astronautic", "mechanical", "engineering mechanics"],
+  "anyEngineeringOk": true,
+  "gradDate": "2027-05",
+  "earliestStart": "2027-06-01",
+  "fields": ["Thermal", "Propulsion", "Structures", "Test", "Nuclear", "Naval", "Aero", "Mechanical"],
+  "citizenship": "US",
+  "clearance": {"active": null, "willingToObtain": true},
+  "locations": "US"
+}

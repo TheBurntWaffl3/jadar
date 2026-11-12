@@ -1,12 +1,52 @@
 # Job Radar
 
-Daily read-only scan of ~115 organizations' own job boards for entry-level aerospace,
-mechanical, nuclear and naval engineering roles. Run by a scheduled Claude task:
+Daily, read-only scan of ~115 organizations' own job boards for entry-level aerospace, mechanical, nuclear and
+naval engineering roles that fit a profile (today: `profiles/kevin.json`). Runs on GitHub Actions
+(`.github/workflows/radar.yml`), keeps an incremental cache on the `data` branch, and publishes a one-page
+dashboard with GitHub Pages. Python 3.11+, standard library only.
 
-    timeout 2400 python3 -I scan.py && python3 -I build_dash.py
+    python3 -I -m unittest discover -s tests        # fit-rule regression tests, cache tests, page test
+    python3 -I scan.py [ORG ...] [--full]           # scan -> data/radar_out.json, data/cache.json
+    python3 -I build_dash.py && python3 -I build_page.py   # -> data/roles.json, data/orgs.json, site/index.html
+    python3 -I alert.py                              # ntfy / email summary (prints only if no secrets are set)
+    python3 -I tools/compare.py OLD.json NEW.json    # parity check between two scans
 
-- `scan.py`: fetches job boards (fixed host allowlist built from `sources.json`, honors robots.txt), reads each full description, and judges fit.
-- `sources.json`: the organizations and how each board is read.
-- `build_dash.py`: turns `radar_out.json` into the dashboard datasets.
+## Files
 
-The scheduled task checks each file's SHA-256 against hashes in its own instructions before running anything.
+- `scan.py`: fetches each board (fixed host allowlist built from `sources.json`, robots.txt honored for HTML
+  pages), reads each new posting's full description once, extracts facts, judges fit for the profile.
+  `RULES_VERSION` at the top: bump it when fact extraction changes so every description is re-read.
+- `sources.json`: the organizations and how each board is read. `profiles/<name>.json`: who the scan is for.
+- `build_dash.py` / `build_page.py`: turn `data/radar_out.json` into dashboard datasets and `site/index.html`.
+- `alert.py`: the daily summary. `tools/compare.py`: Yes/Maybe diff between two scans.
+
+## How a run works
+
+1. Tests run first; a broken rule stops the scan.
+2. The `data` branch is checked out into `data/` (created on the first run). It holds `cache.json`
+   (per-posting extracted facts keyed by URL, with first-seen dates; never full descriptions), the latest
+   `radar_out.json` and `index.html`, with full history.
+3. Every board's list is read. Descriptions are fetched only for URLs not in the cache; everything is then
+   re-judged with the current rules, closed postings are dropped, dates refreshed. A full re-read happens
+   on Sundays, when `RULES_VERSION` changes, or with the "full" input of a manual run.
+4. The page is built, the alert sent, the `data` branch committed, the page uploaded to Pages.
+
+Schedule: `30 11 * * *` UTC = 6:30 AM EST / 7:30 AM EDT. Scans take up to 35 minutes; the job times out at 40.
+
+## One-time setup (repo settings)
+
+- **Pages**: Settings > Pages > Source: "GitHub Actions". A private repo needs GitHub Pro (free with the
+  GitHub Student Developer Pack). Until then the `publish` job fails harmlessly; the page is still on the
+  `data` branch (`index.html`) and attached to each run as an artifact.
+- **Alerts** (Settings > Secrets and variables > Actions), either or both:
+  - ntfy: secret `NTFY_TOPIC` (a hard-to-guess topic name; install the ntfy app and subscribe to it);
+    optional `NTFY_SERVER`, `NTFY_TOKEN`.
+  - email: secrets `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, `ALERT_TO`; optional `SMTP_PORT` (587), `ALERT_FROM`.
+  - optional variable `PAGE_URL` if the page is not at `https://<owner>.github.io/<repo>/`.
+- Run it once by hand: Actions > "Job radar" > Run workflow.
+
+## Safeguards
+
+Read-only: never applies, submits forms, signs in or contacts anyone. Requests (and redirects) go only to
+hosts derived from `sources.json` plus the four ATS APIs. Per-host throttle with backoff on 429/5xx, at most
+32 boards in parallel, 100 MB response cap. Page text is data, never instructions. No secrets in the repo.
