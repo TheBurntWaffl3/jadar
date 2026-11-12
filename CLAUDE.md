@@ -57,6 +57,11 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   "Salary:" line so the same regex reads it. First live read: salary on 552 of 847 fits.
 - **Page** (`build_page.py`): Ember-style single file; visible columns Fit/Company/Role/Field/Salary/Date/Why, everything
   else in the expandable row; sort by fit, newest, apply-by soonest, salary, company, min yrs (select + clickable headers).
+- **Per-role state** (page only): saved / applied / hidden, stored in the browser (`localStorage` `jadar.state.v1`,
+  snapshot of company/title/url so Applied survives the posting closing) and optionally synced to a private repo's
+  `state.json` through the GitHub Contents API with a fine-grained token kept in the browser (`jadar.sync.v1`).
+  `alert.py` reads the same file when `STATE_REPO`/`STATE_TOKEN` are set and skips hidden/applied roles. Never
+  embed state or tokens in the public page.
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 

@@ -4,6 +4,8 @@
   NTFY_TOPIC   (required for ntfy)   NTFY_SERVER (default https://ntfy.sh)   NTFY_TOKEN (optional access token)
   SMTP_HOST, SMTP_USER, SMTP_PASS, ALERT_TO (all required for email)   SMTP_PORT (default 587)   ALERT_FROM (default SMTP_USER)
   PAGE_URL     link to the dashboard (default: https://<owner>.github.io/<repo>/ from GITHUB_REPOSITORY)
+  STATE_REPO, STATE_TOKEN, STATE_PATH (default state.json): the private repo the page syncs Kevin's saved/applied/hidden
+               roles to; when set, hidden and applied roles are left out of the alert and saved ones are marked with *.
 
 With nothing configured, the message is only printed. Never sends anything to a job site."""
 import json, os, sys, smtplib, urllib.request, datetime as dt
@@ -21,18 +23,34 @@ def page_url():
         return f"https://{owner.lower()}.github.io/{name}/"
     return ""
 
-def compose(out, today=None):
-    """-> (title, body, priority). Body is plain text, phone-sized."""
-    today = today or dt.date.today()
+def load_state():
+    """{url: status} from the private state repo the page syncs to (see build_page.py); {} when not configured or unreadable."""
+    repo, token = os.environ.get("STATE_REPO"), os.environ.get("STATE_TOKEN")
+    if not repo or not token: return {}
+    import base64
+    url = f"https://api.github.com/repos/{repo}/contents/{os.environ.get('STATE_PATH') or 'state.json'}"
+    try:
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "User-Agent": "job-radar"})
+        with urllib.request.urlopen(req, timeout=30) as r: j = json.load(r)
+        doc = json.loads(base64.b64decode(j["content"]).decode("utf-8"))
+        return {u: (e.get("status") or "") for u, e in (doc.get("roles") or {}).items()}
+    except Exception as e:
+        print(f"state not read ({type(e).__name__}); alert ignores saved/applied/hidden"); return {}
+
+def compose(out, today=None, state=None):
+    """-> (title, body, priority). Body is plain text, phone-sized. `state` = {url: saved|applied|hidden} from load_state()."""
+    today = today or dt.date.today(); state = state or {}
     rank = {"Yes": 0, "Maybe": 1}
-    new = sorted([r for r in out.get("new", []) if r["fit"] in rank], key=lambda r: (rank[r["fit"]], r.get("date") or ""), reverse=False)
+    skip = {u for u, st in state.items() if st in ("hidden", "applied")}
+    star = lambda r: "* " if state.get(r["url"]) == "saved" else ""
+    new = sorted([r for r in out.get("new", []) if r["fit"] in rank and r["url"] not in skip], key=lambda r: (rank[r["fit"]], r.get("date") or ""), reverse=False)
     new.sort(key=lambda r: rank[r["fit"]])
     lines = []
     if new:
         lines.append(f"{len(new)} new fit{'s' if len(new) != 1 else ''} ({sum(r['fit']=='Yes' for r in new)} Yes):")
         for r in new[:MAX_NEW]:
             loc = f" ({r['location']})" if r.get("location") else ""
-            lines.append(f"- {r['company']}: {r['title']}{loc} - {r['fit']}, {r['why']}\n  {r['url']}")
+            lines.append(f"- {star(r)}{r['company']}: {r['title']}{loc} - {r['fit']}, {r['why']}\n  {r['url']}")
         if len(new) > MAX_NEW: lines.append(f"  ... and {len(new) - MAX_NEW} more on the page")
     else:
         lines.append("No new Yes/Maybe fits today.")
@@ -41,13 +59,15 @@ def compose(out, today=None):
     lines.append(f"Feeds OK {len(ok)}/{len(st)}" + (": failing " + ", ".join(s["org"] for s in bad) if bad else ""))
     soon = []
     for r in out.get("roles", []):
-        if r["fit"] in rank and r.get("applyBy"):
+        if r["fit"] in rank and r.get("applyBy") and r["url"] not in skip:
             try: days = (dt.date.fromisoformat(r["applyBy"]) - today).days
             except ValueError: continue
             if 0 <= days <= 7: soon.append((days, r))
     if soon:
-        soon.sort(key=lambda x: x[0])
-        lines.append("Closing soon: " + "; ".join(f"{r['company']} {r['title']} ({d}d)" for d, r in soon[:6]))
+        soon.sort(key=lambda x: (state.get(x[1]["url"]) != "saved", x[0]))  # saved roles first
+        lines.append("Closing soon: " + "; ".join(f"{star(r)}{r['company']} {r['title']} ({d}d)" for d, r in soon[:6]))
+    applied = sum(1 for st in state.values() if st == "applied")
+    if applied: lines.append(f"Applied so far: {applied}")
     url = page_url()
     if url: lines.append(url)
     yes = sum(r["fit"] == "Yes" for r in new)
@@ -73,7 +93,7 @@ def send_email(title, body):
 
 def main():
     with open(os.path.join(DATA, "radar_out.json")) as f: out = json.load(f)
-    title, body, prio = compose(out)
+    title, body, prio = compose(out, state=load_state())
     print(title); print(body)
     sent = []
     if os.environ.get("NTFY_TOPIC"):

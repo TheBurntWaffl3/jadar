@@ -45,6 +45,23 @@ Schedule: `30 11 * * *` UTC = 6:30 AM EST / 7:30 AM EDT. Scans take up to 35 min
   - optional variable `PAGE_URL` if the page is not at `https://<owner>.github.io/<repo>/`.
 - Run it once by hand: Actions > "Job radar" > Run workflow.
 
+## Saved, applied and hidden roles
+
+On the page each role can be saved, marked applied (with date and a note) or hidden (goes to the Disliked list);
+tabs show Inbox / Saved / Applied / Disliked. That state lives in the browser of the device you use, with
+Export / Import in the Data panel. To keep phone and laptop in step, and to let the daily alert skip what you
+have hidden or applied to:
+
+1. Create a **private** repo, e.g. `jadar-state` (empty is fine).
+2. Make a fine-grained personal access token (Settings > Developer settings > Fine-grained tokens) limited to
+   that one repo with **Contents: read and write**. Nothing else.
+3. On each device, open the page's Data panel > Sync with GitHub, enter `owner/jadar-state` and the token.
+   The token stays in that browser; the page keeps `state.json` in the private repo.
+4. For the alert: repo variables `STATE_REPO` (`owner/jadar-state`) and optionally `STATE_PATH`, plus the
+   secret `STATE_TOKEN` (the same token, or another one scoped the same way).
+
+The public repo and the public page never hold this state.
+
 ## Safeguards
 
 Read-only: never applies, submits forms, signs in or contacts anyone. Requests (and redirects) go only to

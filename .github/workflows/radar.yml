@@ -85,6 +85,9 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
           PAGE_URL: ${{ vars.PAGE_URL }}
+          STATE_REPO: ${{ vars.STATE_REPO }}
+          STATE_PATH: ${{ vars.STATE_PATH }}
+          STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I alert.py
 
       - name: Commit cache and outputs to the data branch
