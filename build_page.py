@@ -25,21 +25,24 @@ TEMPLATE = r"""<!doctype html>
 :root {
   color-scheme: light;
   --page: #ffffff; --ink: #0b0b0c; --ink-2: #3f3f44; --muted: #737379; --line: #ececee; --card: #f7f7f8; --pill: #f4f4f5;
-  --ember: #fa5d19; --tint: #fff0e8; --tint-2: #ffd5bf; --on-ember: #ffffff;
-  --good: #0ca30c; --maybe: #fa5d19; --no: #8a8a90; --crit: #d03b3b;
+  --hero: #0b0b0c; --on-hero: #ffffff; --hero-muted: #9a9aa0;
+  --ember: #2f5bea; --tint: #eaf0ff; --tint-2: #cbd8ff; --on-ember: #ffffff;
+  --good: #0ca30c; --maybe: #2f5bea; --no: #8a8a90; --crit: #d03b3b;
   --fail-wash: rgba(208,59,59,0.06);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --page: #0b0b0c; --ink: #ececee; --ink-2: #c6c6cb; --muted: #8a8a90; --line: #232326; --card: #141416; --pill: #1b1b1e;
-    --tint: #2a1709; --tint-2: #3d2010; --on-ember: #ffffff; --good: #2bbf2b; --no: #737379; --fail-wash: rgba(208,59,59,0.14);
+    --hero: #15151a; --on-hero: #ffffff; --hero-muted: #8a8a90; --ember: #5b82ff; --maybe: #5b82ff;
+    --tint: #121a33; --tint-2: #1c2a55; --on-ember: #ffffff; --good: #2bbf2b; --no: #737379; --fail-wash: rgba(208,59,59,0.14);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
   --page: #0b0b0c; --ink: #ececee; --ink-2: #c6c6cb; --muted: #8a8a90; --line: #232326; --card: #141416; --pill: #1b1b1e;
-  --tint: #2a1709; --tint-2: #3d2010; --on-ember: #ffffff; --good: #2bbf2b; --no: #737379; --fail-wash: rgba(208,59,59,0.14);
+  --hero: #15151a; --on-hero: #ffffff; --hero-muted: #8a8a90; --ember: #5b82ff; --maybe: #5b82ff;
+  --tint: #121a33; --tint-2: #1c2a55; --on-ember: #ffffff; --good: #2bbf2b; --no: #737379; --fail-wash: rgba(208,59,59,0.14);
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.45 "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -49,7 +52,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px; }
 .mono { font-family: ui-monospace, Menlo, Consolas, "SF Mono", monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 
 /* hero */
-.hero { background: var(--ember); color: var(--on-ember); border-radius: 24px; padding: 36px 28px 28px; margin-top: 8px; }
+.hero { background: var(--hero); color: var(--on-hero); border: 1px solid var(--line); border-radius: 24px; padding: 36px 28px 28px; margin-top: 8px; }
 .hero h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1; letter-spacing: -0.035em; font-weight: 600; margin: 0 0 18px; }
 .hero .meta { opacity: .92; }
 .hero .meta .sep { opacity: .55; margin: 0 .35em; }
