@@ -329,3 +329,54 @@ class TestSecondProfile(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestExtras(unittest.TestCase):
+    """Extra listing facts (salary, work mode, employment type, travel, relocation, requirements snippet)."""
+    def setUp(self): scan.TODAY = TODAY
+
+    def test_salary_range_per_year(self):
+        r = scan.requirements("The pay range for this role is $95,000 - $130,000 per year. 401k match up to $5,000.")
+        self.assertEqual((r["salary"], r["salaryMin"], r["salaryMax"]), ("$95,000–$130,000/yr", 95000, 130000))
+        r = scan.requirements("Compensation: $95K–$130K")
+        self.assertEqual((r["salary"], r["salaryMin"], r["salaryMax"]), ("$95,000–$130,000/yr", 95000, 130000))
+        r = scan.requirements("Salary range USD 95,000 to 130,000 annually")
+        self.assertEqual(r["salary"], "$95,000–$130,000/yr")
+
+    def test_salary_hourly_annualized(self):
+        r = scan.requirements("Hourly rate: $45.00 - $52.00 per hour")
+        self.assertEqual((r["salary"], r["salaryMin"], r["salaryMax"]), ("$45–$52/hr", 93600, 108160))
+
+    def test_salary_single_number_skips_bonuses(self):
+        r = scan.requirements("We offer a $1,000 sign-on bonus. This role has a base salary of $85,000.")
+        self.assertEqual((r["salary"], r["salaryMin"], r["salaryMax"]), ("$85,000/yr", 85000, 85000))
+        r = scan.requirements("$500 referral bonus. Benefits include a 401k match.")
+        self.assertIsNone(r["salary"])
+
+    def test_work_mode(self):
+        self.assertEqual(scan.requirements("This position is hybrid (3 days on site).")["workMode"], "Hybrid")
+        self.assertEqual(scan.requirements("This role is not eligible for remote work.")["workMode"], "On-site")
+        self.assertEqual(scan.requirements("Location: Remote (US). Occasional onsite visits.")["workMode"], "Remote")
+        self.assertEqual(scan.requirements("Work on-site at our Hawthorne factory.")["workMode"], "On-site")
+
+    def test_employment_travel_relocation(self):
+        r = scan.requirements("Full-time. Ability to travel up to 25% of the time. Relocation assistance is available.")
+        self.assertEqual((r["employment"], r["travel"], r["relocation"]), ("Full-time", "up to 25%", True))
+        r = scan.requirements("Part time contract. Travel: 10-20%. No relocation assistance.")
+        self.assertEqual((r["employment"], r["travel"], r["relocation"]), ("Part-time", "10-20%", False))
+        self.assertEqual(scan.requirements("Occasional travel to test sites.")["travel"], "occasional")
+        self.assertEqual(scan.requirements("Temporary 6-month assignment.")["employment"], "Temporary")
+
+    def test_req_snippet(self):
+        r = scan.requirements("Basic Qualifications:\n- BS in Mechanical Engineering\n- 0-2 years of experience\n- CAD skills\n\nPreferred Qualifications:\n- FEA")
+        self.assertEqual(r["reqSnippet"], "BS in Mechanical Engineering · 0-2 years of experience · CAD skills")
+        long = "Requirements:\n" + "\n".join(f"- bullet number {i} with some words in it" for i in range(40))
+        snip = scan.requirements(long)["reqSnippet"]
+        self.assertLessEqual(len(snip), 501); self.assertTrue(snip.endswith("…")); self.assertTrue(snip.startswith("bullet number 0"))
+        self.assertIsNone(scan.requirements("No heading here. 2+ years of experience.")["reqSnippet"])
+
+    def test_absent_fields_and_fit_unchanged(self):
+        r = scan.requirements("Bachelor's degree and 3+ years of related work experience or an equivalent combination of education and experience")
+        for k in ("salary", "salaryMin", "salaryMax", "workMode", "employment", "travel", "relocation", "reqSnippet"):
+            self.assertIsNone(r[k], k)
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Structural Analysis Engineer"), ("No", "3+ yrs required"))

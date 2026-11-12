@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-12.1"
+RULES_VERSION = "2026-11-12.2"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -221,7 +221,112 @@ def requirements(text):
             apply_by = d; break
     g = re.search(r"(?i)\bgpa\b[^.\n]{0,30}?\b([23]\.\d{1,2})\b|\b([23]\.\d{1,2})\s*(?:/\s*4\.0\s*)?(?:or (?:higher|better|above)\s*)?(?:cumulative\s*)?(?:gpa|grade point)", req)
     gpa = (g.group(1) or g.group(2)) if g else None
-    return dict(minYears=min_years, schoolExpOk=school_ok, degree=deg, majorSentence=major_sentence(req), gpaReq=gpa, startWindow=start_win, applyBy=apply_by, gradReq=grad, startReq=start, clearance=clr, citizenship=cit)
+    return dict(minYears=min_years, schoolExpOk=school_ok, degree=deg, majorSentence=major_sentence(req), gpaReq=gpa, startWindow=start_win, applyBy=apply_by, gradReq=grad, startReq=start, clearance=clr, citizenship=cit,
+                **extras(t, rq, req))
+
+MONEY = r"\$?\s*(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*([kK])?"
+SAL_RANGE = re.compile(rf"(?:\$|usd\s*|us\$\s*){MONEY}\s*(?:-|–|—|to|and)\s*(?:\$|usd\s*)?{MONEY}(?:[^\n.]{{0,25}}?\b(per|an|/|a)\s*(hour|hr|year|yr|annum|annually|hourly))?", re.I)
+SAL_ONE = re.compile(rf"(?:\$|usd\s*|us\$\s*)(?:\s*){MONEY}(?:[^\n.]{{0,25}}?\b(per|an|/|a)\s*(hour|hr|year|yr|annum|annually|hourly))?", re.I)
+SAL_CTX = re.compile(r"(?i)(salary|pay|compensation|wage|base|range|rate|hourly|annual|per hour|per year|/hr|/yr|\bk\b|annum)")
+
+def _money(num, k):
+    v = float(num.replace(",", ""))
+    if k: v *= 1000
+    return v
+
+def _fmt_money(v):
+    return f"${int(round(v)):,}"
+
+def salary_facts(t):
+    """-> (display, annualMin, annualMax) from the first plausible pay figure in the text; None,None,None if none."""
+    best = None
+    for m in SAL_RANGE.finditer(t):
+        lo, hi = _money(m.group(1), m.group(2)), _money(m.group(3), m.group(4))
+        unit = (m.group(6) or "").lower()
+        ctx = t[max(0, m.start() - 80):m.end() + 40]
+        if not unit and not SAL_CTX.search(ctx): continue
+        hourly = unit.startswith(("hour", "hr")) or (not unit and hi < 300)
+        if hourly:
+            if lo < 15 or hi > 300 or lo > hi: continue
+            best = (f"${lo:g}–${hi:g}/hr", int(lo * 2080), int(hi * 2080))
+        else:
+            if lo < 25000 or hi > 500000 or lo > hi: continue
+            best = (f"{_fmt_money(lo)}–{_fmt_money(hi)}/yr", int(lo), int(hi))
+        break
+    if best: return best
+    for m in SAL_ONE.finditer(t):
+        v = _money(m.group(1), m.group(2)); unit = (m.group(4) or "").lower()
+        ctx = t[max(0, m.start() - 80):m.end() + 40]
+        if not unit and not SAL_CTX.search(ctx): continue
+        near = t[max(0, m.start() - 40):m.start()].split(".")[-1] + t[m.end():m.end() + 30].split(".")[0]
+        if re.search(r"(?i)(bonus|referral|match|stipend|allowance|reimburse|credit|per diem|fee)", near): continue
+        hourly = unit.startswith(("hour", "hr")) or (not unit and v < 300)
+        if hourly:
+            if v < 15 or v > 300: continue
+            return (f"${v:g}/hr", int(v * 2080), int(v * 2080))
+        if v < 25000 or v > 500000: continue
+        return (_fmt_money(v) + "/yr", int(v), int(v))
+    return None, None, None
+
+WORKMODE = re.compile(r"(?i)\b(not eligible for remote|no remote|not remote|non-remote|remote|hybrid|on-?site|in-office|in office|in person|in-person)\b")
+def work_mode(t):
+    def kind(w):
+        w = w.lower()
+        if w == "hybrid": return "Hybrid"
+        if w == "remote": return "Remote"
+        return "On-site"
+    head = [kind(m.group(1)) for m in WORKMODE.finditer(t[:600])]
+    if head: return head[0]
+    m = WORKMODE.search(t)
+    return kind(m.group(1)) if m else None
+
+EMPLOY = re.compile(r"(?i)\b(full[- ]?time|part[- ]?time|contract(?:or|-to-hire)?\b|temporary|temp\b)")
+def employment_type(t):
+    m = EMPLOY.search(t)
+    if not m: return None
+    w = m.group(1).lower()
+    if w.startswith("full"): return "Full-time"
+    if w.startswith("part"): return "Part-time"
+    if w.startswith("contract"): return "Contract"
+    return "Temporary"
+
+def travel_req(t):
+    m = re.search(r"(?i)travel[^.\n]{0,40}?(up to\s*)?(\d{1,2}\s*(?:-|–|to)\s*\d{1,2}|\d{1,3})\s*%", t) or \
+        re.search(r"(?i)(up to\s*)?(\d{1,2}\s*(?:-|–|to)\s*\d{1,2}|\d{1,3})\s*%[^.\n]{0,30}?travel", t)
+    if m:
+        pct = re.sub(r"\s*(-|–|to)\s*", "-", m.group(2)) + "%"
+        return ("up to " if m.group(1) else "") + pct
+    if re.search(r"(?i)(occasional|some|minimal|limited|light)\s+(?:domestic |international |business )?travel", t): return "occasional"
+    if re.search(r"(?i)travel (is |will be |may be )?(required|expected)", t): return "required"
+    return None
+
+def relocation_offered(t):
+    m = re.search(r"(?i)relocation\s+(assistance|package|benefits?|support|bonus|available|provided|offered|is|will|may|not)", t)
+    if not m: return None
+    pre = t[max(0, m.start() - 30):m.start()]
+    if re.search(r"(?i)\b(no|not|without)\b", pre): return False
+    if re.search(r"(?i)^(is|will|may)\b", m.group(1)) and re.search(r"(?i)\bnot\b", t[m.end():m.end() + 12]): return False
+    if m.group(1).lower() == "not": return False
+    return True
+
+def req_snippet(req, rq, cap=500):
+    """Minimum-qualifications excerpt (after the requirements heading, before any Preferred heading), capped."""
+    if not rq: return None
+    body = req[rq.end():rq.end() + 3000]
+    lines = [re.sub(r"^\W+", "", l).strip() for l in body.split("\n")]
+    lines = [l for l in lines if l and not re.match(r"(?i)^(qualifications|requirements)\W*$", l)]
+    if not lines: return None
+    snip = " · ".join(lines)
+    if len(snip) > cap:
+        cut = snip[:cap]
+        k = cut.rfind(" ")
+        snip = (cut[:k] if k > cap // 2 else cut).rstrip(" ·") + "…"
+    return snip
+
+def extras(t, rq, req):
+    sal, lo, hi = salary_facts(t)
+    return dict(salary=sal, salaryMin=lo, salaryMax=hi, workMode=work_mode(t), employment=employment_type(t),
+                travel=travel_req(t), relocation=relocation_offered(t), reqSnippet=req_snippet(req, rq))
 
 OTHER_MAJOR = re.compile(r"(?i)(aerospace|aeronautical|astronautical|mechanical|engineering mechanics|nuclear|electrical|electronics?|computer|chemical|civil|structural|materials?|industrial|systems|software|"
     r"manufacturing|biomedical|environmental|petroleum|mining|ocean|naval architecture|marine|radiation health|health)\s*(engineering|science|physics)?|"
@@ -306,7 +411,32 @@ def a_greenhouse(s):
     for p in j.get("jobs", []):
         yield dict(title=p.get("title", ""), location=(p.get("location") or {}).get("name", ""), url=p.get("absolute_url"),
                    date=iso(p.get("first_published")), dateKind="posted" if p.get("first_published") else None,
-                   desc=strip_html(p.get("content", "")))
+                   desc=strip_html(p.get("content", "")) + pay_line_greenhouse(p))
+
+def pay_line_greenhouse(p):
+    r = ((p.get("pay_input_ranges") or [None])[0]) or {}
+    lo, hi = r.get("min_cents"), r.get("max_cents")
+    if isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and lo > 0:
+        return f"\nSalary: ${lo / 100:,.0f} - ${hi / 100:,.0f} per year"
+    return ""
+
+def pay_line_lever(p):
+    r = p.get("salaryRange") or {}
+    lo, hi = r.get("min"), r.get("max")
+    if isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and lo > 0:
+        unit = "per hour" if str(r.get("interval", "")).lower().startswith("hour") else "per year"
+        return f"\nSalary: ${lo:,.0f} - ${hi:,.0f} {unit}"
+    return ""
+
+def pay_line_ashby(p):
+    c = p.get("compensation") or {}
+    if isinstance(c, dict):
+        if c.get("compensationTierSummary"): return "\nSalary: " + str(c["compensationTierSummary"])
+        for comp in (c.get("summaryComponents") or []):
+            if isinstance(comp, dict) and comp.get("minValue") and comp.get("maxValue"):
+                unit = "per hour" if "hour" in str(comp.get("interval", "")).lower() else "per year"
+                return f"\nSalary: ${comp['minValue']:,.0f} - ${comp['maxValue']:,.0f} {unit}"
+    return ""
 
 def a_rippling(s):
     base = f"https://api.rippling.com/platform/api/ats/v1/board/{s['id']}/jobs"
@@ -420,14 +550,14 @@ def a_lever(s):
         yield dict(title=p.get("text", ""), location=(p.get("categories") or {}).get("location", ""), url=p.get("hostedUrl"),
                    date=iso(p.get("createdAt")), dateKind="posted",
                    desc=lambda p=p: (p.get("descriptionPlain") or "") + "\n" + "\n".join(
-                       l.get("text", "") + "\n" + strip_html(l.get("content", "")) for l in p.get("lists", [])) + "\n" + (p.get("additionalPlain") or ""))
+                       l.get("text", "") + "\n" + strip_html(l.get("content", "")) for l in p.get("lists", [])) + "\n" + (p.get("additionalPlain") or "") + pay_line_lever(p))
 
 def a_ashby(s):
     j = fetch(f"https://api.ashbyhq.com/posting-api/job-board/{s['id']}")
     for p in j.get("jobs", []):
         yield dict(title=p.get("title", ""), location=p.get("location", ""), url=p.get("jobUrl"),
                    date=iso(p.get("publishedAt")), dateKind="posted",
-                   desc=lambda p=p: p.get("descriptionPlain") or strip_html(p.get("descriptionHtml", "")))
+                   desc=lambda p=p: (p.get("descriptionPlain") or strip_html(p.get("descriptionHtml", ""))) + pay_line_ashby(p))
 
 def a_smartrecruiters(s):
     off = 0
@@ -492,7 +622,8 @@ def a_sitemap(s):
 ADAPT = dict(paylocity=a_paylocity, htmllist=a_htmllist, pinpoint=a_pinpoint, bamboo=a_bamboo, rmk=a_rmk, eightfold=a_eightfold, rippling=a_rippling, oracle=a_oracle, apl=a_apl, greenhouse=a_greenhouse, lever=a_lever, ashby=a_ashby, smartrecruiters=a_smartrecruiters, workday=a_workday, sitemap=a_sitemap)
 
 MAX_DETAIL = int(os.environ.get("MAX_DETAIL", "100000"))
-FACT_KEYS = ("minYears", "schoolExpOk", "degree", "majorSentence", "gpaReq", "startWindow", "applyBy", "gradReq", "startReq", "clearance", "citizenship")
+FACT_KEYS = ("minYears", "schoolExpOk", "degree", "majorSentence", "gpaReq", "startWindow", "applyBy", "gradReq", "startReq", "clearance", "citizenship",
+             "salary", "salaryMin", "salaryMax", "workMode", "employment", "travel", "relocation", "reqSnippet")
 DESC_FIELD = re.compile(r"(?i)(thermal|structur|stress|propuls|aerodynam|aerospace|mechanical engineer|nuclear|reactor|naval|marine|hull|test engineer|fluid|heat transfer)")
 
 def needs_fetch(row):
