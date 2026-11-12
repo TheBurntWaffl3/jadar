@@ -50,6 +50,13 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 
 - `sources.json`: one object per organization: `org`, `sector`, `type` (adapter), adapter params, optional `generic: true` (board has many non-engineering roles; title must also pass, and description must mention a field keyword).
 - **Adapters:** greenhouse (`?content=true`, all descriptions in one request), lever, ashby, workday (CXS search POST + detail GET; `startDate` = posted date; `endDate` -> deadline), eightfold (pcsx search/position_details; use `creationTs`, NOT `postedTs`, which moves on every re-post), sitemap (sitemap -> job URLs -> JSON-LD `JobPosting`, incl. `ld&#x2B;json` variant, microdata `datePosted`, Parsons `postedDate` JS var; `validThrough` -> deadline), rmk (SuccessFactors search pages), oracle (HCM REST; `ExternalPostedEndDate` -> deadline), rippling (detail `createdOn`), smartrecruiters, pinpoint (job-page JSON-LD), bamboo (list + `/detail` `datePosted`), apl (JHU APL API), paylocity (`window.pageData` + detail JSON-LD), htmllist (numbered list pages + detail JSON-LD; Naval Nuclear Lab).
+- **Extra facts** (since rules 2026-11-12.2, all profile-independent, shown in the page's detail row): `salary` (normalized
+  "$95,000–$130,000/yr" / "$45–$52/hr") with `salaryMin`/`salaryMax` annualized for sorting; `workMode`; `employment`;
+  `travel`; `relocation`; `reqSnippet` (the minimum-qualifications lines, ≤500 chars, the only posting text kept).
+  Structured pay from Greenhouse `pay_input_ranges`, Lever `salaryRange`, Ashby `compensation` is appended as a
+  "Salary:" line so the same regex reads it. First live read: salary on 552 of 847 fits.
+- **Page** (`build_page.py`): Ember-style single file; visible columns Fit/Company/Role/Field/Salary/Date/Why, everything
+  else in the expandable row; sort by fit, newest, apply-by soonest, salary, company, min yrs (select + clickable headers).
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 
