@@ -69,7 +69,9 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 
 `requirements()` extracts facts from the full description; `fit(profile, facts, title)`/`_fit()` judge them (`tests/test_fit.py` covers every case below).
 - Text normalization: curly apostrophes; "U.S." -> "US" (periods ended sentences early); "two (2) years" -> "two years"; "(2+) years" -> "2+ years".
-- Minimums only: cut at a real "Preferred/Desired/Nice to have/Bonus/Plusses" heading line, never at "Additional ..." headings.
+- Minimums only: cut at a real "Preferred/Desired/Nice to have/Bonus/Plusses" heading line, never at "Additional ..." headings. A heading
+  need not start with the word: Rocket Lab's "THESE QUALIFICATIONS WOULD BE NICE TO HAVE" (all caps, short line) counts; a bullet
+  like "ANSYS experience preferred" does not (`preferred_heading()`; Wallops "Test and Launch Operations Engineer I" is 1+ yrs -> Yes).
 - Years: stated years >= 2 beat entry-sounding titles ("Engineer I"). Tiered postings ("Level I: 0 yrs / Level II: 2 yrs") use the entry tier; otherwise the max of listed minimums. Skip experience that only applies to no-degree paths ("in lieu of a degree", "Associate's degree with five years", high school/GED). Do NOT skip "or an equivalent combination of education and experience" (Boeing "3+ years ... or equivalent combination" is a real 3-year minimum).
 - School/internship experience counts only when said on the same requirement line.
 - Major: if the bachelor's sentence names only other majors -> No (BWXT Radiation Shielding: nuclear engineering or radiation health physics only); "X or related" without his major -> Yes becomes Maybe; "any engineering"/"STEM"/"technical discipline" -> fine.
