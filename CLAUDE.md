@@ -4,11 +4,13 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 
 ## Current state (as of 2026-11-12)
 
-- **Production today is still the Claude scheduled task** ("Job radar daily scan", 6:42 AM ET daily). It carries its own copy
-  of the *original* `scan.py` / `sources.json` / `build_dash.py` inside its prompt (hash-checked, ~59.5 KB of a 60 KB cap).
-  Those originals are commit `3b3dbfb` on `main`; `main` stays that mirror until the GitHub version is proven.
-- Why the task can't fetch code from here: unattended Claude scheduled runs can't get GitHub access to a private repo.
-- **The GitHub version lives on branch `claude/jadar-github-migration-kn6jkk`** (see README.md for how a run works):
+- **Both systems run in parallel (parity period).** The Claude scheduled task ("Job radar daily scan", 6:42 AM ET) still runs
+  its own copy of the *original* `scan.py` / `sources.json` / `build_dash.py` from its prompt (hash-checked, ~59.5 KB of a
+  60 KB cap). Those originals are commit `3b3dbfb` in history. Kevin disables the task himself once parity holds.
+- **`main` is the GitHub version since 2026-11-12** (merged from `claude/jadar-github-migration-kn6jkk` so the cron schedule
+  runs; schedules only fire on the default branch). The repo is **public** (Kevin's choice, for free GitHub Pages) and the
+  page is live at **https://theburntwaffl3.github.io/jadar/**, redeployed by every run.
+- What the GitHub version does (see README.md for how a run works):
   1. Profile file: done. `profiles/kevin.json`; `requirements()` extracts profile-independent facts (incl. the bachelor's
      sentence), `fit(profile, facts, title)` judges them, `major_req(profile, sentence)` applies the major rule.
   2. Workflow: done. `.github/workflows/radar.yml`, cron `30 11 * * *` UTC (6:30 EST / 7:30 EDT), `workflow_dispatch`
@@ -16,9 +18,9 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   3. Incremental cache: done. `data/cache.json` on the `data` branch (facts per URL, firstSeen/lastSeen; never descriptions).
      Full re-read on Sundays, when `RULES_VERSION` changes, or `--full` / the `full` input. Replaces `seen.json`
      (imported once if present in the data dir). Tests: `tests/test_cache.py`.
-  4. Page: done. `build_page.py` -> `site/index.html`, published by the `publish` job (fails harmlessly until Pages is
-     enabled; also committed to the `data` branch and attached to each run). Pages on a private repo needs GitHub Pro
-     (Student Developer Pack). **Kevin: enable Settings > Pages > Source "GitHub Actions" once Pro is active.**
+  4. Page: done and live. `build_page.py` -> `site/index.html`, deployed by the `publish` job (Pages source = GitHub
+     Actions; the `github-pages` environment only accepts deployments from `main`). Also on the `data` branch and attached
+     to each run.
   5. Alerts: built for both channels (`alert.py`); **Kevin picks** by adding either `NTFY_TOPIC` or the `SMTP_*`/`ALERT_TO`
      secrets (README). Until then the alert is only printed in the run log.
   6. Parity: **day 1 done (2026-11-12).** The Claude task's 00:39 UTC roles.json (asset of the "Kevin's Job Radar" artifact;
