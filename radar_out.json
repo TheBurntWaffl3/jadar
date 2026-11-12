@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-12T01:56:23.425514+00:00",
+ "scanned": "2026-11-12T02:02:16.003368+00:00",
  "profile": "kevin",
  "rulesVersion": "2026-11-12.1",
  "fullRead": null,
@@ -241,7 +241,7 @@
   {
    "company": "Rocket Lab",
    "sector": "Space",
-   "title": "Structural Analyst",
+   "title": "Dynamics and Structures Analyst",
    "location": "Auckland, NZ",
    "url": "https://job-boards.greenhouse.io/rocketlab/jobs/8199770003",
    "date": "2026-11-10",
@@ -104175,7 +104175,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 26
   },
   {
    "org": "Castelion",
@@ -104188,7 +104188,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9,
+   "secs": 7,
    "bulkImport": "2026-09-07"
   },
   {
@@ -104202,7 +104202,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "Ursa Major",
@@ -104228,7 +104228,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Mach Industries",
@@ -104254,7 +104254,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 3
   },
   {
    "org": "Zone 5",
@@ -104267,7 +104267,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 2
   },
   {
    "org": "JetZero",
@@ -104293,7 +104293,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 6
   },
   {
    "org": "SpaceX",
@@ -104306,7 +104306,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 12
+   "secs": 13
   },
   {
    "org": "Rocket Lab",
@@ -104319,7 +104319,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 2
   },
   {
    "org": "Relativity Space",
@@ -104332,7 +104332,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 8
+   "secs": 9
   },
   {
    "org": "Stoke Space",
@@ -104345,7 +104345,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 2
   },
   {
    "org": "Varda",
@@ -104358,7 +104358,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "Vast",
@@ -104371,7 +104371,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 4
   },
   {
    "org": "Astranis",
@@ -104384,7 +104384,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 8
+   "secs": 2
   },
   {
    "org": "True Anomaly",
@@ -104397,7 +104397,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 5
   },
   {
    "org": "Inversion Space",
@@ -104410,7 +104410,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 5
   },
   {
    "org": "Muon Space",
@@ -104423,7 +104423,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 2
   },
   {
    "org": "Momentus",
@@ -104436,7 +104436,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 2
   },
   {
    "org": "Planet",
@@ -104449,7 +104449,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 6
   },
   {
    "org": "Portal Space",
@@ -104462,7 +104462,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 3
   },
   {
    "org": "Rendezvous Robotics",
@@ -104475,7 +104475,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "Hawkeye 360",
@@ -104501,7 +104501,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 3
   },
   {
    "org": "Voyager / Astrobotic-adjacent",
@@ -104527,7 +104527,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 16
   },
   {
    "org": "Oklo",
@@ -104540,7 +104540,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 4
   },
   {
    "org": "TerraPower",
@@ -104553,7 +104553,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 5
   },
   {
    "org": "Valar Atomics",
@@ -104566,7 +104566,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Deep Fission",
@@ -104579,7 +104579,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 14
   },
   {
    "org": "General Matter",
@@ -104592,7 +104592,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "Pacific Fusion",
@@ -104605,7 +104605,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 2
   },
   {
    "org": "Standard Nuclear",
@@ -104618,7 +104618,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Regent",
@@ -104631,7 +104631,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Hermeus",
@@ -104644,7 +104644,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 2
   },
   {
    "org": "Venus Aerospace",
@@ -104657,7 +104657,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Shield AI",
@@ -104670,7 +104670,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 5
   },
   {
    "org": "Merlin Labs",
@@ -104696,7 +104696,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 2
   },
   {
    "org": "Last Energy",
@@ -104709,7 +104709,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Commonwealth Fusion",
@@ -104722,7 +104722,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Xcimer",
@@ -104735,7 +104735,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Exowatt",
@@ -104748,7 +104748,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Thea Energy",
@@ -104761,7 +104761,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Radiant",
@@ -104787,7 +104787,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Helion",
@@ -104839,7 +104839,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Skydio",
@@ -104878,7 +104878,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Hadrian",
@@ -104891,7 +104891,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 2
   },
   {
    "org": "Northwood Space",
@@ -104904,7 +104904,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Starfish Space",
@@ -104930,7 +104930,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 2
   },
   {
    "org": "Blue Origin",
@@ -104943,7 +104943,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 35
+   "secs": 29
   },
   {
    "org": "Sierra Space",
@@ -104956,7 +104956,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 10
+   "secs": 11
   },
   {
    "org": "X-energy",
@@ -104969,7 +104969,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 17
   },
   {
    "org": "Leidos",
@@ -104982,7 +104982,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 44
+   "secs": 49
   },
   {
    "org": "Aerospace Corp",
@@ -104995,7 +104995,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 20,
+   "secs": 22,
    "bulkImport": "2026-11-09"
   },
   {
@@ -105035,7 +105035,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 36
+   "secs": 26
   },
   {
    "org": "GE Aerospace",
@@ -105075,7 +105075,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 12
   },
   {
    "org": "AeroVironment",
@@ -105101,7 +105101,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 25
+   "secs": 22
   },
   {
    "org": "Axiom Space",
@@ -105114,7 +105114,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 17
   },
   {
    "org": "GE Vernova (incl. GE-Hitachi)",
@@ -105127,7 +105127,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 17
   },
   {
    "org": "Draper",
@@ -105140,7 +105140,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 24
   },
   {
    "org": "NASA JPL",
@@ -105153,7 +105153,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 12
   },
   {
    "org": "L3Harris (incl. Aerojet Rocketdyne)",
@@ -105166,7 +105166,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "HII (Newport News, Ingalls)",
@@ -105218,7 +105218,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Parsons",
@@ -105231,7 +105231,7 @@
    "error": null,
    "detailErrors": 5,
    "detailErr": "HTTP Error 404: Not Found",
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "LANL",
@@ -105257,7 +105257,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "GTRI",
@@ -105270,7 +105270,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Redwire",
@@ -105278,12 +105278,12 @@
    "ok": true,
    "total": 85,
    "matches": 11,
-   "fetched": 8,
-   "cached": 10,
+   "fetched": 1,
+   "cached": 17,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Electric Boat",
@@ -105296,7 +105296,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Calspan",
@@ -105323,7 +105323,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1,
+   "secs": 0,
    "placeholderDate": "2024-11-12"
   },
   {
@@ -105350,7 +105350,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "Zap Energy",
@@ -105376,7 +105376,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Blue Water Autonomy",
@@ -105402,7 +105402,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 3
   },
   {
    "org": "Lockheed Martin",
@@ -105410,12 +105410,12 @@
    "ok": true,
    "total": 527,
    "matches": 117,
-   "fetched": 2,
-   "cached": 115,
+   "fetched": 0,
+   "cached": 117,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 90
+   "secs": 118
   },
   {
    "org": "Northrop Grumman",
@@ -105423,8 +105423,8 @@
    "ok": true,
    "total": 462,
    "matches": 85,
-   "fetched": 1,
-   "cached": 86,
+   "fetched": 0,
+   "cached": 87,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
@@ -105454,7 +105454,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 5
   },
   {
    "org": "Impulse Space",
@@ -105532,7 +105532,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 6
   },
   {
    "org": "Bath Iron Works",
@@ -105558,7 +105558,7 @@
    "error": null,
    "detailErrors": 1,
    "detailErr": "HTTP Error 410: Gone",
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Moog",
@@ -105571,7 +105571,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 14
   },
   {
    "org": "Honeywell Aerospace",
@@ -105610,7 +105610,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Beta Technologies",
@@ -105650,7 +105650,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Naval Nuclear Laboratory",
@@ -105663,7 +105663,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 26
   }
  ]
 }
