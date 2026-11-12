@@ -43,7 +43,8 @@ def datasets(out, src):
         if not x: continue
         status = "OK" if x["ok"] else "Failing"
         orgs.append(dict(org=s["org"], sector=s["sector"], platform=PLAT.get(s["type"], s["type"]), status=status,
-                         note="" if x["ok"] else (x["error"] or "")[:90], roles=x["matches"] if x["ok"] else None, fits=fits.get(s["org"], 0) if x["ok"] else None))
+                         note=(x["error"] or "")[:90] if not x["ok"] else (f"{x['detailErrors']} of {x['fetched']} pages failed: {x['detailErr']}"[:90] if x.get("detailErrors") else ""),
+                         roles=x["matches"] if x["ok"] else None, fits=fits.get(s["org"], 0) if x["ok"] else None))
     for o, sec, plat, why in GAPS:
         orgs.append(dict(org=o, sector=sec, platform=plat, status="Not covered yet", note=why, roles=None, fits=None))
     roles = [{k: r.get(k) for k in KEEP} for r in out["roles"]]

@@ -567,6 +567,7 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
     (keyed by URL) for every in-scope posting listed this run."""
     cache = cache if cache is not None else {}
     t0 = time.time(); rows = []; err = None; total = 0; detailed = 0; reused = 0; entries = {}
+    derr = collections.Counter()  # detail-page failures by message (a board that blocks page reads shows up here)
     try:
         for row in ADAPT[s["type"]](s):
             total += 1
@@ -585,7 +586,7 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
                 try:
                     row = enrich(s, row); detailed += 1
                 except Exception as ex:
-                    row.setdefault("desc", ""); row["detail_err"] = str(ex)[:80]
+                    row.setdefault("desc", ""); row["detail_err"] = str(ex)[:80]; derr[row["detail_err"]] += 1
                 if not row.get("title"): continue
                 desc = row.get("desc") or ""
                 e = dict(title=row["title"], location=row.get("location") or "", date=row.get("date"), dateKind=row.get("dateKind"),
@@ -607,7 +608,8 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
                              desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen")))
     except Exception as ex:
         err = f"{type(ex).__name__}: {ex}"[:200]
-    st = dict(org=s["org"], type=s["type"], ok=err is None, total=total, matches=len(rows), fetched=detailed, cached=reused, error=err, secs=round(time.time() - t0))
+    st = dict(org=s["org"], type=s["type"], ok=err is None, total=total, matches=len(rows), fetched=detailed, cached=reused, error=err,
+              detailErrors=sum(derr.values()), detailErr=(derr.most_common(1)[0][0] if derr else None), secs=round(time.time() - t0))
     return s, rows, st, entries
 
 def main(argv=None):
@@ -678,6 +680,7 @@ def main(argv=None):
           f"{sum(s['cached'] for s in status)} reused from cache")
     for s in status:
         if not s["ok"]: print("FAIL", s["org"], s["error"])
+        elif s["detailErrors"]: print("DETAIL", s["org"], f"{s['detailErrors']}/{s['fetched']} pages failed:", s["detailErr"])
 
 if __name__ == "__main__":
     main()
