@@ -1,9 +1,10 @@
-# Daily job radar. Schedule is UTC: 11:30 UTC = 6:30 AM EST (Nov-Mar) / 7:30 AM EDT (Mar-Nov). Change to "30 10 * * *"
-# for 6:30 EDT if the summer hour matters. GitHub may start scheduled runs a few minutes late.
+# Job radar, twice a day. Schedules are UTC: 11:30 UTC = 6:30 AM EST / 7:30 AM EDT (the morning digest, always sent);
+# 23:30 UTC = 6:30 PM EST / 7:30 PM EDT (evening check, emails only if new fits appeared). GitHub may start them late.
 name: Job radar
 on:
   schedule:
     - cron: "30 11 * * *"
+    - cron: "30 23 * * *"
   workflow_dispatch:
     inputs:
       full:
@@ -88,6 +89,7 @@ jobs:
           STATE_REPO: ${{ vars.STATE_REPO }}
           STATE_PATH: ${{ vars.STATE_PATH }}
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
+          QUIET_IF_EMPTY: ${{ github.event.schedule == '30 23 * * *' && '1' || '' }}
         run: python3 -I alert.py
 
       - name: Commit cache and outputs to the data branch
