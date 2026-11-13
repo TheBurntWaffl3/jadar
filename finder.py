@@ -94,7 +94,9 @@ def main():
         try:
             q, found_people = search(key, lambda u: http_json(u))
         except urllib.error.HTTPError as e:
-            print(f"finder: stopped at {key}: HTTP {e.code} (quota or key problem)"); break
+            try: detail = re.sub(r"\s+", " ", e.read().decode("utf-8", "replace"))[:400]
+            except Exception: detail = ""
+            print(f"finder: stopped at {key}: HTTP {e.code}. Google said: {detail}"); break
         people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=q, people=found_people)
         done += 1; found += len(found_people)
     if done:
