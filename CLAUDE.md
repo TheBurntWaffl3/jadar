@@ -13,22 +13,27 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 - What the GitHub version does (see README.md for how a run works):
   1. Profile file: done. `profiles/kevin.json`; `requirements()` extracts profile-independent facts (incl. the bachelor's
      sentence), `fit(profile, facts, title)` judges them, `major_req(profile, sentence)` applies the major rule.
-  2. Workflow: done. `.github/workflows/radar.yml`, cron `30 11 * * *` UTC (6:30 EST / 7:30 EDT), `workflow_dispatch`
-     with `full` and `only` inputs, tests first, 40-min timeout. A push only runs the tests.
+  2. Workflow: done. `.github/workflows/radar.yml`, crons `17 11 * * *` (morning digest) and `43 23 * * *` UTC (evening,
+     `QUIET_IF_EMPTY`), `workflow_dispatch` with `full` and `only` inputs, tests first, 40-min timeout. A push only runs
+     the tests. The first scheduled runs (at :30) started 7.5 h and 4 h late; moved off the half hour on 2026-11-13.
   3. Incremental cache: done. `data/cache.json` on the `data` branch (facts per URL, firstSeen/lastSeen; never descriptions).
      Full re-read on Sundays, when `RULES_VERSION` changes, or `--full` / the `full` input. Replaces `seen.json`
      (imported once if present in the data dir). Tests: `tests/test_cache.py`.
   4. Page: done and live. `build_page.py` -> `site/index.html`, deployed by the `publish` job (Pages source = GitHub
      Actions; the `github-pages` environment only accepts deployments from `main`). Also on the `data` branch and attached
      to each run.
-  5. Alerts: built for both channels (`alert.py`); **Kevin picks** by adding either `NTFY_TOPIC` or the `SMTP_*`/`ALERT_TO`
-     secrets (README). Until then the alert is only printed in the run log.
+  5. Alerts: email (Kevin's choice, Gmail SMTP secrets added 2026-11-12). HTML digest, `alerted.json` ledger on the data
+     branch so no posting is mailed twice, evening run mails only when something new appeared. ntfy still supported.
   6. Parity: **day 1 done (2026-11-12).** The Claude task's 00:39 UTC roles.json (asset of the "Kevin's Job Radar" artifact;
      read it with the Artifact tool, `path` = the newest `_blob` id) vs the GitHub run 40 min later: 263/263 Yes and 584/585
      Maybe identical, 0 fit changes on shared postings; the rest were postings listed by only one run (timing) plus one
      explained improvement (HII "ENGINEER MODEL-BASED 4": Yes->No "senior title", the level digit is now seen because
      "Job Details" is stripped before judging). Repeat with `tools/compare.py` for ~2 more days (the GitHub run lands on the
      `data` branch daily), then tell Kevin so he can disable the Claude task. Don't disable it yourself.
+     **Day 2 (2026-11-13, comparing 2026-11-12 11:49 UTC Claude vs 15:58 UTC GitHub):** all shared Yes identical, 585/585
+     shared Maybe identical, 0 fit changes on shared postings. Claude-only: 4 non-US roles the old filter missed (Prestwick,
+     Zurich, Tampere), the HII level-4 title, 5 postings that closed in the 4-hour gap. GitHub-only: 14 postings that
+     appeared in that gap. Parity holds; one more day, then tell Kevin to disable the Claude task.
      Run log: first full read 4 min (4568 descriptions); incremental run 1.5 min (3056 reused, 1511 fetched, mostly
      Greenhouse boards whose descriptions come with the list). The 40-min timeout has plenty of margin.
 - Tests: `python3 -I -m unittest discover -s tests` (fit rules, cache, page). Keep them passing; add a case for every bug.

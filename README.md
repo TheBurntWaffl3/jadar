@@ -31,7 +31,8 @@ dashboard with GitHub Pages. Python 3.11+, standard library only.
    on Sundays, when `RULES_VERSION` changes, or with the "full" input of a manual run.
 4. The page is built, the alert sent, the `data` branch committed, the page uploaded to Pages.
 
-Schedule: `30 11 * * *` UTC = 6:30 AM EST / 7:30 AM EDT. Scans take up to 35 minutes; the job times out at 40.
+Schedule: `17 11 * * *` UTC (6:17 AM EST / 7:17 AM EDT, digest always sent) and `43 23 * * *` UTC (evening, emails only
+if new fits appeared). GitHub can start scheduled runs late, especially at :00/:30. Scans take 2-5 minutes; timeout 40.
 
 ## One-time setup (repo settings)
 
