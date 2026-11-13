@@ -9,6 +9,12 @@ def embedded(html):
     return json.loads(html.split('<script id="data" type="application/json">')[1].split("</script>")[0].replace("<\\/", "</"))
 
 class PageTests(unittest.TestCase):
+    def test_terps_links(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle")
+        self.assertIn("linkedin.com/school/university-of-maryland/people/?keywords=", html)
+        self.assertIn("terrapinsconnect.umd.edu", html)
+        self.assertIn("function division(", html)
+
     def setUp(self):
         with open(FIXTURE) as f: self.out = json.load(f)
         with open(os.path.join(ROOT, "sources.json")) as f: self.src = json.load(f)

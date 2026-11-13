@@ -116,6 +116,9 @@ tr.detail td { padding: 0 10px 16px; background: var(--card); }
 .snip { background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .snip .k { margin-bottom: 6px; }
 .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--ink); color: var(--page); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 13.5px; text-decoration: none; margin-top: 12px; }
+.btn.alt { background: var(--pill); color: var(--ink); font-weight: 500; margin-top: 0; }
+.people { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.people .k { margin-right: 4px; }
 .empty { padding: 24px 10px; color: var(--muted); }
 
 /* tabs + per-role state */
@@ -439,6 +442,24 @@ footer a { color: var(--ink); }
       (st === 'applied' && at ? `<span class="applied-at">Applied ${esc(at)}</span>` : '') +
       `<input type="text" class="note-in" data-note="1" placeholder="Note (contact, referral, follow-up…)" value="${esc(e.note || '')}" aria-label="Note"></div>`;
   }
+  function companyKey(c) { return (c || '').replace(/\s*\(.*?\)\s*/g, ' ').split(' / ')[0].replace(/\s+/g, ' ').trim(); }
+  function division(title) {
+    const t = title || '';
+    let m = t.match(/\(([^)]{3,30})\)\s*$/) || t.match(/[,\u2013\u2014-]\s*([A-Za-z][A-Za-z &/]{2,30})\s*$/);
+    if (!m) return null;
+    const d = m[1].trim();
+    if (/^(i{1,3}|iv|v|\d|entry|junior|senior|sr|staff|lead|associate|new grad|early career|remote|hybrid|onsite|on-site|contract|usa|us)\b/i.test(d)) return null;
+    return d;
+  }
+  function people(r) {
+    const co = companyKey(r.company); if (!co) return '';
+    const alum = k => `https://www.linkedin.com/school/university-of-maryland/people/?keywords=${encodeURIComponent(k)}`;
+    const div = division(r.title);
+    return `<div class="people"><span class="k mono">Terps here</span>` +
+      `<a class="btn alt" href="${alum(co)}" target="_blank" rel="noopener">UMD alumni at ${esc(co)} ↗</a>` +
+      (div ? `<a class="btn alt" href="${alum(co + ' ' + div)}" target="_blank" rel="noopener">…in ${esc(div)} ↗</a>` : '') +
+      `<a class="btn alt" href="https://terrapinsconnect.umd.edu/" target="_blank" rel="noopener">Terrapins Connect ↗</a></div>`;
+  }
   function detail(r) {
     const yrs = r.minYears == null ? 'not stated' : r.minYears + (r.schoolExpOk ? ' (school/internship counts)' : '');
     const pay = r.salary ? r.salary + (/\/hr$/.test(r.salary) && r.salaryMin != null ? ' · $' + num(r.salaryMin) + (r.salaryMax != null && r.salaryMax !== r.salaryMin ? '–$' + num(r.salaryMax) : '') + ' annualized' : '') : null;
@@ -447,7 +468,7 @@ footer a { color: var(--ink); }
       kv('Pay', pay), kv('Work mode', r.workMode), kv('Employment', r.employment), kv('Travel', r.travel), kv('Relocation', r.relocation === true ? 'offered' : r.relocation === false ? 'not offered' : null),
       kv('Posted', r.date ? fmtLong(r.date) + ' (' + r.dateKind + ')' : null), kv('First seen', r.firstSeen ? fmtLong(r.firstSeen) : null), kv('Sector', r.sector)].join('');
     const snip = r.reqSnippet ? `<div class="snip"><div class="k mono">Minimum qualifications</div>${esc(r.reqSnippet)}</div>` : `<div class="snip"><div class="k mono">Why</div>${esc(r.why)}</div>`;
-    return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a></div></div>${actRow(r)}`;
+    return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a>${people(r)}</div></div>${actRow(r)}`;
   }
   function listFor(tab) {  // the universe of rows for a tab, before filters
     if (tab === 'inbox') return roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; });
@@ -467,7 +488,8 @@ footer a { color: var(--ink); }
     if (state.sector) list = list.filter(r => r.sector === state.sector);
     if (state.disc) list = list.filter(r => r.discipline === state.disc);
     if (state.days) list = list.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -Number(state.days));
-    if (state.q) list = list.filter(r => (r._q || [r.company, r.title, r.location].join(' ').toLowerCase()).includes(state.q));
+    if (state.q) { const words = state.q.split(/\s+/).filter(Boolean);  // every word must appear somewhere in the row
+      list = list.filter(r => { const h = r._q || [r.company, r.title, r.location].join(' ').toLowerCase(); return words.every(w => h.includes(w)); }); }
     if (!listTab) list = sorted(list);
     document.querySelectorAll('th.sortable').forEach(th => (!listTab && th.dataset.sort === state.sort) ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = list.length + ' of ' + base.length + ' roles';
