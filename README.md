@@ -66,12 +66,13 @@ The public repo and the public page never hold this state.
 ## Terps finder (UMD alumni at each company)
 
 Every role's panel links to LinkedIn's alumni view for the University of Maryland filtered to that company (and
-division), and to Terrapins Connect. With a Google Programmable Search engine restricted to `linkedin.com/in`
-(free, 100 queries/day) the morning run also searches `"University of Maryland" "<company>"` for every company
-with Yes/Maybe fits, once a week per company, and stores names, headlines and profile links in `people.json` in the
-private state repo. The page shows them under "Terps found here" when sync is connected; the email adds
-"N Terps there" to new fits. Setup: repo variable `GOOGLE_CSE_ID`, secret `GOOGLE_CSE_KEY` (plus the state repo
-above). It only reads public search results; it never contacts anyone.
+division), and to Terrapins Connect. With a Google-results API key the morning run also searches
+`site:linkedin.com/in "University of Maryland" "<company>"` for every company with Yes/Maybe fits, each company every
+two weeks, at most 15 searches a run, and stores names, headlines and profile links in `people.json` in the private
+state repo. The page shows them under "Terps found here" when sync is connected; the email adds "N Terps there" to
+new fits. Setup: secret `SERPAPI_KEY` (serpapi.com, 250 free searches/month, no card) or `SERPER_KEY` (serper.dev,
+2,500 free once), plus the state repo above. Google's own Custom Search JSON API is closed to new customers and is
+not supported. It only reads public search results; it never contacts anyone.
 
 ## Safeguards
 

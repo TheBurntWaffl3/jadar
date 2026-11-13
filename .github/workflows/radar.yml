@@ -97,8 +97,8 @@ jobs:
         if: steps.scan.outcome == 'success' && inputs.only == '' && github.event.schedule != '43 23 * * *'
         env:
           RADAR_DATA: data
-          GOOGLE_CSE_ID: ${{ vars.GOOGLE_CSE_ID }}
-          GOOGLE_CSE_KEY: ${{ secrets.GOOGLE_CSE_KEY }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          SERPER_KEY: ${{ secrets.SERPER_KEY }}
           STATE_REPO: ${{ vars.STATE_REPO }}
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I finder.py

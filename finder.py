@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Terps finder: for every company with a Yes/Maybe fit, search public LinkedIn profiles of University of Maryland people
-there, via Google Programmable Search (an engine restricted to linkedin.com/in). Results go to people.json in Kevin's
-PRIVATE state repo (never the public page or data branch). Read-only; nobody is contacted.
+there, through a Google-results API: SerpApi (SERPAPI_KEY; free 250/month) or Serper (SERPER_KEY; 2,500 free once).
+Google's own Custom Search JSON API is closed to new customers since 2026-01-20 and is not supported.
+Results go to people.json in Kevin's PRIVATE state repo (never the public page or data branch). Read-only; nobody is contacted.
 
-Env: GOOGLE_CSE_ID, GOOGLE_CSE_KEY (search), STATE_REPO, STATE_TOKEN, STATE_PATH-like PEOPLE_PATH (default people.json),
-     RADAR_DATA (data dir with radar_out.json), FINDER_MAX (queries per run, default 60; Google's free quota is 100/day),
-     FINDER_DAYS (re-search a company after this many days, default 7)."""
+Env: SERPAPI_KEY or SERPER_KEY (search), STATE_REPO, STATE_TOKEN, PEOPLE_PATH (default people.json),
+     RADAR_DATA (data dir with radar_out.json), FINDER_MAX (queries per run, default 15), FINDER_DAYS (re-search a company
+     after this many days, default 14). ~83 companies / 14 days = ~180 searches a month, under SerpApi's free 250."""
 import json, os, re, sys, base64, urllib.request, urllib.parse, urllib.error, datetime as dt
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +26,7 @@ def company_key(c):
     return re.sub(r"\s+", " ", re.sub(r"\s*\(.*?\)\s*", " ", c or "").split(" / ")[0]).strip()
 
 def query_for(key):
-    return f'{SCHOOL} "{ALIAS.get(key, key)}"'
+    return f'site:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"'
 
 def parse_items(items):
     """Google CSE items -> people entries. Titles look like 'Jane Doe - Propulsion Engineer - Anduril | LinkedIn'."""
@@ -41,14 +42,24 @@ def parse_items(items):
         if name: out.append(dict(name=name[:80], headline=headline, url=url.split("?")[0], snippet=snippet))
     return out
 
-def search(key, fetch):
-    q = query_for(key)
-    url = "https://www.googleapis.com/customsearch/v1?" + urllib.parse.urlencode(
-        {"key": os.environ["GOOGLE_CSE_KEY"], "cx": os.environ["GOOGLE_CSE_ID"], "q": q, "num": 10})
-    return q, parse_items(fetch(url).get("items", []))
+def provider():
+    if os.environ.get("SERPAPI_KEY"): return "serpapi"
+    if os.environ.get("SERPER_KEY"): return "serper"
+    return None
 
-def http_json(url, token=None, method="GET", body=None):
-    hd = {"Accept": "application/vnd.github+json" if "api.github.com" in url else "application/json", "User-Agent": "job-radar-finder"}
+def search(key, fetch):
+    """-> (query, people). `fetch(url, token=None, method='GET', body=None, headers=None)` returns parsed JSON."""
+    q = query_for(key)
+    if provider() == "serpapi":
+        url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"]})
+        return q, parse_items(fetch(url).get("organic_results", []))
+    if provider() == "serper":
+        j = fetch("https://google.serper.dev/search", None, "POST", {"q": q, "num": 10}, {"X-API-KEY": os.environ["SERPER_KEY"]})
+        return q, parse_items(j.get("organic", []))
+    raise RuntimeError("no search provider configured")
+
+def http_json(url, token=None, method="GET", body=None, headers=None):
+    hd = {"Accept": "application/vnd.github+json" if "api.github.com" in url else "application/json", "User-Agent": "job-radar-finder", **(headers or {})}
     if token: hd["Authorization"] = "Bearer " + token
     data = json.dumps(body).encode() if body is not None else None
     if data: hd["Content-Type"] = "application/json"
@@ -71,7 +82,7 @@ def save_people(doc, sha, fetch):
     if sha: body["sha"] = sha
     fetch(gh_url(), os.environ["STATE_TOKEN"], "PUT", body)
 
-def plan(out, people, today, days=7, max_q=60):
+def plan(out, people, today, days=14, max_q=15):
     """Companies with Yes/Maybe fits whose entry is missing or older than `days`, most fits first, capped."""
     counts = {}
     for r in out.get("roles", []):
@@ -82,21 +93,22 @@ def plan(out, people, today, days=7, max_q=60):
     return due[:max_q], len(counts)
 
 def main():
-    for k in ("GOOGLE_CSE_ID", "GOOGLE_CSE_KEY", "STATE_REPO", "STATE_TOKEN"):
+    if not provider(): print("finder: no SERPAPI_KEY or SERPER_KEY; skipped"); return
+    for k in ("STATE_REPO", "STATE_TOKEN"):
         if not os.environ.get(k): print(f"finder: {k} not set; skipped"); return
     with open(os.path.join(DATA, "radar_out.json")) as f: out = json.load(f)
     today = dt.date.today()
     people, sha = load_people(http_json)
-    due, total = plan(out, people, today, int(os.environ.get("FINDER_DAYS") or 7), int(os.environ.get("FINDER_MAX") or 60))
-    print(f"finder: {total} companies with fits, {len(due)} due for a search")
+    due, total = plan(out, people, today, int(os.environ.get("FINDER_DAYS") or 14), int(os.environ.get("FINDER_MAX") or 15))
+    print(f"finder ({provider()}): {total} companies with fits, {len(due)} due for a search this run")
     done = 0; found = 0
     for key in due:
         try:
-            q, found_people = search(key, lambda u: http_json(u))
+            q, found_people = search(key, http_json)
         except urllib.error.HTTPError as e:
             try: detail = re.sub(r"\s+", " ", e.read().decode("utf-8", "replace"))[:400]
             except Exception: detail = ""
-            print(f"finder: stopped at {key}: HTTP {e.code}. Google said: {detail}"); break
+            print(f"finder: stopped at {key}: HTTP {e.code}. Provider said: {detail}"); break
         people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=q, people=found_people)
         done += 1; found += len(found_people)
     if done:

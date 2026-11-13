@@ -16,8 +16,8 @@ class FinderTests(unittest.TestCase):
         self.assertEqual(finder.company_key("Rocket Lab"), "Rocket Lab")
 
     def test_query_and_parse(self):
-        self.assertEqual(finder.query_for("RTX"), '"University of Maryland" "Raytheon"')
-        self.assertEqual(finder.query_for("Anduril"), '"University of Maryland" "Anduril"')
+        self.assertEqual(finder.query_for("RTX"), 'site:linkedin.com/in "University of Maryland" "Raytheon"')
+        self.assertEqual(finder.query_for("Anduril"), 'site:linkedin.com/in "University of Maryland" "Anduril"')
         p = finder.parse_items(ITEMS)
         self.assertEqual([x["name"] for x in p], ["Jane Doe", "John Roe"])
         self.assertEqual(p[0]["headline"], "Propulsion Engineer · Anduril Industries")
@@ -30,19 +30,24 @@ class FinderTests(unittest.TestCase):
         due, total = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=60)
         self.assertEqual(total, 3); self.assertEqual(due, ["Anduril", "SpaceX"])
         due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=1); self.assertEqual(due, ["Anduril"])
+        due, _ = finder.plan(out, people, dt.date(2026, 11, 13)); self.assertEqual(due, ["Anduril", "SpaceX"], "defaults: 14 days, 15 per run")
 
     def test_end_to_end_with_stubbed_network(self):
-        os.environ.update(GOOGLE_CSE_ID="cx", GOOGLE_CSE_KEY="k", STATE_REPO="o/r", STATE_TOKEN="t")
+        os.environ.update(SERPAPI_KEY="k", STATE_REPO="o/r", STATE_TOKEN="t"); os.environ.pop("SERPER_KEY", None)
         calls = []
-        def fake(url, token=None, method="GET", body=None):
+        def fake(url, token=None, method="GET", body=None, headers=None):
             calls.append((method, url.split("?")[0], body))
             if "api.github.com" in url and method == "GET":
                 import urllib.error
                 raise urllib.error.HTTPError(url, 404, "nf", {}, None)
-            if "googleapis.com/customsearch" in url: return {"items": ITEMS}
+            if "serpapi.com/search.json" in url: return {"organic_results": ITEMS}
+            if "google.serper.dev" in url: return {"organic": ITEMS}
             return {}
         people, sha = finder.load_people(fake); self.assertEqual(people, {"v": 1, "companies": {}}); self.assertIsNone(sha)
-        q, found = finder.search("Anduril", lambda u: fake(u)); self.assertEqual(len(found), 2)
+        q, found = finder.search("Anduril", fake); self.assertEqual(len(found), 2)
+        os.environ.pop("SERPAPI_KEY"); os.environ["SERPER_KEY"] = "s"
+        q2, found2 = finder.search("Anduril", fake); self.assertEqual(len(found2), 2); self.assertEqual(finder.provider(), "serper")
+        os.environ.pop("SERPER_KEY"); self.assertIsNone(finder.provider())
         people["companies"]["Anduril"] = dict(searched="2026-11-13", query=q, people=found)
         finder.save_people(people, None, fake)
         put = [c for c in calls if c[0] == "PUT"][0]
