@@ -93,6 +93,16 @@ jobs:
           QUIET_IF_EMPTY: ${{ github.event.schedule == '43 23 * * *' && '1' || '' }}
         run: python3 -I alert.py
 
+      - name: Find UMD alumni at companies with fits (private people.json)
+        if: steps.scan.outcome == 'success' && inputs.only == '' && github.event.schedule != '43 23 * * *'
+        env:
+          RADAR_DATA: data
+          GOOGLE_CSE_ID: ${{ vars.GOOGLE_CSE_ID }}
+          GOOGLE_CSE_KEY: ${{ secrets.GOOGLE_CSE_KEY }}
+          STATE_REPO: ${{ vars.STATE_REPO }}
+          STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
+        run: python3 -I finder.py
+
       - name: Commit cache and outputs to the data branch
         if: steps.scan.outcome == 'success'
         run: |

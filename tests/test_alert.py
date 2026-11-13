@@ -46,6 +46,11 @@ class AlertTests(unittest.TestCase):
             alert.save_alerted({"https://old": "2026-01-01", "https://keep": "2026-11-01"}, ["https://x/3"], TODAY)
             self.assertEqual(alert.load_alerted(), {"https://keep": "2026-11-01", "https://x/3": "2026-11-12"})
 
+    def test_terps_count_in_lines(self):
+        title, body, prio, parts = alert.compose(OUT, TODAY, people={"SpaceX": 4})
+        self.assertIn("- SpaceX: Thermal Engineer (Hawthorne, CA) - Yes, new-grad / entry title (4 Terps there)", body)
+        self.assertIn("4 Terps there", alert.render_html(parts))
+
     def test_no_state_configured(self):
         for k in ("STATE_REPO", "STATE_TOKEN"): os.environ.pop(k, None)
         self.assertEqual(alert.load_state(), {})

@@ -53,10 +53,27 @@ def load_state():
     except Exception as e:
         print(f"state not read ({type(e).__name__}); alert ignores saved/applied/hidden"); return {}
 
-def compose(out, today=None, state=None, alerted=None):
+def load_people():
+    """{companyKey: n} Terps found per company from the private people.json written by finder.py; {} when unavailable."""
+    repo, token = os.environ.get("STATE_REPO"), os.environ.get("STATE_TOKEN")
+    if not repo or not token: return {}
+    import base64, re
+    try:
+        req = urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{os.environ.get('PEOPLE_PATH') or 'people.json'}",
+                                     headers={"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "User-Agent": "job-radar"})
+        with urllib.request.urlopen(req, timeout=30) as r: j = json.load(r)
+        doc = json.loads(base64.b64decode(j["content"]).decode("utf-8"))
+        return {k: len(v.get("people") or []) for k, v in (doc.get("companies") or {}).items()}
+    except Exception: return {}
+
+def company_key(c):
+    import re
+    return re.sub(r"\s+", " ", re.sub(r"\s*\(.*?\)\s*", " ", c or "").split(" / ")[0]).strip()
+
+def compose(out, today=None, state=None, alerted=None, people=None):
     """-> (title, body, priority, parts). Body is plain text, phone-sized; `parts` feeds the HTML email.
     `state` = {url: saved|applied|hidden} from load_state(); `alerted` = {url: date} already sent (left out)."""
-    today = today or dt.date.today(); state = state or {}; alerted = alerted or {}
+    today = today or dt.date.today(); state = state or {}; alerted = alerted or {}; people = people or {}
     rank = {"Yes": 0, "Maybe": 1}
     skip = {u for u, st in state.items() if st in ("hidden", "applied")} | set(alerted)
     star = lambda r: "* " if state.get(r["url"]) == "saved" else ""
@@ -67,7 +84,8 @@ def compose(out, today=None, state=None, alerted=None):
         lines.append(f"{len(new)} new fit{'s' if len(new) != 1 else ''} ({sum(r['fit']=='Yes' for r in new)} Yes):")
         for r in new[:MAX_NEW]:
             loc = f" ({r['location']})" if r.get("location") else ""
-            lines.append(f"- {star(r)}{r['company']}: {r['title']}{loc} - {r['fit']}, {r['why']}\n  {r['url']}")
+            terps = people.get(company_key(r["company"]), 0)
+            lines.append(f"- {star(r)}{r['company']}: {r['title']}{loc} - {r['fit']}, {r['why']}" + (f" ({terps} Terps there)" if terps else "") + f"\n  {r['url']}")
         if len(new) > MAX_NEW: lines.append(f"  ... and {len(new) - MAX_NEW} more on the page")
     else:
         lines.append("No new Yes/Maybe fits today.")
@@ -92,14 +110,15 @@ def compose(out, today=None, state=None, alerted=None):
     if bad and not new: title += f" ({len(bad)} feed{'s' if len(bad) != 1 else ''} failing)"
     parts = dict(new=new, soon=soon, ok=len(ok), total=len(st), bad=[s["org"] for s in bad], applied=applied, url=url,
                  saved={u for u, s_ in state.items() if s_ == "saved"}, today=today, scanned=out.get("scanned", ""),
-                 fits=sum(1 for r in out.get("roles", []) if r["fit"] in rank and r["url"] not in skip))
+                 fits=sum(1 for r in out.get("roles", []) if r["fit"] in rank and r["url"] not in skip), people=people)
     return title, "\n".join(lines), ("high" if yes else "default"), parts
 
 def render_html(parts):
     """The email body: a short digest in the page's look (black header, blue accent), inline styles only."""
     e = html.escape; p = parts
     def row(r, extra=""):
-        meta = " · ".join(x for x in [r.get("location") or "", r.get("salary") or "", extra] if x)
+        terps = p.get("people", {}).get(company_key(r["company"]), 0)
+        meta = " · ".join(x for x in [r.get("location") or "", r.get("salary") or "", extra, (f"{terps} Terps there" if terps else "")] if x)
         saved = ' <span style="color:#2f5bea">★</span>' if r["url"] in p["saved"] else ""
         color = "#0ca30c" if r["fit"] == "Yes" else "#2f5bea"
         return (f'<tr><td style="padding:10px 0;border-bottom:1px solid #ececee;vertical-align:top">'
@@ -147,7 +166,7 @@ def send_email(title, body, html_body=None):
 def main():
     with open(os.path.join(DATA, "radar_out.json")) as f: out = json.load(f)
     today = dt.date.today(); ledger = load_alerted()
-    title, body, prio, parts = compose(out, today, state=load_state(), alerted=ledger)
+    title, body, prio, parts = compose(out, today, state=load_state(), alerted=ledger, people=load_people())
     print(title); print(body)
     if os.environ.get("QUIET_IF_EMPTY") == "1" and not parts["new"]:
         print("nothing new since the last alert; quiet run, nothing sent"); return

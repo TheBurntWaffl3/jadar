@@ -67,6 +67,11 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   `state.json` through the GitHub Contents API with a fine-grained token kept in the browser (`jadar.sync.v1`).
   `alert.py` reads the same file when `STATE_REPO`/`STATE_TOKEN` are set and skips hidden/applied roles. Never
   embed state or tokens in the public page.
+- **Terps finder** (`finder.py`, morning run only): Google Programmable Search (engine restricted to linkedin.com/in,
+  `GOOGLE_CSE_ID`/`GOOGLE_CSE_KEY`) for `"University of Maryland" "<company alias>"`, one query per company with
+  Yes/Maybe fits, re-searched weekly, max 60/run (free quota 100/day). Results -> `people.json` in the private state repo;
+  page shows "Terps found here" when sync is connected, `alert.py` adds "N Terps there". Public page never embeds names.
+  LinkedIn itself is never fetched or automated; the page only links to LinkedIn's own alumni search.
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 
