@@ -31,8 +31,10 @@ FIELD_WORD = {"Thermal": "thermal", "Propulsion": "propulsion", "Structures": "s
               "Naval": "naval", "Aero": "aerodynamics", "Mechanical": "mechanical"}
 BIG = 8  # fits at or above this -> also search the company's top disciplines
 
-def query_for(key, term=None):
-    return f'site:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"' + (f" {term}" if term else "")
+def query_for(key, term=None, site_in_query=False):
+    """The search text. SerpApi gets the site restriction as a parameter (as_sitesearch) because Google quietly drops a
+    `site:` operator and auto-corrects when it finds few matches; Serper has no such parameter, so it keeps `site:` in the text."""
+    return ("site:linkedin.com/in " if site_in_query else "") + f'{SCHOOL} "{ALIAS.get(key, key)}"' + (f" {term}" if term else "")
 
 def parse_items(items):
     """Google CSE items -> people entries. Titles look like 'Jane Doe - Propulsion Engineer - Anduril | LinkedIn'."""
@@ -55,18 +57,20 @@ def provider():
 
 def search(key, fetch, term=None):
     """-> (query, people). `fetch(url, token=None, method='GET', body=None, headers=None)` returns parsed JSON."""
-    q = query_for(key, term)
     if provider() == "serpapi":
-        url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"]})
+        q = query_for(key, term)
+        url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"],
+                                                                           "as_sitesearch": "linkedin.com", "nfpr": 1, "hl": "en", "gl": "us"})
         j = fetch(url); raw = j.get("organic_results", [])
-        note = j.get("error") or (j.get("search_metadata") or {}).get("status")
+        note = j.get("error") or (j.get("search_information") or {}).get("organic_results_state")
     elif provider() == "serper":
+        q = query_for(key, term, site_in_query=True)
         j = fetch("https://google.serper.dev/search", None, "POST", {"q": q, "num": 10}, {"X-API-KEY": os.environ["SERPER_KEY"]})
         raw = j.get("organic", []); note = j.get("message")
     else:
         raise RuntimeError("no search provider configured")
     people = parse_items(raw)
-    print(f"  {q[:90]} -> {len(raw)} results, {len(people)} profiles" + (f" ({note})" if note and note != "Success" else ""))
+    print(f"  {q[:90]} -> {len(raw)} results, {len(people)} profiles" + (f" ({note})" if note and note not in ("Success", "Results for exact spelling") else ""))
     if raw and not people:  # show what Google gave instead, so the filter can be tuned
         for it in raw[:4]: print(f"      skipped: {(it.get('link') or '')[:100]} | {(it.get('title') or '')[:70]}")
     return q, people

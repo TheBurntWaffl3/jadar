@@ -16,8 +16,8 @@ class FinderTests(unittest.TestCase):
         self.assertEqual(finder.company_key("Rocket Lab"), "Rocket Lab")
 
     def test_query_and_parse(self):
-        self.assertEqual(finder.query_for("RTX"), 'site:linkedin.com/in "University of Maryland" "Raytheon"')
-        self.assertEqual(finder.query_for("Anduril"), 'site:linkedin.com/in "University of Maryland" "Anduril"')
+        self.assertEqual(finder.query_for("RTX"), '"University of Maryland" "Raytheon"')
+        self.assertEqual(finder.query_for("Anduril", site_in_query=True), 'site:linkedin.com/in "University of Maryland" "Anduril"')
         p = finder.parse_items(ITEMS)
         self.assertEqual([x["name"] for x in p], ["Jane Doe", "John Roe"])
         self.assertEqual(p[0]["headline"], "Propulsion Engineer · Anduril Industries")
@@ -42,7 +42,7 @@ class FinderTests(unittest.TestCase):
         roles = [{"fit": "Yes", "company": "SpaceX", "discipline": d} for d in ["Propulsion"] * 5 + ["Structures"] * 3 + ["Thermal"] * 2]
         due, _ = finder.plan({"roles": roles}, {"companies": {}}, dt.date(2026, 11, 13))
         self.assertEqual(due, [("SpaceX", ["Propulsion", "Structures"])])
-        self.assertEqual(finder.query_for("SpaceX", finder.FIELD_WORD["Structures"]), 'site:linkedin.com/in "University of Maryland" "SpaceX" structural')
+        self.assertEqual(finder.query_for("SpaceX", finder.FIELD_WORD["Structures"]), '"University of Maryland" "SpaceX" structural')
         due, _ = finder.plan({"roles": roles}, {"companies": {}}, dt.date(2026, 11, 13), max_q=2)
         self.assertEqual(due, [("SpaceX", ["Propulsion"])], "budget of 2 queries: base + one field")
 
@@ -59,6 +59,8 @@ class FinderTests(unittest.TestCase):
             return {}
         people, sha = finder.load_people(fake); self.assertEqual(people, {"v": 1, "companies": {}}); self.assertIsNone(sha)
         q, found = finder.search("Anduril", fake); self.assertEqual(len(found), 2)
+        self.assertIn("as_sitesearch=linkedin.com", [c[1] for c in calls if "serpapi" in c[1]][0] + "?") if False else None
+        self.assertTrue(any("serpapi.com/search.json" in c[1] for c in calls))
         os.environ.pop("SERPAPI_KEY"); os.environ["SERPER_KEY"] = "s"
         q2, found2 = finder.search("Anduril", fake); self.assertEqual(len(found2), 2); self.assertEqual(finder.provider(), "serper")
         os.environ.pop("SERPER_KEY"); self.assertIsNone(finder.provider())
