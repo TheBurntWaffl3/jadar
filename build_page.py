@@ -125,6 +125,18 @@ tr.detail td { padding: 0 10px 16px; background: var(--card); }
 .found li a { color: var(--ink); font-weight: 600; text-decoration: none; } .found li a:hover { text-decoration: underline; }
 .found li .hl { color: var(--muted); font-size: 13px; }
 .found .quiet { color: var(--muted); }
+.found .fhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.found .fhead .k { margin: 0; }
+.tseg { display: inline-flex; gap: 2px; background: var(--pill); border-radius: 999px; padding: 2px; }
+.pbtn.sm { padding: 3px 10px; font-size: 12px; min-height: 0; border-color: transparent; background: transparent; }
+.tseg .pbtn.sm.on { background: var(--ink); color: var(--page); }
+.found li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; }
+.found li .why-t { font-size: 10.5px; color: var(--ember); background: var(--tint); border-radius: 999px; padding: 1px 7px; letter-spacing: .06em; text-transform: uppercase; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.found li .draft-b { margin-left: auto; }
+.draft { flex-basis: 100%; display: grid; gap: 8px; margin: 4px 0 6px; }
+.draft textarea { width: 100%; min-height: 128px; font: inherit; font-size: 13.5px; line-height: 1.45; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--page); color: var(--ink); resize: vertical; }
+.draft .brow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.draft .brow .quiet { font-size: 12.5px; }
 .tag.terps { background: var(--tint); color: var(--ember); }
 .empty { padding: 24px 10px; color: var(--muted); }
 
@@ -141,7 +153,7 @@ td.acts { white-space: nowrap; width: 96px; padding-left: 4px; padding-right: 4p
 .ic { width: 28px; height: 28px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; vertical-align: middle; }
 .ic:hover, .ic:focus-visible { background: var(--pill); color: var(--ink); outline: none; }
 .ic.on.save { color: var(--ember); } .ic.on.applied { color: var(--good); } .ic.on.hide { color: var(--crit); }
-.tag.closed { background: var(--pill); color: var(--muted); } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
+.tag.closed { background: var(--pill); color: var(--muted); } .tag.status.repost { opacity: .85; } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
 tr.row.dim td .role a, tr.row.dim td.co, tr.row.dim td.why { color: var(--muted); }
 .actrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
 .pbtn { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--page); color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; min-height: 32px; }
@@ -320,14 +332,25 @@ footer a { color: var(--ink); }
   const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
   function loadState() { try { const s = JSON.parse(lsGet(KEY) || 'null'); if (s && s.v === 1 && s.roles) return s; } catch (e) {} return {v: 1, roles: {}}; }
   let S = loadState();
-  function persist() { lsSet(KEY, JSON.stringify(S)); schedulePush(); }
+  function persist() { FPM = null; lsSet(KEY, JSON.stringify(S)); schedulePush(); }
   const entry = url => S.roles[url];
   const statusOf = url => (S.roles[url] || {}).status || null;
+  // fingerprint = company + normalized title: a re-posted job (new URL, same job) stays hidden / applied
+  const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const fpOf = r => companyKey(r.company) + '|' + norm(r.title);
+  Object.values(S.roles).forEach(e => { if (!e.fp && e.snap && e.snap.title) e.fp = fpOf(e.snap); });  // migrate older entries
+  let FPM = null;  // fp -> 'hidden' | 'applied', rebuilt on each render
+  function fpMap() { const m = {}; Object.values(S.roles).forEach(e => { if ((e.status === 'hidden' || e.status === 'applied') && e.fp) m[e.fp] = m[e.fp] === 'applied' ? 'applied' : e.status; }); return m; }
+  function effStatus(r) {  // own status, else the status of another posting with the same company + title
+    const own = statusOf(r.url); if (own) return {status: own, repost: false};
+    const via = (FPM || (FPM = fpMap()))[fpOf(r)]; return via ? {status: via, repost: true} : {status: null, repost: false};
+  }
+  const inInbox = r => { const e = effStatus(r); return e.status !== 'hidden' && e.status !== 'applied'; };
   function snapOf(r) { const s = {company: r.company, title: r.title, location: r.location || '', url: r.url, fit: r.fit}; if (r.applyBy) s.applyBy = r.applyBy; return s; }
   function setStatus(r, status) {
     const url = r.url, cur = S.roles[url];
     if (!status) { if (cur && cur.note) { cur.status = null; cur.at = new Date().toISOString(); } else delete S.roles[url]; }
-    else S.roles[url] = Object.assign({}, cur || {}, {status, at: new Date().toISOString(), snap: (cur && cur.snap && cur.snap.title) ? cur.snap : snapOf(r)});
+    else S.roles[url] = Object.assign({}, cur || {}, {status, at: new Date().toISOString(), snap: (cur && cur.snap && cur.snap.title) ? cur.snap : snapOf(r), fp: fpOf(r)});
     persist();
   }
   function setNote(r, note) {
@@ -356,7 +379,7 @@ footer a { color: var(--ink); }
   $('#meta').innerHTML = ['Scanned ' + esc(stamp), 'rules ' + esc(D.rulesVersion || '—'), D.fullRead ? 'full re-read' : 'incremental', okN + '/' + (okN + failN) + ' boards'].join('<span class="sep">·</span>');
   if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
   function renderStats() {
-    const inbox = roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; });
+    const inbox = roles.filter(inInbox);
     const fits = inbox.filter(r => r.fit !== 'No');
     const week = fits.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -7).length;
     const closing = fits.filter(r => r._dt != null && r._dt >= 0 && r._dt <= 14).length;
@@ -375,7 +398,7 @@ footer a { color: var(--ink); }
   }
 
   // controls
-  const state = {tab: 'inbox', fit: 'fits', sector: '', disc: '', days: '', q: '', sort: 'fit', dir: 'asc', open: null};
+  const state = {tab: 'inbox', fit: 'fits', sector: '', disc: '', days: '', q: '', sort: 'fit', dir: 'asc', open: null, draft: null};
   const fill = (sel, vals) => { vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); }); };
   fill($('#sector'), [...new Set(roles.map(r => r.sector).filter(Boolean))].sort());
   fill($('#disc'), [...new Set(roles.map(r => r.discipline).filter(Boolean))].sort());
@@ -423,10 +446,11 @@ footer a { color: var(--ink); }
     const s = e.snap || {}; return Object.assign({}, s, {id: 'snap:' + s.url, _closed: true, _dt: daysTo(s.applyBy), why: '', _q: ''});
   }
   function tagsFor(r) {
-    const t = []; const st = statusOf(r.url);
+    const t = []; const es = effStatus(r); const st = es.status;
     if (r._closed) t.push('<span class="tag closed">closed</span>');
     if (r._new) t.push('<span class="tag new">New</span>');
-    if (st && state.tab !== st && state.tab !== 'saved' && state.tab !== 'applied' && state.tab !== 'hidden') t.push(`<span class="tag status ${st}">${st === 'hidden' ? 'Hidden' : st === 'applied' ? 'Applied' : 'Saved'}</span>`);
+    if (st && state.tab !== st && state.tab !== 'saved' && state.tab !== 'applied' && state.tab !== 'hidden')
+      t.push(`<span class="tag status ${st}${es.repost ? ' repost' : ''}">${st === 'hidden' ? 'Hidden' : st === 'applied' ? 'Applied' : 'Saved'}${es.repost ? ' (re-post)' : ''}</span>`);
     if (r._dt != null && r._dt >= 0 && r._dt <= 10) t.push(`<span class="tag closing">${r._dt === 0 ? 'Closes today' : 'Closes in ' + r._dt + 'd'}</span>`);
     if (r.workMode) t.push(`<span class="tag">${esc(r.workMode)}</span>`);
     if (r.employment && r.employment !== 'Full-time') t.push(`<span class="tag">${esc(r.employment)}</span>`);
@@ -472,18 +496,66 @@ footer a { color: var(--ink); }
   let PEOPLE = null;  // {v, updated, companies: {companyKey: {searched, people: [{name, headline, url}]}}}
   function peopleFor(r) { if (!PEOPLE || !PEOPLE.companies) return null; const e = PEOPLE.companies[companyKey(r.company)]; return e && Array.isArray(e.people) ? e : null; }
   const linkedinOk = u => typeof u === 'string' && /^https?:\/\/([a-z0-9-]+\.)*linkedin\.com\//i.test(u);
+  const TKEY = 'jadar.terps.v1', NKEY = 'jadar.notetpl.v1';
+  const terpsMode = () => lsGet(TKEY) === 'all' ? 'all' : 'likely';
+  const FIELD_OF = {Thermal: 'thermal', Propulsion: 'propulsion', Structures: 'structures', Test: 'test', Nuclear: 'nuclear', Naval: 'naval', Aero: 'aero', Mechanical: 'mechanical'};
+  function rankPeople(list, r) {  // who is most likely to answer a student: recruiters, same field, recent grads
+    const field = FIELD_OF[r.discipline] || null;
+    const scored = list.map((p, i) => {
+      const text = ((p && p.headline) || '') + ' ' + ((p && p.snippet) || ''); const tags = []; let sc = 0;
+      if (/recruit|talent|university relations|campus|early career program/i.test(text)) { sc += 3; tags.push('recruiter'); }
+      if (field && p && typeof p.via === 'string' && p.via.toLowerCase() === field) { sc += 3; tags.push('same field'); }
+      if (/\b(202[2-6])\b|new grad|recent grad|engineer i\b|associate|entry/i.test(text)) { sc += 2; tags.push('recent grad'); }
+      if (/engineer/i.test((p && p.headline) || '')) sc += 1;
+      if (/\bvp\b|vice president|director|chief|head of|senior director/i.test(text)) sc -= 2;
+      return {p, i, sc, tags};
+    });
+    scored.sort((a, b) => b.sc - a.sc || String(a.p && a.p.name || '').localeCompare(String(b.p && b.p.name || '')) || a.i - b.i);
+    return scored;
+  }
+  const DRAFT = {};  // url -> people list as rendered (for the Draft note buttons)
   function foundBlock(r) {
     if (!syncCfg()) return `<div class="found"><span class="quiet">Connect sync in Data to see Terps found at this company.</span></div>`;
     const e = peopleFor(r);
     if (!e) return `<div class="found"><span class="quiet">Not searched yet (next weekly run).</span></div>`;
-    const head = `<div class="k mono">Terps found here${e.searched ? ' · searched ' + esc(fmt(String(e.searched).slice(0, 10))) : ''}</div>`;
+    const mode = terpsMode();
+    const seg = `<span class="tseg" role="group" aria-label="Terps order"><button type="button" class="pbtn sm${mode === 'likely' ? ' on' : ''}" data-terps="likely" aria-pressed="${mode === 'likely'}">Likely to reply</button><button type="button" class="pbtn sm${mode === 'all' ? ' on' : ''}" data-terps="all" aria-pressed="${mode === 'all'}">All</button></span>`;
+    const head = `<div class="fhead"><span class="k mono">Terps found here · ${e.people.length} found${e.searched ? ' · searched ' + esc(fmt(String(e.searched).slice(0, 10))) : ''}</span>${e.people.length ? seg : ''}</div>`;
     if (!e.people.length) return `<div class="found">${head}<span class="quiet">none found yet</span></div>`;
-    const items = e.people.slice(0, 6).map(p => {
-      const name = esc(p && p.name || 'Unknown'); const hl = p && p.headline ? ` <span class="hl">${esc(p.headline)}</span>` : '';
-      return `<li>${linkedinOk(p && p.url) ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${name} ↗</a>` : name}${hl}</li>`;
+    const ranked = mode === 'likely' ? rankPeople(e.people, r) : e.people.map((p, i) => ({p, i, sc: 0, tags: []}));
+    DRAFT[r.url] = ranked.map(x => x.p);
+    const items = ranked.slice(0, 6).map((x, k) => {
+      const p = x.p; const name = esc(p && p.name || 'Unknown'); const hl = p && p.headline ? `<span class="hl">${esc(p.headline)}</span>` : '';
+      const tags = mode === 'likely' ? x.tags.map(t => `<span class="why-t">${esc(t)}</span>`).join('') : '';
+      const dr = state.draft && state.draft.url === r.url && state.draft.pi === k ? draftPanel(p, r, state.draft.editing) : '';
+      return `<li data-pi="${k}">${linkedinOk(p && p.url) ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${name} ↗</a>` : name}${hl}${tags}<button type="button" class="pbtn sm draft-b" data-draft="${k}" aria-expanded="${!!dr}">Draft note</button>${dr}</li>`;
     }).join('');
     const more = e.people.length > 6 ? `<li class="quiet">+${e.people.length - 6} more</li>` : '';
     return `<div class="found">${head}<ul>${items}${more}</ul></div>`;
+  }
+  // ---------- Draft note: a copy-only message to one person; nothing is ever sent by the page ----------
+  const noteTemplate = () => lsGet(NKEY) || D.noteTemplate || '';
+  function fillNote(tpl, p, r) {
+    const name = (p && p.name) || ''; const first = name.trim().split(/\s+/)[0] || 'there';
+    return tpl.replace(/\{first\}/g, first).replace(/\{name\}/g, name).replace(/\{title\}/g, r.title || '').replace(/\{company\}/g, companyKey(r.company));
+  }
+  function draftPanel(p, r, editing) {
+    const tpl = noteTemplate();
+    const prof = linkedinOk(p && p.url) ? `<a class="pbtn sm" href="${esc(p.url)}" target="_blank" rel="noopener">Open profile ↗</a>` : '';
+    if (editing) return `<div class="draft" data-draft-panel="1"><span class="quiet">Template · placeholders: {first} {name} {title} {company}</span><textarea data-tpl="1" aria-label="Note template">${esc(tpl)}</textarea>` +
+      `<div class="brow"><button type="button" class="pbtn sm on" data-tpl-save="1">Save template</button><button type="button" class="pbtn sm" data-tpl-reset="1">Reset</button><button type="button" class="pbtn sm" data-draft-close="1">Close</button></div></div>`;
+    return `<div class="draft" data-draft-panel="1"><textarea data-note-ta="1" aria-label="Draft note">${esc(fillNote(tpl, p, r))}</textarea>` +
+      `<div class="brow"><button type="button" class="pbtn sm on" data-copy="1">Copy</button>${prof}<button type="button" class="pbtn sm" data-tpl-edit="1">Edit template</button><button type="button" class="pbtn sm" data-draft-close="1">Close</button><span class="quiet" data-copy-status=""></span></div></div>`;
+  }
+  function showDraft(r, pi, editing) {  // (re)render with the panel open and focus its textarea
+    state.draft = pi == null ? null : {url: r.url, pi, editing: !!editing}; render();
+    if (state.draft) { const ta = $(`.found li[data-pi="${pi}"] textarea`); if (ta) ta.focus({preventScroll: true}); }
+  }
+  async function copyText(text, statusEl, ta) {
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+    if (!ok && ta) { try { ta.focus(); ta.select(); ok = document.execCommand('copy'); } catch (e) {} }
+    if (statusEl) statusEl.textContent = ok ? 'copied' : 'select the text and copy';
   }
   function detail(r) {
     const yrs = r.minYears == null ? 'not stated' : r.minYears + (r.schoolExpOk ? ' (school/internship counts)' : '');
@@ -496,15 +568,15 @@ footer a { color: var(--ink); }
     return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a>${people(r)}${foundBlock(r)}</div></div>${actRow(r)}`;
   }
   function listFor(tab) {  // the universe of rows for a tab, before filters
-    if (tab === 'inbox') return roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; });
+    if (tab === 'inbox') return roles.filter(inInbox);
     if (tab === 'all') return roles.slice();
     const st = tab;  // saved / applied / hidden: stored entries, newest action first, closed postings as snapshots
     return Object.values(S.roles).filter(e => e.status === st).sort((a, b) => (b.at || '').localeCompare(a.at || ''))
       .map(e => byUrl.get(e.snap && e.snap.url) || snapRole(e));
   }
   function render() {
-    renderStats();
-    const c = counts(); const inboxN = roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; }).length;
+    FPM = null; renderStats();
+    const c = counts(); const inboxN = roles.filter(inInbox).length;
     const badges = {inbox: inboxN, saved: c.saved, applied: c.applied, hidden: c.hidden, all: roles.length};
     document.querySelectorAll('.tabs [data-badge]').forEach(b => b.textContent = badges[b.dataset.badge] ? ' ' + badges[b.dataset.badge] : '');
     $('#state-sum').textContent = (c.saved || c.applied || c.hidden) ? `${c.saved} saved · ${c.applied} applied · ${c.hidden} hidden` : '';
@@ -523,8 +595,8 @@ footer a { color: var(--ink); }
       $('#rows').innerHTML = `<tr><td colspan="9" class="empty">${msg}</td></tr>`; return;
     }
     $('#rows').innerHTML = list.map(r => {
-      const open = !r._closed && state.open === r.id; const st = statusOf(r.url);
-      const dim = state.tab === 'all' && (st === 'hidden');
+      const open = !r._closed && state.open === r.id; const es = effStatus(r);
+      const dim = state.tab === 'all' && (es.status === 'hidden');
       return `<tr class="row${dim ? ' dim' : ''}" data-id="${esc(r.id)}" data-url="${esc(r.url)}" tabindex="0" aria-expanded="${open}">
 <td class="fitco"><span class="fit ${esc(r.fit)}">${esc(r.fit)}</span><span class="co sm-co">${esc(r.company)}</span></td>
 <td class="co">${esc(r.company)}</td>
@@ -541,13 +613,29 @@ footer a { color: var(--ink); }
   $('#rows').addEventListener('click', e => {
     const b = e.target.closest('button[data-act]');
     if (b) { e.stopPropagation(); const r = roleFromEl(b); if (r) { act(r, b.dataset.act); render(); } return; }
-    if (e.target.closest('a') || e.target.closest('input') || e.target.closest('tr.detail')) return;
+    const tb = e.target.closest('button[data-terps]');
+    if (tb) { e.stopPropagation(); lsSet(TKEY, tb.dataset.terps); render(); return; }
+    const db = e.target.closest('button[data-draft], button[data-copy], button[data-tpl-edit], button[data-tpl-save], button[data-tpl-reset], button[data-draft-close]');
+    if (db) {
+      e.stopPropagation(); const r = roleFromEl(db); const li = db.closest('li'); if (!r || !li) return;
+      const pi = Number(li.dataset.pi); const p = (DRAFT[r.url] || [])[pi]; if (!p) return;
+      const isOpen = state.draft && state.draft.url === r.url && state.draft.pi === pi;
+      if (db.dataset.draft != null) showDraft(r, isOpen ? null : pi, false);
+      else if (db.dataset.copy) { const ta = li.querySelector('textarea[data-note-ta]'); copyText(ta ? ta.value : '', li.querySelector('[data-copy-status]'), ta); }
+      else if (db.dataset.tplEdit) showDraft(r, pi, true);
+      else if (db.dataset.tplSave) { const ta = li.querySelector('textarea[data-tpl]'); if (ta && ta.value.trim()) lsSet(NKEY, ta.value); showDraft(r, pi, false); }
+      else if (db.dataset.tplReset) { lsDel(NKEY); showDraft(r, pi, false); }
+      else if (db.dataset.draftClose) showDraft(r, null);
+      return;
+    }
+    if (e.target.closest('a') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('tr.detail')) return;
     const tr = e.target.closest('tr.row'); if (!tr || tr.querySelector('.chev[style]')) return;
-    state.open = state.open === tr.dataset.id ? null : tr.dataset.id; render();
+    state.open = state.open === tr.dataset.id ? null : tr.dataset.id; state.draft = null; render();
     if (state.open) { const el = $(`tr.row[data-id="${state.open}"]`); if (el) el.focus({preventScroll: true}); }
   });
   $('#rows').addEventListener('keydown', e => {
     if (e.target.matches('input[data-note]')) { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } return; }
+    if (e.target.matches('textarea')) return;
     if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('row')) { e.preventDefault(); e.target.click(); }
   });
   $('#rows').addEventListener('change', e => {
@@ -597,7 +685,7 @@ footer a { color: var(--ink); }
       const r = await fetch(peopleUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
       if (!r.ok) { if (r.status === 404) PEOPLE = {v: 1, companies: {}}; return; }
       const j = await r.json(); const d = JSON.parse(b64dec(j.content || ''));
-      if (d && typeof d === 'object' && d.companies && typeof d.companies === 'object') { PEOPLE = d; render(); }
+      if (d && typeof d === 'object' && d.companies && typeof d.companies === 'object' && JSON.stringify(d) !== JSON.stringify(PEOPLE)) { PEOPLE = d; render(); }
     } catch (e) { /* quiet: the block says "not searched yet" */ }
   }
   let syncing = false, pending = false, pushTimer = null;
@@ -647,7 +735,22 @@ footer a { color: var(--ink); }
 </html>
 """
 
-def build(out, src, profile_name=None):
+DEFAULT_NOTE = ("Hi {first}, I'm a University of Maryland {major} senior (graduating {grad}) and I'm applying to the {title} role at {company}. "
+                "I saw you're a fellow Terp there \u2014 would you be open to a 10-minute chat about the team, or to pointing me to the right person? "
+                "Happy to send my resume. Thanks so much,\n{signoff}")
+
+def note_template(profile):
+    """The default 'Draft note' text, with the profile's major, graduation month and first name baked in."""
+    profile = profile or {}
+    majors = profile.get("majors") or ["aerospace"]
+    major = majors[0] if majors[0].endswith("engineering") else majors[0] + " engineering"
+    grad = profile.get("gradDate") or "2027-05"
+    try: grad = dt.date(int(grad[:4]), int(grad[5:7]), 1).strftime("%B %Y")
+    except Exception: grad = "May 2027"
+    signoff = (profile.get("name") or "Kevin").split()[0]
+    return DEFAULT_NOTE.replace("{major}", major).replace("{grad}", grad).replace("{signoff}", signoff)
+
+def build(out, src, profile_name=None, profile=None):
     """Return the HTML string for a radar_out.json dict and sources.json list."""
     roles, orgs = build_dash.datasets(out, src)
     by_url = {r["url"]: r for r in out["roles"]}
@@ -659,7 +762,8 @@ def build(out, src, profile_name=None):
     roles = [{k: v for k, v in r.items() if v is not None and v is not False} for r in roles]  # drop empty keys: the page treats missing as null
     today = (out.get("scanned") or dt.date.today().isoformat())[:10]
     data = dict(roles=roles, orgs=orgs, new=[r["url"] for r in out.get("new", [])], today=today, scanned=out.get("scanned"),
-                rulesVersion=out.get("rulesVersion"), fullRead=out.get("fullRead"), profileName=profile_name)
+                rulesVersion=out.get("rulesVersion"), fullRead=out.get("fullRead"), profileName=profile_name or (profile or {}).get("name"),
+                noteTemplate=note_template(profile))
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     short = REPO_URL.replace("https://github.com/", "")
     return TEMPLATE.replace("__DATA__", blob).replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short)
@@ -669,12 +773,13 @@ def main():
     site = os.environ.get("SITE_DIR", os.path.join(ROOT, "site"))
     with open(os.path.join(data, "radar_out.json")) as f: out = json.load(f)
     with open(os.path.join(ROOT, "sources.json")) as f: src = json.load(f)
-    name = None
+    name = None; profile = None
     try:
         prof = os.environ.get("PROFILE") or os.path.join(ROOT, "profiles", f"{out.get('profile', 'kevin')}.json")
-        with open(prof) as f: name = json.load(f).get("name")
+        with open(prof) as f: profile = json.load(f)
+        name = profile.get("name")
     except Exception: pass
-    html = build(out, src, name)
+    html = build(out, src, name, profile)
     os.makedirs(site, exist_ok=True)
     with open(os.path.join(site, "index.html"), "w") as f: f.write(html)
     print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles")

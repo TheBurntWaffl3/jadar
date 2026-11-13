@@ -19,6 +19,29 @@ class PageTests(unittest.TestCase):
         for leak in ("Jane Doe", '"companies"', "janedoe"):  # people data is fetched at runtime, never embedded
             self.assertNotIn(leak, html)
 
+    def test_repost_terps_toggle_and_draft_note(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle", {"name": "Kevin Kyle", "majors": ["aerospace"], "gradDate": "2027-05"})
+        # 1. re-post fingerprint
+        self.assertIn("const fpOf = r => companyKey(r.company) + '|' + norm(r.title)", html)
+        self.assertIn("(re-post)", html); self.assertIn("function fpMap()", html); self.assertIn("effStatus", html)
+        # 2. Terps ranking toggle
+        self.assertIn("jadar.terps.v1", html); self.assertIn(">Likely to reply<", html); self.assertIn('data-terps="all"', html)
+        self.assertIn("function rankPeople(", html); self.assertIn("same field", html); self.assertIn("recent grad", html)
+        # 3. draft note: default template baked from the profile, editable template stored under its own key, copy only
+        self.assertIn("jadar.notetpl.v1", html)
+        blob = embedded(html)
+        self.assertIn("University of Maryland aerospace engineering senior (graduating May 2027)", blob["noteTemplate"])
+        self.assertTrue(blob["noteTemplate"].endswith("Thanks so much,\nKevin"))
+        self.assertIn("{first}", blob["noteTemplate"]); self.assertIn("{title}", blob["noteTemplate"]); self.assertIn("{company}", blob["noteTemplate"])
+        self.assertIn('data-draft="', html); self.assertIn('data-copy="1"', html); self.assertIn("navigator.clipboard.writeText", html)
+        self.assertNotIn("sendBeacon", html); self.assertNotIn("mailto:", html)
+        for leak in ("Jane Doe", '"companies"', "janedoe"): self.assertNotIn(leak, html)
+        # the fixture's re-post row is present: same company + title, different URL
+        ids = {r["id"]: r for r in blob["roles"]}
+        self.assertEqual((ids["r0014"]["company"], ids["r0014"]["title"]), (ids["r0002"]["company"], ids["r0002"]["title"])); self.assertNotEqual(ids["r0014"]["url"], ids["r0002"]["url"])
+        self.assertEqual(build_page.note_template(None).split("\n")[-1], "Kevin")
+        self.assertIn("nuclear engineering senior (graduating December 2028)", build_page.note_template({"name": "Pat Q", "majors": ["nuclear"], "gradDate": "2028-12"}))
+
     def test_terps_links(self):
         html = build_page.build(self.out, self.src, "Kevin Kyle")
         self.assertIn("linkedin.com/school/university-of-maryland/people/?keywords=", html)
@@ -53,7 +76,7 @@ class PageTests(unittest.TestCase):
         self.assertIn('id="sort"', html); self.assertIn("Apply-by soonest", html); self.assertIn('data-sort="salary"', html)
         self.assertIn('id="boards-toggle"', html); self.assertIn("Show boards", html)
         blob = embedded(html)
-        self.assertEqual(sum(r["fit"] == "Yes" for r in blob["roles"]), 5)
+        self.assertEqual(sum(r["fit"] == "Yes" for r in blob["roles"]), 6)
         self.assertEqual(sum(r["fit"] == "Maybe" for r in blob["roles"]), 4)
         self.assertEqual(blob["today"], "2026-11-12")
         self.assertIn("https://boards.greenhouse.io/spacex/jobs/1001", blob["new"])
