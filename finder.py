@@ -58,11 +58,16 @@ def search(key, fetch, term=None):
     q = query_for(key, term)
     if provider() == "serpapi":
         url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"]})
-        return q, parse_items(fetch(url).get("organic_results", []))
-    if provider() == "serper":
+        j = fetch(url); raw = j.get("organic_results", [])
+        note = j.get("error") or (j.get("search_metadata") or {}).get("status")
+    elif provider() == "serper":
         j = fetch("https://google.serper.dev/search", None, "POST", {"q": q, "num": 10}, {"X-API-KEY": os.environ["SERPER_KEY"]})
-        return q, parse_items(j.get("organic", []))
-    raise RuntimeError("no search provider configured")
+        raw = j.get("organic", []); note = j.get("message")
+    else:
+        raise RuntimeError("no search provider configured")
+    people = parse_items(raw)
+    print(f"  {q[:90]} -> {len(raw)} results, {len(people)} profiles" + (f" ({note})" if note and note != "Success" else ""))
+    return q, people
 
 def http_json(url, token=None, method="GET", body=None, headers=None):
     hd = {"Accept": "application/vnd.github+json" if "api.github.com" in url else "application/json", "User-Agent": "job-radar-finder", **(headers or {})}
@@ -98,7 +103,10 @@ def plan(out, people, today, days=14, max_q=15):
             d = r.get("discipline")
             if d in FIELD_WORD: fields.setdefault(k, {})[d] = fields.setdefault(k, {}).get(d, 0) + 1
     cutoff = (today - dt.timedelta(days=days)).isoformat()
-    due = [k for k in counts if (people.get("companies", {}).get(k, {}).get("searched") or "") < cutoff]
+    ents = people.get("companies", {})
+    # due: never searched, searched more than `days` ago, or searched with no result (retried the next day, not in 2 weeks)
+    due = [k for k in counts if (ents.get(k, {}).get("searched") or "") < cutoff
+           or (not ents.get(k, {}).get("people") and (ents.get(k, {}).get("searched") or "") < today.isoformat())]
     due.sort(key=lambda k: (-counts[k], k))
     todo, budget = [], max_q
     for k in due:

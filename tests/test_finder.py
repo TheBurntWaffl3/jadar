@@ -31,6 +31,11 @@ class FinderTests(unittest.TestCase):
         self.assertEqual(total, 3); self.assertEqual(due, [("Anduril", []), ("SpaceX", [])])
         due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=1); self.assertEqual(due, [("Anduril", [])])
         due, _ = finder.plan(out, people, dt.date(2026, 11, 13)); self.assertEqual(due, [("Anduril", []), ("SpaceX", [])], "defaults: 14 days, 15 per run")
+        # Boeing was searched yesterday but found nobody: retried today, not in two weeks
+        due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=14)
+        self.assertEqual([k for k, _ in due], ["Anduril", "Boeing", "SpaceX"])
+        people["companies"]["Boeing"]["searched"] = "2026-11-13"
+        due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=14); self.assertEqual([k for k, _ in due], ["Anduril", "SpaceX"])
 
     def test_big_companies_get_field_narrowed_searches(self):
         roles = [{"fit": "Yes", "company": "SpaceX", "discipline": d} for d in ["Propulsion"] * 5 + ["Structures"] * 3 + ["Thermal"] * 2]
