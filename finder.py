@@ -67,6 +67,8 @@ def search(key, fetch, term=None):
         raise RuntimeError("no search provider configured")
     people = parse_items(raw)
     print(f"  {q[:90]} -> {len(raw)} results, {len(people)} profiles" + (f" ({note})" if note and note != "Success" else ""))
+    if raw and not people:  # show what Google gave instead, so the filter can be tuned
+        for it in raw[:4]: print(f"      skipped: {(it.get('link') or '')[:100]} | {(it.get('title') or '')[:70]}")
     return q, people
 
 def http_json(url, token=None, method="GET", body=None, headers=None):

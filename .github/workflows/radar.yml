@@ -15,6 +15,9 @@ on:
       only:
         description: Only these organizations, separated by " | " (blank = all)
         default: ""
+      finder_max:
+        description: Max Terps-finder searches this run (blank = default 15)
+        default: ""
   push:
     paths: ["**.py", "sources.json", "profiles/**", ".github/workflows/radar.yml"]
 
@@ -99,6 +102,7 @@ jobs:
           RADAR_DATA: data
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           SERPER_KEY: ${{ secrets.SERPER_KEY }}
+          FINDER_MAX: ${{ inputs.finder_max }}
           STATE_REPO: ${{ vars.STATE_REPO }}
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I finder.py
