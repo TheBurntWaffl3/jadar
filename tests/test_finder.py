@@ -26,12 +26,13 @@ class FinderTests(unittest.TestCase):
     def test_plan_prefers_companies_with_most_fits_and_skips_fresh(self):
         out = {"roles": [{"fit": "Yes", "company": "Anduril"}, {"fit": "Maybe", "company": "Anduril"}, {"fit": "Yes", "company": "Boeing"},
                          {"fit": "No", "company": "Moog"}, {"fit": "Yes", "company": "SpaceX"}]}
-        people = {"companies": {"Boeing": {"searched": "2026-11-12", "people": []}, "SpaceX": {"searched": "2026-10-01", "people": []}}}
+        people = {"companies": {"Boeing": {"searched": "2026-11-12", "people": [{"name": "A Terp"}]}, "SpaceX": {"searched": "2026-10-01", "people": []}}}
         due, total = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=60)
         self.assertEqual(total, 3); self.assertEqual(due, [("Anduril", []), ("SpaceX", [])])
         due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=1); self.assertEqual(due, [("Anduril", [])])
         due, _ = finder.plan(out, people, dt.date(2026, 11, 13)); self.assertEqual(due, [("Anduril", []), ("SpaceX", [])], "defaults: 14 days, 15 per run")
-        # Boeing was searched yesterday but found nobody: retried today, not in two weeks
+        # Boeing searched yesterday but found nobody: retried today, not in two weeks; searched today -> not retried yet
+        people["companies"]["Boeing"]["people"] = []
         due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=14)
         self.assertEqual([k for k, _ in due], ["Anduril", "Boeing", "SpaceX"])
         people["companies"]["Boeing"]["searched"] = "2026-11-13"
