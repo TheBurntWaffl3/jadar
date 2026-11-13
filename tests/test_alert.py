@@ -46,6 +46,14 @@ class AlertTests(unittest.TestCase):
             alert.save_alerted({"https://old": "2026-01-01", "https://keep": "2026-11-01"}, ["https://x/3"], TODAY)
             self.assertEqual(alert.load_alerted(), {"https://keep": "2026-11-01", "https://x/3": "2026-11-12"})
 
+    def test_repost_hidden_by_fingerprint(self):
+        # SpaceX "Thermal Engineer" was hidden under an old URL; the same title re-posted under https://x/1 stays out
+        state = {"https://old/9": "hidden", "fp:" + alert.fingerprint("SpaceX", "Thermal  Engineer!"): "hidden"}
+        title, body, prio, parts = alert.compose(OUT, TODAY, state)
+        self.assertNotIn("SpaceX", body); self.assertEqual(title, "Job radar: 1 Yes, 1 Maybe new")
+        self.assertEqual(alert.fingerprint("L3Harris (incl. Aerojet Rocketdyne)", "Associate, Mechanical Engineering (Design)"),
+                         "L3Harris|associate mechanical engineering design")
+
     def test_terps_count_in_lines(self):
         title, body, prio, parts = alert.compose(OUT, TODAY, people={"SpaceX": 4})
         self.assertIn("- SpaceX: Thermal Engineer (Hawthorne, CA) - Yes, new-grad / entry title (4 Terps there)", body)

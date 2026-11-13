@@ -25,8 +25,14 @@ def company_key(c):
     """Same rule as the page's companyKey(): strip parentheticals, part before ' / ', collapse spaces."""
     return re.sub(r"\s+", " ", re.sub(r"\s*\(.*?\)\s*", " ", c or "").split(" / ")[0]).strip()
 
-def query_for(key):
-    return f'site:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"'
+# Field-narrowed searches for companies with many fits: discipline (as the page labels it) -> search word; `via` stores the
+# lowercased discipline so the page can match a person to the role's field.
+FIELD_WORD = {"Thermal": "thermal", "Propulsion": "propulsion", "Structures": "structural", "Test": "test", "Nuclear": "nuclear",
+              "Naval": "naval", "Aero": "aerodynamics", "Mechanical": "mechanical"}
+BIG = 8  # fits at or above this -> also search the company's top disciplines
+
+def query_for(key, term=None):
+    return f'site:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"' + (f" {term}" if term else "")
 
 def parse_items(items):
     """Google CSE items -> people entries. Titles look like 'Jane Doe - Propulsion Engineer - Anduril | LinkedIn'."""
@@ -47,9 +53,9 @@ def provider():
     if os.environ.get("SERPER_KEY"): return "serper"
     return None
 
-def search(key, fetch):
+def search(key, fetch, term=None):
     """-> (query, people). `fetch(url, token=None, method='GET', body=None, headers=None)` returns parsed JSON."""
-    q = query_for(key)
+    q = query_for(key, term)
     if provider() == "serpapi":
         url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"]})
         return q, parse_items(fetch(url).get("organic_results", []))
@@ -83,14 +89,26 @@ def save_people(doc, sha, fetch):
     fetch(gh_url(), os.environ["STATE_TOKEN"], "PUT", body)
 
 def plan(out, people, today, days=14, max_q=15):
-    """Companies with Yes/Maybe fits whose entry is missing or older than `days`, most fits first, capped."""
-    counts = {}
+    """-> ([(companyKey, [disciplines to narrow by]), ...], companies with fits). Companies whose entry is missing or older
+    than `days`, most fits first; a company with >= BIG fits also gets up to 2 field-narrowed searches. `max_q` caps queries."""
+    counts, fields = {}, {}
     for r in out.get("roles", []):
-        if r["fit"] in ("Yes", "Maybe"): counts[company_key(r["company"])] = counts.get(company_key(r["company"]), 0) + 1
+        if r["fit"] in ("Yes", "Maybe"):
+            k = company_key(r["company"]); counts[k] = counts.get(k, 0) + 1
+            d = r.get("discipline")
+            if d in FIELD_WORD: fields.setdefault(k, {})[d] = fields.setdefault(k, {}).get(d, 0) + 1
     cutoff = (today - dt.timedelta(days=days)).isoformat()
     due = [k for k in counts if (people.get("companies", {}).get(k, {}).get("searched") or "") < cutoff]
     due.sort(key=lambda k: (-counts[k], k))
-    return due[:max_q], len(counts)
+    todo, budget = [], max_q
+    for k in due:
+        narrow = [d for d, _ in sorted(fields.get(k, {}).items(), key=lambda x: -x[1])[:2]] if counts[k] >= BIG else []
+        need = 1 + len(narrow)
+        if need > budget:
+            if budget >= 1: todo.append((k, narrow[:budget - 1])); budget = 0
+            break
+        todo.append((k, narrow)); budget -= need
+    return todo, len(counts)
 
 def main():
     if not provider(): print("finder: no SERPAPI_KEY or SERPER_KEY; skipped"); return
@@ -101,20 +119,29 @@ def main():
     people, sha = load_people(http_json)
     due, total = plan(out, people, today, int(os.environ.get("FINDER_DAYS") or 14), int(os.environ.get("FINDER_MAX") or 15))
     print(f"finder ({provider()}): {total} companies with fits, {len(due)} due for a search this run")
-    done = 0; found = 0
-    for key in due:
-        try:
-            q, found_people = search(key, http_json)
-        except urllib.error.HTTPError as e:
-            try: detail = re.sub(r"\s+", " ", e.read().decode("utf-8", "replace"))[:400]
-            except Exception: detail = ""
-            print(f"finder: stopped at {key}: HTTP {e.code}. Provider said: {detail}"); break
-        people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=q, people=found_people)
-        done += 1; found += len(found_people)
+    done = 0; found = 0; queries = 0; stop = False
+    for key, narrow in due:
+        merged, qs = {}, []
+        for term_d in [None] + narrow:
+            term = FIELD_WORD[term_d] if term_d else None
+            try:
+                q, got = search(key, http_json, term); queries += 1
+            except urllib.error.HTTPError as e:
+                try: detail = re.sub(r"\s+", " ", e.read().decode("utf-8", "replace"))[:400]
+                except Exception: detail = ""
+                print(f"finder: stopped at {key}: HTTP {e.code}. Provider said: {detail}"); stop = True; break
+            qs.append(q)
+            for p_ in got:
+                p_["via"] = term_d.lower() if term_d else "base"
+                merged.setdefault(p_["url"], p_)  # first hit wins (base first, then fields)
+        if stop and not merged: break
+        people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=" || ".join(qs), people=list(merged.values()))
+        done += 1; found += len(merged)
+        if stop: break
     if done:
         people["v"] = 1; people["updated"] = dt.datetime.now(dt.timezone.utc).isoformat()
         save_people(people, sha, http_json)
-    print(f"finder: searched {done} companies, {found} profiles found; people.json now covers {len(people.get('companies', {}))} companies")
+    print(f"finder: {queries} searches over {done} companies, {found} profiles found; people.json now covers {len(people.get('companies', {}))} companies")
 
 if __name__ == "__main__":
     main()

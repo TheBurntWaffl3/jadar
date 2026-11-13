@@ -28,9 +28,17 @@ class FinderTests(unittest.TestCase):
                          {"fit": "No", "company": "Moog"}, {"fit": "Yes", "company": "SpaceX"}]}
         people = {"companies": {"Boeing": {"searched": "2026-11-12", "people": []}, "SpaceX": {"searched": "2026-10-01", "people": []}}}
         due, total = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=60)
-        self.assertEqual(total, 3); self.assertEqual(due, ["Anduril", "SpaceX"])
-        due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=1); self.assertEqual(due, ["Anduril"])
-        due, _ = finder.plan(out, people, dt.date(2026, 11, 13)); self.assertEqual(due, ["Anduril", "SpaceX"], "defaults: 14 days, 15 per run")
+        self.assertEqual(total, 3); self.assertEqual(due, [("Anduril", []), ("SpaceX", [])])
+        due, _ = finder.plan(out, people, dt.date(2026, 11, 13), days=7, max_q=1); self.assertEqual(due, [("Anduril", [])])
+        due, _ = finder.plan(out, people, dt.date(2026, 11, 13)); self.assertEqual(due, [("Anduril", []), ("SpaceX", [])], "defaults: 14 days, 15 per run")
+
+    def test_big_companies_get_field_narrowed_searches(self):
+        roles = [{"fit": "Yes", "company": "SpaceX", "discipline": d} for d in ["Propulsion"] * 5 + ["Structures"] * 3 + ["Thermal"] * 2]
+        due, _ = finder.plan({"roles": roles}, {"companies": {}}, dt.date(2026, 11, 13))
+        self.assertEqual(due, [("SpaceX", ["Propulsion", "Structures"])])
+        self.assertEqual(finder.query_for("SpaceX", finder.FIELD_WORD["Structures"]), 'site:linkedin.com/in "University of Maryland" "SpaceX" structural')
+        due, _ = finder.plan({"roles": roles}, {"companies": {}}, dt.date(2026, 11, 13), max_q=2)
+        self.assertEqual(due, [("SpaceX", ["Propulsion"])], "budget of 2 queries: base + one field")
 
     def test_end_to_end_with_stubbed_network(self):
         os.environ.update(SERPAPI_KEY="k", STATE_REPO="o/r", STATE_TOKEN="t"); os.environ.pop("SERPER_KEY", None)

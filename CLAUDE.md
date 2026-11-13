@@ -69,7 +69,10 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   embed state or tokens in the public page.
 - **Terps finder** (`finder.py`, morning run only): SerpApi (`SERPAPI_KEY`, 250 free/month) or Serper (`SERPER_KEY`) Google
   results for `site:linkedin.com/in "University of Maryland" "<company alias>"`, one query per company with Yes/Maybe fits,
-  re-searched every 14 days, max 15/run. Google's Custom Search JSON API is closed to new customers (2026-01-20; dies
+  re-searched every 14 days, max 15 queries/run; companies with >= 8 fits also get up to 2 field-narrowed queries
+  (`FIELD_WORD`; each person carries `via` = lowercased discipline or "base"). Page: "Likely to reply" ranking toggle
+  (`jadar.terps.v1`), "Draft note" copy-only template (`jadar.notetpl.v1`). Hidden/applied also match by fingerprint
+  companyKey|normalized title (`fp` in state entries; `alert.fingerprint()`), so re-posts stay hidden. Google's Custom Search JSON API is closed to new customers (2026-01-20; dies
   2027-01-01): do not go back to it. Results -> `people.json` in the private state repo;
   page shows "Terps found here" when sync is connected, `alert.py` adds "N Terps there". Public page never embeds names.
   LinkedIn itself is never fetched or automated; the page only links to LinkedIn's own alumni search.

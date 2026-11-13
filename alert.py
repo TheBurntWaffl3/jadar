@@ -39,8 +39,15 @@ def page_url():
         return f"https://{owner.lower()}.github.io/{name}/"
     return ""
 
+def fingerprint(company, title):
+    """Same as the page's fp: companyKey + '|' + normalized title, so a re-posted role under a new URL stays hidden."""
+    import re
+    t = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", (title or "").lower())).strip()
+    return company_key(company) + "|" + t
+
 def load_state():
-    """{url: status} from the private state repo the page syncs to (see build_page.py); {} when not configured or unreadable."""
+    """{url: status, 'fp:<fingerprint>': status} from the private state repo the page syncs to; {} when not configured.
+    The fp keys come from hidden/applied entries' snapshots (or stored fp) so re-posts under a new URL are skipped too."""
     repo, token = os.environ.get("STATE_REPO"), os.environ.get("STATE_TOKEN")
     if not repo or not token: return {}
     import base64
@@ -49,7 +56,13 @@ def load_state():
         req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "User-Agent": "job-radar"})
         with urllib.request.urlopen(req, timeout=30) as r: j = json.load(r)
         doc = json.loads(base64.b64decode(j["content"]).decode("utf-8"))
-        return {u: (e.get("status") or "") for u, e in (doc.get("roles") or {}).items()}
+        out = {}
+        for u, e in (doc.get("roles") or {}).items():
+            st = e.get("status") or ""; out[u] = st
+            if st in ("hidden", "applied"):
+                fp = e.get("fp") or (fingerprint(e["snap"].get("company"), e["snap"].get("title")) if isinstance(e.get("snap"), dict) else None)
+                if fp: out["fp:" + fp] = st
+        return out
     except Exception as e:
         print(f"state not read ({type(e).__name__}); alert ignores saved/applied/hidden"); return {}
 
@@ -76,6 +89,8 @@ def compose(out, today=None, state=None, alerted=None, people=None):
     today = today or dt.date.today(); state = state or {}; alerted = alerted or {}; people = people or {}
     rank = {"Yes": 0, "Maybe": 1}
     skip = {u for u, st in state.items() if st in ("hidden", "applied")} | set(alerted)
+    fps = {k[3:] for k, st in state.items() if k.startswith("fp:") and st in ("hidden", "applied")}
+    if fps: skip |= {r["url"] for r in out.get("roles", []) + out.get("new", []) if fingerprint(r.get("company"), r.get("title")) in fps}
     star = lambda r: "* " if state.get(r["url"]) == "saved" else ""
     new = sorted([r for r in out.get("new", []) if r["fit"] in rank and r["url"] not in skip], key=lambda r: (rank[r["fit"]], r.get("date") or ""), reverse=False)
     new.sort(key=lambda r: rank[r["fit"]])
