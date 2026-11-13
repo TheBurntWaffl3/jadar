@@ -9,6 +9,16 @@ def embedded(html):
     return json.loads(html.split('<script id="data" type="application/json">')[1].split("</script>")[0].replace("<\\/", "</"))
 
 class PageTests(unittest.TestCase):
+    def test_terps_found_block(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle")
+        self.assertIn("people.json", html)
+        self.assertIn("Terps found here", html)
+        self.assertIn("Connect sync in Data to see Terps found at this company.", html)
+        self.assertIn("linkedin\\.com", html)           # host check on every profile link
+        self.assertIn("Not searched yet (next weekly run).", html)
+        for leak in ("Jane Doe", '"companies"', "janedoe"):  # people data is fetched at runtime, never embedded
+            self.assertNotIn(leak, html)
+
     def test_terps_links(self):
         html = build_page.build(self.out, self.src, "Kevin Kyle")
         self.assertIn("linkedin.com/school/university-of-maryland/people/?keywords=", html)

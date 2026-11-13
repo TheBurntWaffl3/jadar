@@ -119,6 +119,13 @@ tr.detail td { padding: 0 10px 16px; background: var(--card); }
 .btn.alt { background: var(--pill); color: var(--ink); font-weight: 500; margin-top: 0; }
 .people { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
 .people .k { margin-right: 4px; }
+.found { margin-top: 12px; font-size: 13.5px; }
+.found .k { margin-bottom: 6px; }
+.found ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.found li a { color: var(--ink); font-weight: 600; text-decoration: none; } .found li a:hover { text-decoration: underline; }
+.found li .hl { color: var(--muted); font-size: 13px; }
+.found .quiet { color: var(--muted); }
+.tag.terps { background: var(--tint); color: var(--ember); }
 .empty { padding: 24px 10px; color: var(--muted); }
 
 /* tabs + per-role state */
@@ -423,6 +430,7 @@ footer a { color: var(--ink); }
     if (r._dt != null && r._dt >= 0 && r._dt <= 10) t.push(`<span class="tag closing">${r._dt === 0 ? 'Closes today' : 'Closes in ' + r._dt + 'd'}</span>`);
     if (r.workMode) t.push(`<span class="tag">${esc(r.workMode)}</span>`);
     if (r.employment && r.employment !== 'Full-time') t.push(`<span class="tag">${esc(r.employment)}</span>`);
+    const pf = peopleFor(r); if (pf && pf.people.length) t.push(`<span class="tag terps">${pf.people.length} Terp${pf.people.length === 1 ? '' : 's'}</span>`);
     return t.length ? `<div class="tags">${t.join('')}</div>` : '';
   }
   function icons(r) {
@@ -460,6 +468,23 @@ footer a { color: var(--ink); }
       (div ? `<a class="btn alt" href="${alum(co + ' ' + div)}" target="_blank" rel="noopener">…in ${esc(div)} ↗</a>` : '') +
       `<a class="btn alt" href="https://terrapinsconnect.umd.edu/" target="_blank" rel="noopener">Terrapins Connect ↗</a></div>`;
   }
+  // ---------- Terps found here: people.json from the private sync repo (memory only, never stored or embedded) ----------
+  let PEOPLE = null;  // {v, updated, companies: {companyKey: {searched, people: [{name, headline, url}]}}}
+  function peopleFor(r) { if (!PEOPLE || !PEOPLE.companies) return null; const e = PEOPLE.companies[companyKey(r.company)]; return e && Array.isArray(e.people) ? e : null; }
+  const linkedinOk = u => typeof u === 'string' && /^https?:\/\/([a-z0-9-]+\.)*linkedin\.com\//i.test(u);
+  function foundBlock(r) {
+    if (!syncCfg()) return `<div class="found"><span class="quiet">Connect sync in Data to see Terps found at this company.</span></div>`;
+    const e = peopleFor(r);
+    if (!e) return `<div class="found"><span class="quiet">Not searched yet (next weekly run).</span></div>`;
+    const head = `<div class="k mono">Terps found here${e.searched ? ' · searched ' + esc(fmt(String(e.searched).slice(0, 10))) : ''}</div>`;
+    if (!e.people.length) return `<div class="found">${head}<span class="quiet">none found yet</span></div>`;
+    const items = e.people.slice(0, 6).map(p => {
+      const name = esc(p && p.name || 'Unknown'); const hl = p && p.headline ? ` <span class="hl">${esc(p.headline)}</span>` : '';
+      return `<li>${linkedinOk(p && p.url) ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${name} ↗</a>` : name}${hl}</li>`;
+    }).join('');
+    const more = e.people.length > 6 ? `<li class="quiet">+${e.people.length - 6} more</li>` : '';
+    return `<div class="found">${head}<ul>${items}${more}</ul></div>`;
+  }
   function detail(r) {
     const yrs = r.minYears == null ? 'not stated' : r.minYears + (r.schoolExpOk ? ' (school/internship counts)' : '');
     const pay = r.salary ? r.salary + (/\/hr$/.test(r.salary) && r.salaryMin != null ? ' · $' + num(r.salaryMin) + (r.salaryMax != null && r.salaryMax !== r.salaryMin ? '–$' + num(r.salaryMax) : '') + ' annualized' : '') : null;
@@ -468,7 +493,7 @@ footer a { color: var(--ink); }
       kv('Pay', pay), kv('Work mode', r.workMode), kv('Employment', r.employment), kv('Travel', r.travel), kv('Relocation', r.relocation === true ? 'offered' : r.relocation === false ? 'not offered' : null),
       kv('Posted', r.date ? fmtLong(r.date) + ' (' + r.dateKind + ')' : null), kv('First seen', r.firstSeen ? fmtLong(r.firstSeen) : null), kv('Sector', r.sector)].join('');
     const snip = r.reqSnippet ? `<div class="snip"><div class="k mono">Minimum qualifications</div>${esc(r.reqSnippet)}</div>` : `<div class="snip"><div class="k mono">Why</div>${esc(r.why)}</div>`;
-    return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a>${people(r)}</div></div>${actRow(r)}`;
+    return `<div class="panel"><div class="kv">${left}</div><div>${snip}<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Open posting ↗</a>${people(r)}${foundBlock(r)}</div></div>${actRow(r)}`;
   }
   function listFor(tab) {  // the universe of rows for a tab, before filters
     if (tab === 'inbox') return roles.filter(r => { const s = statusOf(r.url); return s !== 'hidden' && s !== 'applied'; });
@@ -566,6 +591,15 @@ footer a { color: var(--ink); }
     const r = await fetch(ghUrl(c), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, ghHeaders(c)), body: JSON.stringify(body)});
     if (!r.ok) throw new Error(String(r.status));
   }
+  const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
+  async function loadPeople(c) {
+    try {
+      const r = await fetch(peopleUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
+      if (!r.ok) { if (r.status === 404) PEOPLE = {v: 1, companies: {}}; return; }
+      const j = await r.json(); const d = JSON.parse(b64dec(j.content || ''));
+      if (d && typeof d === 'object' && d.companies && typeof d.companies === 'object') { PEOPLE = d; render(); }
+    } catch (e) { /* quiet: the block says "not searched yet" */ }
+  }
   let syncing = false, pending = false, pushTimer = null;
   async function syncNow() {
     const c = syncCfg(); if (!c) return;
@@ -580,6 +614,7 @@ footer a { color: var(--ink); }
       if (JSON.stringify(merged) !== before) { S = merged; lsSet(KEY, JSON.stringify(S)); render(); }
       if (!remote || JSON.stringify(merged) !== JSON.stringify(remote)) await ghPut(c, merged, sha);
       const now = new Date(); setSync('synced ' + now.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase());
+      loadPeople(c);
     } catch (err) { setSync('sync failed: ' + (err.message || 'error')); }
     finally { syncing = false; if (pending) { pending = false; syncNow(); } }
   }
@@ -591,7 +626,7 @@ footer a { color: var(--ink); }
     if (!lsSet(SKEY, JSON.stringify({repo, path, token}))) { alert('This browser blocks storage; sync cannot be kept.'); return; }
     $('#sync-token').value = ''; reflectSync(); syncNow();
   });
-  $('#sync-disconnect').addEventListener('click', () => { lsDel(SKEY); reflectSync(); setSync(''); });
+  $('#sync-disconnect').addEventListener('click', () => { lsDel(SKEY); PEOPLE = null; reflectSync(); setSync(''); render(); });
   $('#sync-now').addEventListener('click', syncNow);
   window.addEventListener('online', () => { if (syncCfg()) syncNow(); });
   reflectSync();
