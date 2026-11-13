@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-13T18:09:12.456918+00:00",
+ "scanned": "2026-11-13T18:14:24.764916+00:00",
  "profile": "kevin",
  "rulesVersion": "2026-11-12.3",
  "fullRead": null,
@@ -18776,40 +18776,6 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Build Engineer (Crew Starship)",
-   "location": "Starbase, TX",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8841987002?gh_jid=8841987002",
-   "date": "2026-09-30",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 1,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "Remote",
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor's degree in an engineering discipline \u00b7 1+ years of engineering experience in manufacturing or integration",
-   "majorReq": null,
-   "fit": "Maybe",
-   "why": "1 yr required",
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r0553"
-  },
-  {
-   "company": "SpaceX",
-   "sector": "Space",
-   "title": "Build Engineer (Crew Starship)",
    "location": "Hawthorne, CA",
    "url": "https://boards.greenhouse.io/spacex/jobs/8841997002?gh_jid=8841997002",
    "date": "2026-09-30",
@@ -18828,6 +18794,40 @@
    "salary": "$100,000/yr",
    "salaryMin": 100000,
    "salaryMax": 100000,
+   "workMode": "Remote",
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor's degree in an engineering discipline \u00b7 1+ years of engineering experience in manufacturing or integration",
+   "majorReq": null,
+   "fit": "Maybe",
+   "why": "1 yr required",
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "id": "r0553"
+  },
+  {
+   "company": "SpaceX",
+   "sector": "Space",
+   "title": "Build Engineer (Crew Starship)",
+   "location": "Starbase, TX",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8841987002?gh_jid=8841987002",
+   "date": "2026-09-30",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 1,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
    "workMode": "Remote",
    "employment": null,
    "travel": null,
@@ -19048,40 +19048,6 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Design Reliability Engineer (Crew Starship)",
-   "location": "Starbase, TX",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8842004002?gh_jid=8842004002",
-   "date": "2026-09-28",
-   "dateKind": "posted",
-   "discipline": "Mechanical",
-   "minYears": 1,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": null,
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor's degree in an engineering discipline. \u00b7 1+ years professional experience in fabrication, assembly, and/or testing.",
-   "majorReq": null,
-   "fit": "Maybe",
-   "why": "1 yr required",
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r0561"
-  },
-  {
-   "company": "SpaceX",
-   "sector": "Space",
-   "title": "Design Reliability Engineer (Crew Starship)",
    "location": "Hawthorne, CA",
    "url": "https://boards.greenhouse.io/spacex/jobs/8842018002?gh_jid=8842018002",
    "date": "2026-09-28",
@@ -19100,6 +19066,40 @@
    "salary": "$100,000/yr",
    "salaryMin": 100000,
    "salaryMax": 100000,
+   "workMode": null,
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor's degree in an engineering discipline. \u00b7 1+ years professional experience in fabrication, assembly, and/or testing.",
+   "majorReq": null,
+   "fit": "Maybe",
+   "why": "1 yr required",
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "id": "r0561"
+  },
+  {
+   "company": "SpaceX",
+   "sector": "Space",
+   "title": "Design Reliability Engineer (Crew Starship)",
+   "location": "Starbase, TX",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8842004002?gh_jid=8842004002",
+   "date": "2026-09-28",
+   "dateKind": "posted",
+   "discipline": "Mechanical",
+   "minYears": 1,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
    "workMode": null,
    "employment": null,
    "travel": null,
@@ -72360,40 +72360,6 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Sr. IC Package Design Engineer (Silicon Engineering)",
-   "location": "Austin, TX",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8912202002?gh_jid=8912202002",
-   "date": "2026-10-23",
-   "dateKind": "posted",
-   "discipline": "Mechanical",
-   "minYears": 5,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": null,
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor's degree in electrical engineering, computer engineering, or physics \u00b7 5+ years of experience with IC package design",
-   "majorReq": "only: computer engineering, electrical engineering, physics",
-   "fit": "No",
-   "why": "degree must be computer engineering, electrical enginee",
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r2129"
-  },
-  {
-   "company": "SpaceX",
-   "sector": "Space",
-   "title": "Sr. IC Package Design Engineer (Silicon Engineering)",
    "location": "Irvine, CA",
    "url": "https://boards.greenhouse.io/spacex/jobs/8912180002?gh_jid=8912180002",
    "date": "2026-10-23",
@@ -72412,6 +72378,40 @@
    "salary": "$165,000/yr",
    "salaryMin": 165000,
    "salaryMax": 165000,
+   "workMode": null,
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor's degree in electrical engineering, computer engineering, or physics \u00b7 5+ years of experience with IC package design",
+   "majorReq": "only: computer engineering, electrical engineering, physics",
+   "fit": "No",
+   "why": "degree must be computer engineering, electrical enginee",
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "id": "r2129"
+  },
+  {
+   "company": "SpaceX",
+   "sector": "Space",
+   "title": "Sr. IC Package Design Engineer (Silicon Engineering)",
+   "location": "Austin, TX",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8912202002?gh_jid=8912202002",
+   "date": "2026-10-23",
+   "dateKind": "posted",
+   "discipline": "Mechanical",
+   "minYears": 5,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
    "workMode": null,
    "employment": null,
    "travel": null,
@@ -98948,40 +98948,6 @@
    "company": "Anduril",
    "sector": "Hypersonics & defense tech",
    "title": "Senior Telecom Infrastructure Engineer",
-   "location": "Washington, District of Columbia, United States",
-   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5241090007?gh_jid=5241090007",
-   "date": "2026-09-23",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 6,
-   "schoolExpOk": false,
-   "degree": null,
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Secret (obtain)",
-   "citizenship": null,
-   "salary": "$146,000\u2013$194,000/yr",
-   "salaryMin": 146000,
-   "salaryMax": 194000,
-   "workMode": "Remote",
-   "employment": "Full-time",
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Minimum of 6 years of experience in a Network and/or Systems Infrastructure role. \u00b7 Minimum of 4 years of experience in infrastructure analysis, site build, and M&A assessments. \u00b7 Proven experience in gathering and evaluating infrastructure requirements. \u00b7 Strong ability to translate technical details into actionable SOWs. \u00b7 Strong understanding of construction phases and analyzing construction drawings \u00b7 Excellent communication and collaboration skills; capable of effectively working with\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "6+ yrs required",
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r2911"
-  },
-  {
-   "company": "Anduril",
-   "sector": "Hypersonics & defense tech",
-   "title": "Senior Telecom Infrastructure Engineer",
    "location": "Ashville, Ohio, United States",
    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5247141007?gh_jid=5247141007",
    "date": "2026-09-23",
@@ -99010,7 +98976,7 @@
    "why": "6+ yrs required",
    "desc_ok": true,
    "firstSeen": "2026-11-12",
-   "id": "r2912"
+   "id": "r2911"
   },
   {
    "company": "Anduril",
@@ -99018,6 +98984,40 @@
    "title": "Senior Telecom Infrastructure Engineer",
    "location": "Boston, Massachusetts, United States",
    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5247140007?gh_jid=5247140007",
+   "date": "2026-09-23",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 6,
+   "schoolExpOk": false,
+   "degree": null,
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Secret (obtain)",
+   "citizenship": null,
+   "salary": "$146,000\u2013$194,000/yr",
+   "salaryMin": 146000,
+   "salaryMax": 194000,
+   "workMode": "Remote",
+   "employment": "Full-time",
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Minimum of 6 years of experience in a Network and/or Systems Infrastructure role. \u00b7 Minimum of 4 years of experience in infrastructure analysis, site build, and M&A assessments. \u00b7 Proven experience in gathering and evaluating infrastructure requirements. \u00b7 Strong ability to translate technical details into actionable SOWs. \u00b7 Strong understanding of construction phases and analyzing construction drawings \u00b7 Excellent communication and collaboration skills; capable of effectively working with\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "6+ yrs required",
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "id": "r2912"
+  },
+  {
+   "company": "Anduril",
+   "sector": "Hypersonics & defense tech",
+   "title": "Senior Telecom Infrastructure Engineer",
+   "location": "Washington, District of Columbia, United States",
+   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5241090007?gh_jid=5241090007",
    "date": "2026-09-23",
    "dateKind": "posted",
    "discipline": "Other",
@@ -99764,40 +99764,6 @@
    "company": "Anduril",
    "sector": "Hypersonics & defense tech",
    "title": "Staff Flight Test Engineer, Unmanned Air Vehicles",
-   "location": "Costa Mesa, California, United States",
-   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5118006007?gh_jid=5118006007",
-   "date": "2026-09-22",
-   "dateKind": "posted",
-   "discipline": "Test",
-   "minYears": 12,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "TS/SCI (obtain)",
-   "citizenship": null,
-   "salary": "$183,000\u2013$243,000/yr",
-   "salaryMin": 183000,
-   "salaryMax": 243000,
-   "workMode": null,
-   "employment": "Full-time",
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "12+ years of experience as test conductor/director for developmental aircraft, weapons, or missile systems. \u00b7 A bachelor's degree or a related technical discipline from an accredited institution. May substitute equivalent engineering experience in lieu of education. \u00b7 Extensive experience as a test conductor/test director for developmental aircraft, weapon, or missile systems \u00b7 Test engineering experience working with developmental systems of manned and/or unmanned aircraft to include\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "12+ yrs required",
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r2935"
-  },
-  {
-   "company": "Anduril",
-   "sector": "Hypersonics & defense tech",
-   "title": "Staff Flight Test Engineer, Unmanned Air Vehicles",
    "location": "Victorville, California, United States",
    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5246694007?gh_jid=5246694007",
    "date": "2026-09-22",
@@ -99816,6 +99782,40 @@
    "salary": "$166,000\u2013$220,000/yr",
    "salaryMin": 166000,
    "salaryMax": 220000,
+   "workMode": null,
+   "employment": "Full-time",
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "12+ years of experience as test conductor/director for developmental aircraft, weapons, or missile systems. \u00b7 A bachelor's degree or a related technical discipline from an accredited institution. May substitute equivalent engineering experience in lieu of education. \u00b7 Extensive experience as a test conductor/test director for developmental aircraft, weapon, or missile systems \u00b7 Test engineering experience working with developmental systems of manned and/or unmanned aircraft to include\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "12+ yrs required",
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "id": "r2935"
+  },
+  {
+   "company": "Anduril",
+   "sector": "Hypersonics & defense tech",
+   "title": "Staff Flight Test Engineer, Unmanned Air Vehicles",
+   "location": "Costa Mesa, California, United States",
+   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5118006007?gh_jid=5118006007",
+   "date": "2026-09-22",
+   "dateKind": "posted",
+   "discipline": "Test",
+   "minYears": 12,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "TS/SCI (obtain)",
+   "citizenship": null,
+   "salary": "$183,000\u2013$243,000/yr",
+   "salaryMin": 183000,
+   "salaryMax": 243000,
    "workMode": null,
    "employment": "Full-time",
    "travel": null,
@@ -101124,8 +101124,8 @@
    "company": "Anduril",
    "sector": "Hypersonics & defense tech",
    "title": "Thermal Engineer, Thermal Protection Systems (TPS)",
-   "location": "Seattle, Washington, United States",
-   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5243042007?gh_jid=5243042007",
+   "location": "Mountain View, California, United States",
+   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5243043007?gh_jid=5243043007",
    "date": "2026-09-18",
    "dateKind": "posted",
    "discipline": "Thermal",
@@ -101139,9 +101139,9 @@
    "startReq": null,
    "clearance": "TS/SCI (obtain)",
    "citizenship": null,
-   "salary": "$132,000\u2013$175,000/yr",
-   "salaryMin": 132000,
-   "salaryMax": 175000,
+   "salary": "$144,000\u2013$191,000/yr",
+   "salaryMin": 144000,
+   "salaryMax": 191000,
    "workMode": null,
    "employment": "Full-time",
    "travel": null,
@@ -101192,8 +101192,8 @@
    "company": "Anduril",
    "sector": "Hypersonics & defense tech",
    "title": "Thermal Engineer, Thermal Protection Systems (TPS)",
-   "location": "Mountain View, California, United States",
-   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5243043007?gh_jid=5243043007",
+   "location": "Seattle, Washington, United States",
+   "url": "https://boards.greenhouse.io/andurilindustries/jobs/5243042007?gh_jid=5243042007",
    "date": "2026-09-18",
    "dateKind": "posted",
    "discipline": "Thermal",
@@ -101207,9 +101207,9 @@
    "startReq": null,
    "clearance": "TS/SCI (obtain)",
    "citizenship": null,
-   "salary": "$144,000\u2013$191,000/yr",
-   "salaryMin": 144000,
-   "salaryMax": 191000,
+   "salary": "$132,000\u2013$175,000/yr",
+   "salaryMin": 132000,
+   "salaryMax": 175000,
    "workMode": null,
    "employment": "Full-time",
    "travel": null,
@@ -104048,8 +104048,8 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Physical Design Engineer (Silicon Engineering)",
-   "location": "Austin, TX",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8800765002?gh_jid=8800765002",
+   "location": "Irvine, CA",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8795576002?gh_jid=8795576002",
    "date": "2026-09-11",
    "dateKind": "posted",
    "discipline": "Mechanical",
@@ -104063,9 +104063,9 @@
    "startReq": null,
    "clearance": null,
    "citizenship": "US person (ITAR)",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
+   "salary": "$125,000/yr",
+   "salaryMin": 125000,
+   "salaryMax": 125000,
    "workMode": null,
    "employment": null,
    "travel": null,
@@ -104116,8 +104116,8 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Physical Design Engineer (Silicon Engineering)",
-   "location": "Irvine, CA",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8795576002?gh_jid=8795576002",
+   "location": "Austin, TX",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8800765002?gh_jid=8800765002",
    "date": "2026-09-11",
    "dateKind": "posted",
    "discipline": "Mechanical",
@@ -104131,9 +104131,9 @@
    "startReq": null,
    "clearance": null,
    "citizenship": "US person (ITAR)",
-   "salary": "$125,000/yr",
-   "salaryMin": 125000,
-   "salaryMax": 125000,
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
    "workMode": null,
    "employment": null,
    "travel": null,
@@ -118532,8 +118532,8 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Sr. RFIC Design Engineer (RFIC Engineering)",
-   "location": "Palo Alto, CA",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8642084002?gh_jid=8642084002",
+   "location": "Irvine, CA",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8642078002?gh_jid=8642078002",
    "date": "2026-07-21",
    "dateKind": "posted",
    "discipline": "Mechanical",
@@ -118547,9 +118547,9 @@
    "startReq": null,
    "clearance": null,
    "citizenship": "US person (ITAR)",
-   "salary": "$175,000/yr",
-   "salaryMin": 175000,
-   "salaryMax": 175000,
+   "salary": "$165,000/yr",
+   "salaryMin": 165000,
+   "salaryMax": 165000,
    "workMode": null,
    "employment": null,
    "travel": null,
@@ -118600,8 +118600,8 @@
    "company": "SpaceX",
    "sector": "Space",
    "title": "Sr. RFIC Design Engineer (RFIC Engineering)",
-   "location": "Irvine, CA",
-   "url": "https://boards.greenhouse.io/spacex/jobs/8642078002?gh_jid=8642078002",
+   "location": "Palo Alto, CA",
+   "url": "https://boards.greenhouse.io/spacex/jobs/8642084002?gh_jid=8642084002",
    "date": "2026-07-21",
    "dateKind": "posted",
    "discipline": "Mechanical",
@@ -118615,9 +118615,9 @@
    "startReq": null,
    "clearance": null,
    "citizenship": "US person (ITAR)",
-   "salary": "$165,000/yr",
-   "salaryMin": 165000,
-   "salaryMax": 165000,
+   "salary": "$175,000/yr",
+   "salaryMin": 175000,
+   "salaryMax": 175000,
    "workMode": null,
    "employment": null,
    "travel": null,
@@ -135808,14 +135808,14 @@
    "org": "Anduril",
    "type": "greenhouse",
    "ok": true,
-   "total": 2589,
+   "total": 2590,
    "matches": 296,
    "fetched": 304,
    "cached": 0,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 25
   },
   {
    "org": "Castelion",
@@ -135828,7 +135828,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7,
+   "secs": 11,
    "bulkImport": "2026-09-07"
   },
   {
@@ -135842,7 +135842,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 2
   },
   {
    "org": "Ursa Major",
@@ -135855,7 +135855,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 8
   },
   {
    "org": "Epirus",
@@ -135868,7 +135868,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 6
   },
   {
    "org": "Mach Industries",
@@ -135881,7 +135881,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "Divergent",
@@ -135894,7 +135894,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 2
   },
   {
    "org": "Zone 5",
@@ -135907,7 +135907,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 9
   },
   {
    "org": "JetZero",
@@ -135920,7 +135920,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 2
   },
   {
    "org": "Electra",
@@ -135933,20 +135933,20 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 6
   },
   {
    "org": "SpaceX",
    "type": "greenhouse",
    "ok": true,
-   "total": 2850,
+   "total": 2848,
    "matches": 355,
    "fetched": 355,
    "cached": 0,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 14
+   "secs": 20
   },
   {
    "org": "Rocket Lab",
@@ -135959,7 +135959,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 10
+   "secs": 13
   },
   {
    "org": "Relativity Space",
@@ -135972,7 +135972,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 11
   },
   {
    "org": "Stoke Space",
@@ -135985,7 +135985,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 3
   },
   {
    "org": "Varda",
@@ -135998,7 +135998,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 5
   },
   {
    "org": "Vast",
@@ -136011,7 +136011,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 10
   },
   {
    "org": "Astranis",
@@ -136024,7 +136024,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 3
   },
   {
    "org": "True Anomaly",
@@ -136037,7 +136037,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 1
   },
   {
    "org": "Inversion Space",
@@ -136050,7 +136050,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 5
   },
   {
    "org": "Muon Space",
@@ -136063,7 +136063,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 1
   },
   {
    "org": "Momentus",
@@ -136076,7 +136076,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Planet",
@@ -136089,7 +136089,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Portal Space",
@@ -136102,7 +136102,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 5
   },
   {
    "org": "Rendezvous Robotics",
@@ -136115,7 +136115,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 2
   },
   {
    "org": "Hawkeye 360",
@@ -136141,7 +136141,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 4
   },
   {
    "org": "Voyager / Astrobotic-adjacent",
@@ -136154,7 +136154,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 8
   },
   {
    "org": "Kairos Power",
@@ -136167,7 +136167,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 6
   },
   {
    "org": "Oklo",
@@ -136180,7 +136180,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "TerraPower",
@@ -136193,7 +136193,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 5
   },
   {
    "org": "Valar Atomics",
@@ -136206,7 +136206,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 6
   },
   {
    "org": "Deep Fission",
@@ -136225,14 +136225,14 @@
    "org": "General Matter",
    "type": "greenhouse",
    "ok": true,
-   "total": 132,
+   "total": 133,
    "matches": 17,
    "fetched": 17,
    "cached": 0,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 1
   },
   {
    "org": "Pacific Fusion",
@@ -136245,7 +136245,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Standard Nuclear",
@@ -136258,7 +136258,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 2
   },
   {
    "org": "Regent",
@@ -136271,7 +136271,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 2
   },
   {
    "org": "Hermeus",
@@ -136284,7 +136284,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 23
+   "secs": 1
   },
   {
    "org": "Venus Aerospace",
@@ -136297,7 +136297,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 0
   },
   {
    "org": "Shield AI",
@@ -136310,7 +136310,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 1
   },
   {
    "org": "Merlin Labs",
@@ -136323,7 +136323,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "CX2",
@@ -136362,7 +136362,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Xcimer",
@@ -136388,7 +136388,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Thea Energy",
@@ -136401,7 +136401,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Radiant",
@@ -136453,7 +136453,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "HavocAI",
@@ -136505,7 +136505,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Integrate",
@@ -136544,7 +136544,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Starfish Space",
@@ -136570,20 +136570,20 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Blue Origin",
    "type": "workday",
    "ok": true,
-   "total": 353,
+   "total": 352,
    "matches": 118,
    "fetched": 0,
    "cached": 118,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 31
+   "secs": 30
   },
   {
    "org": "Sierra Space",
@@ -136596,7 +136596,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 12
+   "secs": 15
   },
   {
    "org": "X-energy",
@@ -136622,7 +136622,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 46
+   "secs": 45
   },
   {
    "org": "Aerospace Corp",
@@ -136635,7 +136635,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22,
+   "secs": 24,
    "bulkImport": "2026-11-09"
   },
   {
@@ -136649,7 +136649,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 31
   },
   {
    "org": "Boeing",
@@ -136657,12 +136657,12 @@
    "ok": true,
    "total": 336,
    "matches": 84,
-   "fetched": 2,
-   "cached": 100,
+   "fetched": 0,
+   "cached": 102,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 35
+   "secs": 39
   },
   {
    "org": "RTX (Raytheon, Pratt & Whitney, Collins)",
@@ -136675,7 +136675,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 21
+   "secs": 26
   },
   {
    "org": "GE Aerospace",
@@ -136688,7 +136688,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 20
   },
   {
    "org": "Firefly Aerospace",
@@ -136701,7 +136701,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16,
+   "secs": 17,
    "bulkImport": "2026-10-20"
   },
   {
@@ -136715,7 +136715,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 20
   },
   {
    "org": "AeroVironment",
@@ -136728,7 +136728,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 30
   },
   {
    "org": "Curtiss-Wright",
@@ -136741,7 +136741,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 35
+   "secs": 28
   },
   {
    "org": "Axiom Space",
@@ -136754,7 +136754,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 20
+   "secs": 22
   },
   {
    "org": "GE Vernova (incl. GE-Hitachi)",
@@ -136767,7 +136767,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 25
   },
   {
    "org": "Draper",
@@ -136780,7 +136780,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 20
   },
   {
    "org": "NASA JPL",
@@ -136806,7 +136806,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "HII (Newport News, Ingalls)",
@@ -136819,20 +136819,20 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Westinghouse",
    "type": "sitemap",
    "ok": true,
-   "total": 1119,
+   "total": 1118,
    "matches": 87,
-   "fetched": 1,
+   "fetched": 0,
    "cached": 232,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "NASSCO",
@@ -136871,7 +136871,7 @@
    "error": null,
    "detailErrors": 5,
    "detailErr": "HTTP Error 404: Not Found",
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "LANL",
@@ -136884,7 +136884,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Sandia",
@@ -136897,7 +136897,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "GTRI",
@@ -136923,7 +136923,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Electric Boat",
@@ -136936,7 +136936,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Calspan",
@@ -136949,7 +136949,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4,
+   "secs": 1,
    "placeholderDate": "2024-11-12"
   },
   {
@@ -136977,7 +136977,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Oceaneering",
@@ -137003,7 +137003,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Aalo Atomics",
@@ -137029,7 +137029,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "JHU APL",
@@ -137055,7 +137055,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 138
+   "secs": 143
   },
   {
    "org": "Northrop Grumman",
@@ -137063,12 +137063,12 @@
    "ok": true,
    "total": 470,
    "matches": 75,
-   "fetched": 2,
-   "cached": 74,
+   "fetched": 0,
+   "cached": 76,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 77
+   "secs": 75
   },
   {
    "org": "BAE Systems",
@@ -137076,12 +137076,12 @@
    "ok": true,
    "total": 1965,
    "matches": 90,
-   "fetched": 5,
-   "cached": 86,
+   "fetched": 0,
+   "cached": 91,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 11
+   "secs": 3
   },
   {
    "org": "BWXT",
@@ -137094,7 +137094,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 12
   },
   {
    "org": "Impulse Space",
@@ -137172,7 +137172,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 10
+   "secs": 13
   },
   {
    "org": "Bath Iron Works",
@@ -137185,7 +137185,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 0
   },
   {
    "org": "MITRE",
@@ -137211,7 +137211,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 15
   },
   {
    "org": "Honeywell Aerospace",
@@ -137250,7 +137250,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Beta Technologies",
@@ -137290,7 +137290,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Naval Nuclear Laboratory",
@@ -137303,7 +137303,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 17
+   "secs": 18
   }
  ]
 }
