@@ -58,11 +58,10 @@ class FinderTests(unittest.TestCase):
             if "google.serper.dev" in url: return {"organic": ITEMS}
             return {}
         people, sha = finder.load_people(fake); self.assertEqual(people, {"v": 1, "companies": {}}); self.assertIsNone(sha)
-        q, found = finder.search("Anduril", fake); self.assertEqual(len(found), 2)
-        self.assertIn("as_sitesearch=linkedin.com", [c[1] for c in calls if "serpapi" in c[1]][0] + "?") if False else None
+        q, found, ok = finder.search("Anduril", fake); self.assertEqual(len(found), 2); self.assertTrue(ok)
         self.assertTrue(any("serpapi.com/search.json" in c[1] for c in calls))
         os.environ.pop("SERPAPI_KEY"); os.environ["SERPER_KEY"] = "s"
-        q2, found2 = finder.search("Anduril", fake); self.assertEqual(len(found2), 2); self.assertEqual(finder.provider(), "serper")
+        q2, found2, ok2 = finder.search("Anduril", fake); self.assertEqual(len(found2), 2); self.assertEqual(finder.provider(), "serper")
         os.environ.pop("SERPER_KEY"); self.assertIsNone(finder.provider())
         people["companies"]["Anduril"] = dict(searched="2026-11-13", query=q, people=found)
         finder.save_people(people, None, fake)
@@ -70,6 +69,18 @@ class FinderTests(unittest.TestCase):
         self.assertTrue(put[1].endswith("/repos/o/r/contents/people.json"))
         doc = json.loads(base64.b64decode(put[2]["content"]))
         self.assertEqual(doc["companies"]["Anduril"]["people"][0]["name"], "Jane Doe"); self.assertNotIn("sha", put[2])
+
+    def test_ignored_site_restriction_is_not_recorded(self):
+        os.environ.update(SERPAPI_KEY="k"); os.environ.pop("SERPER_KEY", None)
+        junk = [{"title": "USAspending.gov", "link": "https://www.google.com/goto?url=abc", "snippet": ""}] * 5
+        n = {"calls": 0}
+        def fake(url, token=None, method="GET", body=None, headers=None):
+            n["calls"] += 1; return {"organic_results": junk}
+        q, found, ok = finder.search("Boeing", fake)
+        self.assertEqual(found, []); self.assertFalse(ok); self.assertEqual(n["calls"], 2, "one retry with inurl: phrasing")
+        self.assertIn("inurl:linkedin.com/in", q)
+        def empty(url, token=None, method="GET", body=None, headers=None): return {"organic_results": []}
+        q, found, ok = finder.search("Boeing", empty); self.assertTrue(ok, "a genuinely empty answer counts as searched")
 
 if __name__ == "__main__":
     unittest.main()

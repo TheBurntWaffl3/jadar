@@ -55,25 +55,33 @@ def provider():
     if os.environ.get("SERPER_KEY"): return "serper"
     return None
 
+def _serpapi(q, fetch):
+    url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"],
+                                                                       "as_sitesearch": "linkedin.com", "nfpr": 1, "hl": "en", "gl": "us", "google_domain": "google.com"})
+    j = fetch(url)
+    return j.get("organic_results", []), j.get("error") or (j.get("search_information") or {}).get("organic_results_state")
+
+def _serper(q, fetch):
+    j = fetch("https://google.serper.dev/search", None, "POST", {"q": q, "num": 10}, {"X-API-KEY": os.environ["SERPER_KEY"]})
+    return j.get("organic", []), j.get("message")
+
 def search(key, fetch, term=None):
-    """-> (query, people). `fetch(url, token=None, method='GET', body=None, headers=None)` returns parsed JSON."""
-    if provider() == "serpapi":
-        q = query_for(key, term)
-        url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"],
-                                                                           "as_sitesearch": "linkedin.com", "nfpr": 1, "hl": "en", "gl": "us"})
-        j = fetch(url); raw = j.get("organic_results", [])
-        note = j.get("error") or (j.get("search_information") or {}).get("organic_results_state")
-    elif provider() == "serper":
-        q = query_for(key, term, site_in_query=True)
-        j = fetch("https://google.serper.dev/search", None, "POST", {"q": q, "num": 10}, {"X-API-KEY": os.environ["SERPER_KEY"]})
-        raw = j.get("organic", []); note = j.get("message")
-    else:
-        raise RuntimeError("no search provider configured")
-    people = parse_items(raw)
-    print(f"  {q[:90]} -> {len(raw)} results, {len(people)} profiles" + (f" ({note})" if note and note not in ("Success", "Results for exact spelling") else ""))
-    if raw and not people:  # show what Google gave instead, so the filter can be tuned
-        for it in raw[:4]: print(f"      skipped: {(it.get('link') or '')[:100]} | {(it.get('title') or '')[:70]}")
-    return q, people
+    """-> (query, people, usable). `usable` is False when Google ignored the site restriction (no linkedin.com links at all,
+    or only google.com/goto redirects), which happens on some SERPs; the caller then does not treat the company as searched.
+    One retry with a different phrasing (inurl:) before giving up. `fetch(url, token=None, method='GET', body=None, headers=None)`."""
+    run = _serpapi if provider() == "serpapi" else _serper if provider() == "serper" else None
+    if not run: raise RuntimeError("no search provider configured")
+    tried = []
+    for q in (query_for(key, term, site_in_query=True), f'inurl:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"' + (f" {term}" if term else "")):
+        raw, note = run(q, fetch); tried.append(q)
+        people = parse_items(raw)
+        linked = sum(1 for it in raw if "linkedin.com" in (it.get("link") or ""))
+        print(f"  {q[:90]} -> {len(raw)} results, {linked} on linkedin, {len(people)} profiles" + (f" ({note})" if note and note not in ("Success", "Results for exact spelling") else ""))
+        if people or (linked and not raw[:1] == []): return q, people, True
+        if raw and not linked:
+            for it in raw[:3]: print(f"      skipped: {(it.get('link') or '')[:90]} | {(it.get('title') or '')[:60]}")
+        if not raw: return q, [], True  # a genuine empty answer: nothing to find
+    return " / ".join(tried), [], False
 
 def http_json(url, token=None, method="GET", body=None, headers=None):
     hd = {"Accept": "application/vnd.github+json" if "api.github.com" in url else "application/json", "User-Agent": "job-radar-finder", **(headers or {})}
@@ -135,22 +143,25 @@ def main():
     print(f"finder ({provider()}): {total} companies with fits, {len(due)} due for a search this run")
     done = 0; found = 0; queries = 0; stop = False
     for key, narrow in due:
-        merged, qs = {}, []
+        merged, qs, usable = {}, [], False
         for term_d in [None] + narrow:
             term = FIELD_WORD[term_d] if term_d else None
             try:
-                q, got = search(key, http_json, term); queries += 1
+                q, got, ok = search(key, http_json, term); queries += 1 + (0 if ok and got else 1)
             except urllib.error.HTTPError as e:
                 try: detail = re.sub(r"\s+", " ", e.read().decode("utf-8", "replace"))[:400]
                 except Exception: detail = ""
                 print(f"finder: stopped at {key}: HTTP {e.code}. Provider said: {detail}"); stop = True; break
-            qs.append(q)
+            qs.append(q); usable = usable or ok
             for p_ in got:
                 p_["via"] = term_d.lower() if term_d else "base"
                 merged.setdefault(p_["url"], p_)  # first hit wins (base first, then fields)
         if stop and not merged: break
-        people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=" || ".join(qs), people=list(merged.values()))
-        done += 1; found += len(merged)
+        if usable or merged:
+            people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=" || ".join(qs), people=list(merged.values()))
+            done += 1; found += len(merged)
+        else:
+            print(f"  {key}: Google ignored the site restriction on every query; left for the next run")
         if stop: break
     if done:
         people["v"] = 1; people["updated"] = dt.datetime.now(dt.timezone.utc).isoformat()
