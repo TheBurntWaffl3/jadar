@@ -24,10 +24,16 @@ def load_alerted():
         with open(LEDGER) as f: return json.load(f)
     except Exception: return {}
 
+def should_send(new_count, ledger, today, quiet=False):
+    """Send when there are new fits, or when nothing has been sent yet today (the daily status mail), unless quiet."""
+    if quiet: return new_count > 0
+    return new_count > 0 or ledger.get("_sent") != today.isoformat()
+
 def save_alerted(ledger, urls, today):
     cutoff = (today - dt.timedelta(days=45)).isoformat()
     ledger = {u: d for u, d in ledger.items() if d >= cutoff}
     for u in urls: ledger[u] = today.isoformat()
+    ledger["_sent"] = today.isoformat()
     os.makedirs(DATA, exist_ok=True)
     with open(LEDGER, "w") as f: json.dump(ledger, f, separators=(",", ":"))
 
@@ -88,7 +94,7 @@ def compose(out, today=None, state=None, alerted=None, people=None):
     `state` = {url: saved|applied|hidden} from load_state(); `alerted` = {url: date} already sent (left out)."""
     today = today or dt.date.today(); state = state or {}; alerted = alerted or {}; people = people or {}
     rank = {"Yes": 0, "Maybe": 1}
-    skip = {u for u, st in state.items() if st in ("hidden", "applied")} | set(alerted)
+    skip = {u for u, st in state.items() if st in ("hidden", "applied")} | {u for u in alerted if not u.startswith("_")}
     fps = {k[3:] for k, st in state.items() if k.startswith("fp:") and st in ("hidden", "applied")}
     if fps: skip |= {r["url"] for r in out.get("roles", []) + out.get("new", []) if fingerprint(r.get("company"), r.get("title")) in fps}
     star = lambda r: "* " if state.get(r["url"]) == "saved" else ""
@@ -183,8 +189,8 @@ def main():
     today = dt.date.today(); ledger = load_alerted()
     title, body, prio, parts = compose(out, today, state=load_state(), alerted=ledger, people=load_people())
     print(title); print(body)
-    if os.environ.get("QUIET_IF_EMPTY") == "1" and not parts["new"]:
-        print("nothing new since the last alert; quiet run, nothing sent"); return
+    if not should_send(len(parts["new"]), ledger, today, os.environ.get("QUIET_IF_EMPTY") == "1"):
+        print("nothing new since the last alert and today's digest already went out; nothing sent"); return
     sent = []
     if os.environ.get("NTFY_TOPIC"):
         send_ntfy(title, body, prio); sent.append("ntfy")

@@ -68,14 +68,19 @@ class CacheTests(unittest.TestCase):
         finally:
             DESC.pop("d")
 
-    def test_failed_board_keeps_cache(self):
+    def test_failed_board_keeps_cache_and_shows_last_read(self):
         scan.main([])
         self.board.fail = True
+        scan.TODAY = dt.date(2026, 11, 13)
         scan.main([])
         o = self.out()
         self.assertFalse(any(s["ok"] for s in o["status"]))
         self.assertEqual(len(self.cache()["postings"]), 6, "a board that did not answer keeps its cached postings")
-        self.assertEqual(o["roles"], [])
+        self.assertEqual(len(o["roles"]), 6, "its roles from the last read within 3 days are still shown")
+        self.assertEqual([s["stale"] for s in o["status"]], [3, 3])
+        scan.TODAY = dt.date(2026, 11, 20)  # last read is now older than STALE_DAYS
+        scan.main([])
+        self.assertEqual(self.out()["roles"], [])
 
     def test_rules_change_and_full_flag_force_reread(self):
         scan.main([]); self.assertEqual(self.board.fetches, 6)

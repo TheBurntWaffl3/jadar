@@ -44,7 +44,10 @@ class AlertTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             alert.LEDGER = os.path.join(d, "alerted.json")
             alert.save_alerted({"https://old": "2026-01-01", "https://keep": "2026-11-01"}, ["https://x/3"], TODAY)
-            self.assertEqual(alert.load_alerted(), {"https://keep": "2026-11-01", "https://x/3": "2026-11-12"})
+            self.assertEqual(alert.load_alerted(), {"https://keep": "2026-11-01", "https://x/3": "2026-11-12", "_sent": "2026-11-12"})
+        self.assertTrue(alert.should_send(0, {}, TODAY)); self.assertTrue(alert.should_send(2, {"_sent": "2026-11-12"}, TODAY))
+        self.assertFalse(alert.should_send(0, {"_sent": "2026-11-12"}, TODAY)); self.assertFalse(alert.should_send(0, {}, TODAY, quiet=True))
+        self.assertTrue(alert.should_send(0, {"_sent": "2026-11-11"}, TODAY), "first run of a new day sends the status digest")
 
     def test_repost_hidden_by_fingerprint(self):
         # SpaceX "Thermal Engineer" was hidden under an old URL; the same title re-posted under https://x/1 stays out

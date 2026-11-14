@@ -13,9 +13,14 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 - What the GitHub version does (see README.md for how a run works):
   1. Profile file: done. `profiles/kevin.json`; `requirements()` extracts profile-independent facts (incl. the bachelor's
      sentence), `fit(profile, facts, title)` judges them, `major_req(profile, sentence)` applies the major rule.
-  2. Workflow: done. `.github/workflows/radar.yml`, crons `17 11 * * *` (morning digest) and `43 23 * * *` UTC (evening,
-     `QUIET_IF_EMPTY`), `workflow_dispatch` with `full` and `only` inputs, tests first, 40-min timeout. A push only runs
-     the tests. The first scheduled runs (at :30) started 7.5 h and 4 h late; moved off the half hour on 2026-11-13.
+  2. Workflow: done. `.github/workflows/radar.yml`, crons 11:17 / 12:17 / 13:17 UTC (morning window; the first to fire
+     sends the digest, later ones mail only if new) and 21:43 UTC (evening), `workflow_dispatch` with `full`, `only`,
+     `finder_max` inputs, tests first, 40-min timeout. A push only runs the tests. GitHub starts scheduled runs 4-8 h late
+     on this repo (off-hour minutes did not help: 23:43 fired at 03:35), hence the extra morning slots and the sent ledger
+     (`alerted.json` `_sent` date; `alert.should_send()`). Scans are cheap (2 min), so extra runs cost nothing.
+     Boards that fail a run (Workday's Friday-night maintenance returns 521 on all 17 tenants) keep their roles from a read
+     within `STALE_DAYS` (3): `judge_entry()` re-judges the cached entries, status gets `stale=N`, the orgs table says
+     "showing last read".
   3. Incremental cache: done. `data/cache.json` on the `data` branch (facts per URL, firstSeen/lastSeen; never descriptions).
      Full re-read on Sundays, when `RULES_VERSION` changes, or `--full` / the `full` input. Replaces `seen.json`
      (imported once if present in the data dir). Tests: `tests/test_cache.py`.

@@ -708,6 +708,22 @@ def full_read_due(cache, force=False):
     if TODAY.weekday() == 6: return "weekly (Sunday)"
     return None
 
+def judge_entry(s, e, profile=PROFILE):
+    """Cache entry (listed posting with extracted facts) -> output row for this profile, or None when out of scope."""
+    if not in_scope(e["title"], s.get("generic")): return None
+    if NON_US.search(e["location"]) and not US_HINT.search(e["location"]): return None
+    if s.get("generic") and not FIELD.search(e["title"]) and not e.get("fieldInDesc"): return None
+    disc = discipline(e["title"])
+    if profile.get("fields") and disc != "Other" and disc not in profile["fields"]: return None
+    rq = dict(e["facts"])
+    if rq.get("applyBy") and rq["applyBy"] < TODAY.isoformat(): rq["applyBy"] = None  # deadline passed, posting still up
+    f, why = fit(profile, rq, e["title"])
+    return dict(company=s["org"], sector=s["sector"], title=e["title"], location=e["location"].strip(), url=e["url"],
+                date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why,
+                desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen"))
+
+STALE_DAYS = 3  # a board that fails this run keeps its roles from a read within this many days
+
 def run_source(s, cache=None, full=False, profile=PROFILE):
     """Read one organization's board. Returns (source, rows, status, entries) where entries are the cache entries
     (keyed by URL) for every in-scope posting listed this run."""
@@ -741,17 +757,8 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
             e.update(company=s["org"], sector=s["sector"], url=u, lastSeen=TODAY.isoformat()); e.pop("legacy", None)
             e["title"] = re.sub(r"(?i)\s*job details\s*$", "", e["title"]).strip()
             entries[u] = e
-            if not in_scope(e["title"], s.get("generic")): continue
-            if NON_US.search(e["location"]) and not US_HINT.search(e["location"]): continue
-            if s.get("generic") and not FIELD.search(e["title"]) and not e.get("fieldInDesc"): continue
-            disc = discipline(e["title"])
-            if profile.get("fields") and disc != "Other" and disc not in profile["fields"]: continue
-            rq = dict(e["facts"])
-            if rq.get("applyBy") and rq["applyBy"] < TODAY.isoformat(): rq["applyBy"] = None  # deadline passed, posting still up
-            f, why = fit(profile, rq, e["title"])
-            rows.append(dict(company=s["org"], sector=s["sector"], title=e["title"], location=e["location"].strip(), url=u,
-                             date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why,
-                             desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen")))
+            row_out = judge_entry(s, e, profile)
+            if row_out: rows.append(row_out)
     except Exception as ex:
         err = f"{type(ex).__name__}: {ex}"[:200]
     st = dict(org=s["org"], type=s["type"], ok=err is None, total=total, matches=len(rows), fetched=detailed, cached=reused, error=err,
@@ -770,10 +777,15 @@ def main(argv=None):
     roles, status = [], []
     with ThreadPoolExecutor(32) as ex:
         for s, rows, st, entries in ex.map(lambda s: run_source(s, cache["postings"], bool(full)), srcs):
-            status.append(st); roles += rows
             if st["ok"]:  # the board answered: postings it no longer lists are closed
                 for u in [u for u, e in cache["postings"].items() if e.get("company") == s["org"] and u not in entries]:
                     del cache["postings"][u]
+            else:  # board down (e.g. Workday's Friday-night maintenance): keep what it listed within STALE_DAYS
+                keep = (TODAY - dt.timedelta(days=STALE_DAYS)).isoformat()
+                rows = [r for r in (judge_entry(s, e) for e in cache["postings"].values()
+                                    if e.get("company") == s["org"] and e.get("facts") and (e.get("lastSeen") or "") >= keep) if r]
+                st["stale"] = len(rows); st["matches"] = len(rows)
+            status.append(st); roles += rows
             cache["postings"].update(entries)
     now = TODAY.isoformat()
     stale = (TODAY - dt.timedelta(days=60)).isoformat()
