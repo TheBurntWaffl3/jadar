@@ -77,8 +77,14 @@ class FinderTests(unittest.TestCase):
         def fake(url, token=None, method="GET", body=None, headers=None):
             n["calls"] += 1; return {"organic_results": junk}
         q, found, ok = finder.search("Boeing", fake)
-        self.assertEqual(found, []); self.assertFalse(ok); self.assertEqual(n["calls"], 2, "one retry with inurl: phrasing")
-        self.assertIn("inurl:linkedin.com/in", q)
+        self.assertEqual(found, []); self.assertFalse(ok); self.assertEqual(n["calls"], 3, "google_light retry, then inurl: phrasing")
+        self.assertIn("inurl:linkedin.com/in", q); self.assertIn("[light]", q)
+        # the light parser returns real links on the second attempt
+        m = {"calls": 0}
+        def light(url, token=None, method="GET", body=None, headers=None):
+            m["calls"] += 1
+            return {"organic_results": ITEMS} if "engine=google_light" in url else {"organic_results": junk}
+        q, found, ok = finder.search("Boeing", light); self.assertTrue(ok); self.assertEqual(len(found), 2); self.assertEqual(m["calls"], 2)
         def empty(url, token=None, method="GET", body=None, headers=None): return {"organic_results": []}
         q, found, ok = finder.search("Boeing", empty); self.assertTrue(ok, "a genuinely empty answer counts as searched")
 

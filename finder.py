@@ -55,11 +55,16 @@ def provider():
     if os.environ.get("SERPER_KEY"): return "serper"
     return None
 
-def _serpapi(q, fetch):
-    url = "https://serpapi.com/search.json?" + urllib.parse.urlencode({"engine": "google", "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"],
-                                                                       "as_sitesearch": "linkedin.com", "nfpr": 1, "hl": "en", "gl": "us", "google_domain": "google.com"})
-    j = fetch(url)
-    return j.get("organic_results", []), j.get("error") or (j.get("search_information") or {}).get("organic_results_state")
+def _serpapi(q, fetch, engine="google"):
+    """SerpApi Google results. The default parser sometimes returns google.com/goto redirect links instead of the real URLs
+    (seen 2026-11-14); `google_light` is SerpApi's simpler parser that gives direct links, used as the fallback."""
+    params = {"engine": engine, "q": q, "num": 10, "api_key": os.environ["SERPAPI_KEY"], "hl": "en", "gl": "us", "google_domain": "google.com"}
+    if engine == "google": params.update({"as_sitesearch": "linkedin.com", "nfpr": 1})
+    j = fetch("https://serpapi.com/search.json?" + urllib.parse.urlencode(params))
+    raw = j.get("organic_results", [])
+    for it in raw:  # prefer a real link over a Google redirect when both are present
+        if "google.com/goto" in (it.get("link") or "") and it.get("redirect_link") and "google.com" not in it["redirect_link"]: it["link"] = it["redirect_link"]
+    return raw, j.get("error") or (j.get("search_information") or {}).get("organic_results_state")
 
 def _serper(q, fetch):
     j = fetch("https://google.serper.dev/search", None, "POST", {"q": q, "num": 10}, {"X-API-KEY": os.environ["SERPER_KEY"]})
@@ -72,14 +77,19 @@ def search(key, fetch, term=None):
     run = _serpapi if provider() == "serpapi" else _serper if provider() == "serper" else None
     if not run: raise RuntimeError("no search provider configured")
     tried = []
-    for q in (query_for(key, term, site_in_query=True), f'inurl:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"' + (f" {term}" if term else "")):
-        raw, note = run(q, fetch); tried.append(q)
+    attempts = [(query_for(key, term, site_in_query=True), {})]
+    if provider() == "serpapi": attempts.append((query_for(key, term, site_in_query=True), {"engine": "google_light"}))
+    attempts.append((f'inurl:linkedin.com/in {SCHOOL} "{ALIAS.get(key, key)}"' + (f" {term}" if term else ""), {}))
+    for q, kw in attempts:
+        raw, note = run(q, fetch, **kw); tried.append(q + (" [light]" if kw else ""))
         people = parse_items(raw)
         linked = sum(1 for it in raw if "linkedin.com" in (it.get("link") or ""))
-        print(f"  {q[:90]} -> {len(raw)} results, {linked} on linkedin, {len(people)} profiles" + (f" ({note})" if note and note not in ("Success", "Results for exact spelling") else ""))
-        if people or (linked and not raw[:1] == []): return q, people, True
+        redirects = sum(1 for it in raw if "google.com/goto" in (it.get("link") or ""))
+        print(f"  {q[:80]}{' [light]' if kw else ''} -> {len(raw)} results, {linked} on linkedin, {redirects} redirects, {len(people)} profiles"
+              + (f" ({note})" if note and note not in ("Success", "Results for exact spelling") else ""))
+        if people or linked: return q, people, True
         if raw and not linked:
-            for it in raw[:3]: print(f"      skipped: {(it.get('link') or '')[:90]} | {(it.get('title') or '')[:60]}")
+            for it in raw[:2]: print(f"      skipped: {(it.get('link') or '')[:80]} | {(it.get('title') or '')[:60]}")
         if not raw: return q, [], True  # a genuine empty answer: nothing to find
     return " / ".join(tried), [], False
 
