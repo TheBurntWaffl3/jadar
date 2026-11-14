@@ -171,7 +171,8 @@ def main():
             people.setdefault("companies", {})[key] = dict(searched=today.isoformat(), query=" || ".join(qs), people=list(merged.values()))
             done += 1; found += len(merged)
         else:
-            print(f"  {key}: Google ignored the site restriction on every query; left for the next run")
+            print(f"  {key}: Google ignored the site restriction on every query; left for the next run, stopping for today")
+            break  # a bad SERP day: don't burn the month's quota, try again tomorrow
         if stop: break
     if done:
         people["v"] = 1; people["updated"] = dt.datetime.now(dt.timezone.utc).isoformat()
