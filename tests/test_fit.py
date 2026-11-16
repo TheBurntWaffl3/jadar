@@ -330,6 +330,9 @@ class TestTiming(unittest.TestCase):
         self.assertEqual(scan.timing(P, r, "Associate Thermal Engineer"), ("unstated", None))
         r = scan.requirements("BS in Aerospace Engineering. Candidates must be available to begin within 30-60 days of applying.")
         self.assertEqual(scan.timing(P, r, "Propulsion Engineer")[0], "immediate")
+        scan.TODAY = dt.date(2027, 4, 5)  # past June 1 minus 60 days: now it is a usable window
+        self.assertEqual(scan.timing(P, r, "Propulsion Engineer"), ("window", "start window open now"))
+        scan.TODAY = TODAY
         r = scan.requirements("BS in Aerospace Engineering. Graduating between December 2026 and August 2028.")
         self.assertEqual(scan.timing(P, r, "Engineer I")[0], "window")
 

@@ -1,5 +1,5 @@
 """The daily alert: new fits first, feeds line, closing-soon line; honors saved/applied/hidden state."""
-import os, sys, unittest, datetime as dt
+import os, sys, json, unittest, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import alert
 
@@ -57,6 +57,11 @@ class AlertTests(unittest.TestCase):
         self.assertNotIn("SpaceX", body); self.assertEqual(title, "Job radar: 1 Yes, 1 Maybe new")
         self.assertEqual(alert.fingerprint("L3Harris (incl. Aerojet Rocketdyne)", "Associate, Mechanical Engineering (Design)"),
                          "L3Harris|associate mechanical engineering design")
+
+    def test_immediate_start_roles_are_left_out(self):
+        out = json.loads(json.dumps(OUT)); out["new"][1]["timing"] = "immediate"
+        title, body, prio, parts = alert.compose(out, TODAY)
+        self.assertNotIn("Boeing", body); self.assertEqual(title, "Job radar: 2 Yes, 0 Maybe new")
 
     def test_terps_count_in_lines(self):
         title, body, prio, parts = alert.compose(OUT, TODAY, people={"SpaceX": 4})

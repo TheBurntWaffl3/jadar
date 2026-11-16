@@ -389,7 +389,10 @@ def timing(profile, r, title):
     if re.search(rf"\b{gy}\b|'{gy[2:]}\b", txt):
         m = re.search(rf"(?i)(class of {gy}|[^.\n]{{0,40}}\b{gy}\b[^.\n]{{0,25}})", txt)
         return gy, re.sub(r"\s+", " ", m.group(0)).strip()[:60] if m else gy
-    if r.get("startWindow"): return "immediate", (r["startWindow"] or "")[:60]
+    if r.get("startWindow"):  # immediate only while the apply-after date (earliest start minus the window) is still ahead
+        days = int(re.search(r"\d+", r["startWindow"]).group(0))
+        if TODAY < profile["_start"] - dt.timedelta(days=days): return "immediate", (r["startWindow"] or "")[:60]
+        return "window", "start window open now"
     if r.get("gradReq") or r.get("startReq"): return "window", (r.get("gradReq") or r.get("startReq"))[:60]
     return "unstated", None
 

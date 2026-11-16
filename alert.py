@@ -95,6 +95,7 @@ def compose(out, today=None, state=None, alerted=None, people=None):
     today = today or dt.date.today(); state = state or {}; alerted = alerted or {}; people = people or {}
     rank = {"Yes": 0, "Maybe": 1}
     skip = {u for u, st in state.items() if st in ("hidden", "applied")} | {u for u in alerted if not u.startswith("_")}
+    skip |= {r["url"] for r in out.get("roles", []) + out.get("new", []) if r.get("timing") == "immediate"}  # not for now
     fps = {k[3:] for k, st in state.items() if k.startswith("fp:") and st in ("hidden", "applied")}
     if fps: skip |= {r["url"] for r in out.get("roles", []) + out.get("new", []) if fingerprint(r.get("company"), r.get("title")) in fps}
     star = lambda r: "* " if state.get(r["url"]) == "saved" else ""
