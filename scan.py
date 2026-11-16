@@ -752,7 +752,7 @@ def judge_entry(s, e, profile=PROFILE):
                 date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why, timing=tk, timingNote=tn,
                 desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen"))
 
-URL_SENIOR = re.compile(r"(?i)/(?:[a-z0-9-]*-)?(senior|sr|principal|staff|lead|chief|director)[-_]")
+URL_SENIOR = re.compile(r"(?i)/(?:[a-z0-9-]*-)?(senior|sr|principal|chief|director)[-_]")  # not staff/lead: MIT LL "Assistant Staff" is entry level, Curtiss-Wright "...-Engineer-Staff" was 0 yrs
 STALE_DAYS = 3  # a board that fails this run keeps its roles from a read within this many days
 
 def run_source(s, cache=None, full=False, profile=PROFILE):

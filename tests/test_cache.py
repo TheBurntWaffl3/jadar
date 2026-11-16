@@ -30,6 +30,12 @@ class UrlSeniorTests(unittest.TestCase):
         self.assertEqual(r["fit"], "Maybe")
         r = scan.judge_entry(s, dict(base, title="2027 Early Career Mechanical Engineer", url="https://x.test/job/Senior-Program-2027-Early-Career-Mechanical-Engineer_R1"))
         self.assertNotEqual(r["fit"], "No", "an entry-level title wins over a slug word")
+        # live run 2026-11-16: "staff"/"lead" in a slug are not seniority (MIT LL "Assistant Staff" is the entry level,
+        # Curtiss-Wright "Manufacturing-Engineer-Staff" asked 0 years)
+        for url in ("https://careers.ll.mit.edu/job/Lexington-Thermal-Engineer-Assistant-Staff-MA-02420/1432105100/",
+                    "https://curtisswright.wd1.myworkdayjobs.com/en-US/CW_External_Career_Site/job/US-NY-Farmingdale-Sensors/Manufacturing-Engineer-Staff_JR13308-1"):
+            r = scan.judge_entry(s, dict(base, title="Thermal Engineer - Assistant Staff", url=url))
+            self.assertNotEqual(r["why"], "senior per posting URL", url)
 
 class CacheTests(unittest.TestCase):
     def setUp(self):
