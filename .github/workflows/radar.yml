@@ -99,6 +99,8 @@ jobs:
 
       - name: Find UMD alumni at companies with fits (private people.json)
         if: steps.scan.outcome == 'success' && inputs.only == '' && github.event.schedule != '43 21 * * *'
+        continue-on-error: true
+        timeout-minutes: 6
         env:
           RADAR_DATA: data
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}

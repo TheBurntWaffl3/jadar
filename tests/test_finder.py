@@ -70,6 +70,26 @@ class FinderTests(unittest.TestCase):
         doc = json.loads(base64.b64decode(put[2]["content"]))
         self.assertEqual(doc["companies"]["Anduril"]["people"][0]["name"], "Jane Doe"); self.assertNotIn("sha", put[2])
 
+    def test_timeouts_stop_the_run_quietly(self):
+        import tempfile, io, contextlib, urllib.error
+        os.environ.update(SERPAPI_KEY="k", STATE_REPO="o/r", STATE_TOKEN="t"); os.environ.pop("SERPER_KEY", None)
+        calls = []
+        def slow(url, token=None, method="GET", body=None, headers=None):
+            calls.append(url.split("?")[0])
+            if "serpapi" in url: raise TimeoutError("The read operation timed out")
+            if method == "GET": raise urllib.error.HTTPError(url, 404, "nf", {}, None)
+            return {}
+        orig, orig_data = finder.http_json, finder.DATA
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "radar_out.json"), "w") as f: json.dump({"roles": [{"fit": "Yes", "company": "Boeing"}]}, f)
+            finder.http_json, finder.DATA = slow, d
+            try:
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf): finder.main()   # must not raise
+            finally: finder.http_json, finder.DATA = orig, orig_data
+        self.assertIn("stopped at Boeing: TimeoutError", buf.getvalue())
+        self.assertFalse(any(c.endswith("people.json") and c for c in calls[2:]), "nothing written after a timeout")
+
     def test_ignored_site_restriction_is_not_recorded(self):
         os.environ.update(SERPAPI_KEY="k"); os.environ.pop("SERPER_KEY", None)
         junk = [{"title": "USAspending.gov", "link": "https://www.google.com/goto?url=abc", "snippet": ""}] * 5

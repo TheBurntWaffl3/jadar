@@ -162,6 +162,8 @@ def main():
                 try: detail = re.sub(r"\s+", " ", e.read().decode("utf-8", "replace"))[:400]
                 except Exception: detail = ""
                 print(f"finder: stopped at {key}: HTTP {e.code}. Provider said: {detail}"); stop = True; break
+            except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:  # slow or broken provider: stop for today
+                print(f"finder: stopped at {key}: {type(e).__name__}: {str(e)[:120]}"); stop = True; break
             qs.append(q); usable = usable or ok
             for p_ in got:
                 p_["via"] = term_d.lower() if term_d else "base"
@@ -180,4 +182,6 @@ def main():
     print(f"finder: {queries} searches over {done} companies, {found} profiles found; people.json now covers {len(people.get('companies', {}))} companies")
 
 if __name__ == "__main__":
-    main()
+    try: main()
+    except Exception as e:  # the finder must never fail the run; the page and email come first
+        print(f"finder: gave up: {type(e).__name__}: {str(e)[:200]}")
