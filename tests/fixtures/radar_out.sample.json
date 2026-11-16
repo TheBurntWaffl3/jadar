@@ -36,7 +36,9 @@
    "employment": "Full-time",
    "travel": null,
    "relocation": true,
-   "reqSnippet": "Bachelor's degree in aerospace, mechanical, or related engineering discipline \u00b7 0+ years of experience with thermal analysis tools (Thermal Desktop, ANSYS) \u00b7 Hands-on project experience; internships and student teams count \u00b7 Must be a US person (ITAR)"
+   "reqSnippet": "Bachelor's degree in aerospace, mechanical, or related engineering discipline \u00b7 0+ years of experience with thermal analysis tools (Thermal Desktop, ANSYS) \u00b7 Hands-on project experience; internships and student teams count \u00b7 Must be a US person (ITAR)",
+   "timing": "2027",
+   "timingNote": "Class of 2027"
   },
   {
    "id": "r0002",
@@ -70,7 +72,9 @@
    "employment": "Full-time",
    "travel": "up to 10%",
    "relocation": null,
-   "reqSnippet": "Bachelor's degree in Mechanical or Aerospace Engineering \u00b7 0-2 years of related experience \u00b7 Familiarity with FEA (NASTRAN, ANSYS) \u00b7 Ability to obtain a TS/SCI clearance"
+   "reqSnippet": "Bachelor's degree in Mechanical or Aerospace Engineering \u00b7 0-2 years of related experience \u00b7 Familiarity with FEA (NASTRAN, ANSYS) \u00b7 Ability to obtain a TS/SCI clearance",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0003",
@@ -104,7 +108,9 @@
    "employment": "Full-time",
    "travel": "up to 25%",
    "relocation": true,
-   "reqSnippet": "Bachelor's degree from an accredited college in a related discipline \u00b7 Minimum GPA 3.0 \u00b7 Ability to obtain a Secret clearance \u00b7 US citizenship required"
+   "reqSnippet": "Bachelor's degree from an accredited college in a related discipline \u00b7 Minimum GPA 3.0 \u00b7 Ability to obtain a Secret clearance \u00b7 US citizenship required",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0004",
@@ -138,7 +144,9 @@
    "employment": "Full-time",
    "travel": null,
    "relocation": false,
-   "reqSnippet": "Bachelor's degree in engineering \u00b7 DOE Q clearance must be obtainable \u00b7 US citizenship required"
+   "reqSnippet": "Bachelor's degree in engineering \u00b7 DOE Q clearance must be obtainable \u00b7 US citizenship required",
+   "timing": "2027",
+   "timingNote": "2027 grads named"
   },
   {
    "id": "r0005",
@@ -172,7 +180,9 @@
    "employment": "Full-time",
    "travel": "occasional",
    "relocation": null,
-   "reqSnippet": "Bachelor's degree in Mechanical, Aerospace, or related engineering field \u00b7 Experience with test stands, DAQ, or instrumentation (internships and student teams count) \u00b7 Comfortable in a fast-paced hardware environment"
+   "reqSnippet": "Bachelor's degree in Mechanical, Aerospace, or related engineering field \u00b7 Experience with test stands, DAQ, or instrumentation (internships and student teams count) \u00b7 Comfortable in a fast-paced hardware environment",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0006",
@@ -206,7 +216,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": null
+   "reqSnippet": null,
+   "timing": "immediate",
+   "timingNote": "start within 60 days of applying"
   },
   {
    "id": "r0007",
@@ -240,7 +252,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": null
+   "reqSnippet": null,
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0008",
@@ -274,7 +288,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": null
+   "reqSnippet": null,
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0009",
@@ -308,7 +324,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": null
+   "reqSnippet": null,
+   "timing": "window",
+   "timingNote": "2026 new-grad cycle"
   },
   {
    "id": "r0010",
@@ -342,7 +360,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": "Master's degree required \u00b7 5+ years of experience"
+   "reqSnippet": "Master's degree required \u00b7 5+ years of experience",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0011",
@@ -376,7 +396,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": "Master's degree required \u00b7 5+ years of experience"
+   "reqSnippet": "Master's degree required \u00b7 5+ years of experience",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0012",
@@ -410,7 +432,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": "Master's degree required \u00b7 5+ years of experience"
+   "reqSnippet": "Master's degree required \u00b7 5+ years of experience",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0013",
@@ -444,7 +468,9 @@
    "employment": null,
    "travel": null,
    "relocation": null,
-   "reqSnippet": "Master's degree required \u00b7 5+ years of experience"
+   "reqSnippet": "Master's degree required \u00b7 5+ years of experience",
+   "timing": "unstated",
+   "timingNote": null
   },
   {
    "id": "r0014",
@@ -478,7 +504,9 @@
    "employment": "Full-time",
    "travel": "up to 10%",
    "relocation": null,
-   "reqSnippet": "Bachelor's degree in Mechanical or Aerospace Engineering \u00b7 0-2 years of related experience \u00b7 Familiarity with FEA (NASTRAN, ANSYS) \u00b7 Ability to obtain a TS/SCI clearance"
+   "reqSnippet": "Bachelor's degree in Mechanical or Aerospace Engineering \u00b7 0-2 years of related experience \u00b7 Familiarity with FEA (NASTRAN, ANSYS) \u00b7 Ability to obtain a TS/SCI clearance",
+   "timing": "unstated",
+   "timingNote": null
   }
  ],
  "new": [

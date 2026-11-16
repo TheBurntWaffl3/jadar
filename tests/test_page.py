@@ -9,6 +9,17 @@ def embedded(html):
     return json.loads(html.split('<script id="data" type="application/json">')[1].split("</script>")[0].replace("<\\/", "</"))
 
 class PageTests(unittest.TestCase):
+    def test_timing_sort_filter_pills(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle")
+        i = html.index('id="sort"'); first = html[i:].index("<option")
+        self.assertTrue(html[i + first:].startswith('<option value="fit2027">Sort: Fit · 2027 first</option>'), "2027-first is the first sort option")
+        self.assertIn("sort: 'fit2027'", html, "and the default")
+        self.assertIn('id="only2027"', html); self.assertIn("2027 only", html)
+        for o in ("Says 2027", "States a window", "Not stated", "Immediate start"): self.assertIn(o, html)
+        for c in ("tag t2027", "tag twindow", "tag tasap"): self.assertIn(c, html)
+        self.assertIn("kv('Timing'", html)
+        self.assertEqual({r["timing"] for r in self.out["roles"]}, {"2027", "window", "unstated", "immediate"}, "fixture covers all four")
+
     def test_filters(self):
         html = build_page.build(self.out, self.src, "Kevin Kyle")
         for needle in ("jadar.filters.v1", "DMV (MD · DC · VA)", "West Coast (CA OR WA AK HI)", "More filters", "Clear filters",

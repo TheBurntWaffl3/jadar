@@ -110,6 +110,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tag { display: inline-block; font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 8px; background: var(--pill); color: var(--ink-2); white-space: nowrap; }
 .tag.new { background: var(--ember); color: var(--on-ember); }
 .tag.closing { background: var(--tint); color: var(--ember); }
+.tag.t2027 { background: transparent; color: var(--good); box-shadow: inset 0 0 0 1.5px var(--good); }
+.tag.twindow, .tag.tasap { background: var(--pill); color: var(--muted); }
+.ctl.pillbtn[aria-pressed="true"] { background: var(--good); color: #fff; }
 .kind { color: var(--muted); display: block; margin-top: 2px; }
 td.date { white-space: nowrap; }
 .why { color: var(--ink-2); font-size: 13.5px; max-width: 320px; }
@@ -274,6 +277,7 @@ footer a { color: var(--ink); }
     <button type="button" data-fit="Yes" aria-pressed="false">Yes</button>
     <button type="button" data-fit="all" aria-pressed="false">All</button>
   </div>
+  <button type="button" class="ctl pillbtn" id="only2027" aria-pressed="false" title="Only roles that name 2027 in their grad or start window">2027 only</button>
   <select class="ctl" id="sector" aria-label="Sector"><option value="">All sectors</option></select>
   <select class="ctl" id="disc" aria-label="Field"><option value="">All fields</option></select>
   <select class="ctl" id="days" aria-label="Posted within">
@@ -281,7 +285,7 @@ footer a { color: var(--ink); }
   </select>
   <select class="ctl" id="loc" aria-label="Location"><option value="">All locations</option></select>
   <select class="ctl" id="sort" aria-label="Sort by">
-    <option value="fit">Sort: Fit</option><option value="date">Sort: Newest</option><option value="applyBy">Sort: Apply-by soonest</option>
+    <option value="fit2027">Sort: Fit · 2027 first</option><option value="fit">Sort: Fit</option><option value="date">Sort: Newest</option><option value="applyBy">Sort: Apply-by soonest</option>
     <option value="salary">Sort: Salary high→low</option><option value="company">Sort: Company</option><option value="minYears">Sort: Min yrs</option>
   </select>
   <input class="ctl" type="search" id="q" placeholder="Search company, title, location, why" aria-label="Search">
@@ -299,6 +303,7 @@ footer a { color: var(--ink); }
   <select class="ctl" id="company" aria-label="Company"><option value="">All companies</option></select>
   <select class="ctl" id="closing" aria-label="Closing"><option value="">Any closing date</option><option value="7">Closes within 7 days</option><option value="14">Closes within 14 days</option><option value="30">Closes within 30 days</option><option value="any">Has a deadline</option></select>
   <label class="chk" id="terps-chk"><input type="checkbox" id="terps"> has Terps found</label>
+  <select class="ctl" id="timing" aria-label="Timing"><option value="">Any timing</option><option value="2027">Says 2027</option><option value="window">States a window</option><option value="unstated">Not stated</option><option value="immediate">Immediate start</option></select>
   <label class="chk"><input type="checkbox" id="newonly"> new today</label>
 </div>
 <div class="wrap">
@@ -367,7 +372,9 @@ footer a { color: var(--ink); }
     ['wc', 'West Coast (CA OR WA AK HI)', ['CA','OR','WA','AK','HI']]];
   const REGION_STATES = Object.fromEntries(REGIONS.map(([k, , st]) => [k, new Set(st)]));
   const locMatch = (r, v) => !v ? true : v === 'remote' ? r._remote : v === 'unknown' ? !r._state : REGION_STATES[v] ? REGION_STATES[v].has(r._state) : r._state === v;
-  const roles = D.roles.map(r => { const pl = parseLoc(r.location); return Object.assign({}, r, {_new: NEW.has(r.url), _dt: daysTo(r.applyBy), _state: pl.state, _remote: pl.remote,
+  const TIMING_RANK = {'2027': 0, window: 1, unstated: 2, immediate: 3};
+  const TIMING_LABEL = {'2027': 'Says 2027', window: 'States a window', unstated: 'Not stated', immediate: 'Immediate start'};
+  const roles = D.roles.map(r => { const pl = parseLoc(r.location); return Object.assign({}, r, {_new: NEW.has(r.url), _dt: daysTo(r.applyBy), _state: pl.state, _remote: pl.remote, _timing: TIMING_RANK[r.timing] != null ? r.timing : 'unstated',
     _q: [r.company, r.title, r.location, r.why, r.discipline, r.salary].join(' ').toLowerCase()}); });
 
   // ---------- per-role state (saved / applied / hidden), kept in this browser ----------
@@ -443,12 +450,12 @@ footer a { color: var(--ink); }
   }
 
   // controls
-  const FILTER_DEFAULTS = {sector: '', disc: '', days: '', loc: '', q: '', mode: '', pay: '', payonly: false, exp: '', clr: '', cit: '', company: '', closing: '', terps: false, newonly: false};
-  const state = Object.assign({tab: 'inbox', fit: 'fits', sort: 'fit', dir: 'asc', more: false, open: null, draft: null}, FILTER_DEFAULTS);
+  const FILTER_DEFAULTS = {sector: '', disc: '', days: '', loc: '', q: '', mode: '', pay: '', payonly: false, exp: '', clr: '', cit: '', company: '', closing: '', timing: '', terps: false, newonly: false};
+  const state = Object.assign({tab: 'inbox', fit: 'fits', sort: 'fit2027', dir: 'asc', more: false, open: null, draft: null}, FILTER_DEFAULTS);
   const FKEY = 'jadar.filters.v1';
   function saveFilters() { const o = {v: 1, fit: state.fit, sort: state.sort, dir: state.dir, more: state.more}; Object.keys(FILTER_DEFAULTS).forEach(k => o[k] = state[k]); lsSet(FKEY, JSON.stringify(o)); }
   function loadFilters() { try { const o = JSON.parse(lsGet(FKEY) || 'null'); if (!o || o.v !== 1) return; Object.keys(FILTER_DEFAULTS).forEach(k => { if (k in o && typeof o[k] === typeof FILTER_DEFAULTS[k]) state[k] = o[k]; });
-    if (['fits', 'Yes', 'all'].includes(o.fit)) state.fit = o.fit; if (typeof o.sort === 'string') state.sort = o.sort; if (o.dir === 'asc' || o.dir === 'desc') state.dir = o.dir; state.more = !!o.more; } catch (e) {} }
+    if (['fits', 'Yes', 'all'].includes(o.fit)) state.fit = o.fit; if (typeof o.sort === 'string' && KEYS[o.sort]) state.sort = o.sort; if (o.dir === 'asc' || o.dir === 'desc') state.dir = o.dir; state.more = !!o.more; } catch (e) {} }
   const fill = (sel, vals) => { vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); }); };
   fill($('#sector'), [...new Set(roles.map(r => r.sector).filter(Boolean))].sort());
   fill($('#disc'), [...new Set(roles.map(r => r.discipline).filter(Boolean))].sort());
@@ -473,30 +480,33 @@ footer a { color: var(--ink); }
     state.company = setOptions($('#company'), [['', Object.keys(cc).sort().map(c => [c, c + ' · ' + cc[c]])]], state.company);
   }
   function reflectFilters() {  // push state into the controls
-    ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing', 'sort'].forEach(k => { const el = $('#' + k); if (el) el.value = state[k]; });
+    ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing', 'timing', 'sort'].forEach(k => { const el = $('#' + k); if (el) el.value = state[k]; });
+    $('#only2027').setAttribute('aria-pressed', state.timing === '2027');
     $('#q').value = state.q; $('#payonly').checked = state.payonly; $('#terps').checked = state.terps; $('#newonly').checked = state.newonly;
     document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x.dataset.fit === state.fit));
     $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more);
   }
   const activeFilters = () => Object.keys(FILTER_DEFAULTS).filter(k => state[k] !== FILTER_DEFAULTS[k]);
-  const MORE_KEYS = ['mode', 'pay', 'payonly', 'exp', 'clr', 'cit', 'company', 'closing', 'terps', 'newonly'];
+  const MORE_KEYS = ['mode', 'pay', 'payonly', 'exp', 'clr', 'cit', 'company', 'closing', 'timing', 'terps', 'newonly'];
   document.querySelectorAll('.seg:not(.tabs) button').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.fit = b.dataset.fit; saveFilters(); render();
   }));
   document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.tab = b.dataset.tab; state.open = null; render();
   }));
-  ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing'].forEach(k => $('#' + k).addEventListener('change', e => { state[k] = e.target.value; saveFilters(); render(); }));
+  ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing', 'timing'].forEach(k => $('#' + k).addEventListener('change', e => { state[k] = e.target.value; saveFilters(); render(); }));
+  $('#only2027').addEventListener('click', () => { state.timing = state.timing === '2027' ? '' : '2027'; saveFilters(); render(); });
   [['payonly', 'payonly'], ['terps', 'terps'], ['newonly', 'newonly']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { state[k] = e.target.checked; saveFilters(); render(); }));
   $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); saveFilters(); render(); });
   $('#more-toggle').addEventListener('click', () => { state.more = !state.more; $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more); saveFilters(); });
   $('#clear-filters').addEventListener('click', () => { Object.assign(state, FILTER_DEFAULTS); fillTab = null; reflectFilters(); saveFilters(); render(); });
-  const DEFAULT_DIR = {fit: 'asc', date: 'desc', applyBy: 'asc', salary: 'desc', company: 'asc', minYears: 'asc', discipline: 'asc'};
+  const DEFAULT_DIR = {fit2027: 'asc', fit: 'asc', date: 'desc', applyBy: 'asc', salary: 'desc', company: 'asc', minYears: 'asc', discipline: 'asc'};
   $('#sort').addEventListener('change', e => { state.sort = e.target.value; state.dir = DEFAULT_DIR[state.sort]; saveFilters(); render(); });
   document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
     const k = th.dataset.sort;
-    state.dir = state.sort === k ? (state.dir === 'asc' ? 'desc' : 'asc') : DEFAULT_DIR[k]; state.sort = k;
-    if ([...$('#sort').options].some(o => o.value === k)) $('#sort').value = k; saveFilters(); render();
+    const kk = (k === 'fit' && state.sort === 'fit2027') ? 'fit2027' : k;
+    state.dir = state.sort === kk ? (state.dir === 'asc' ? 'desc' : 'asc') : DEFAULT_DIR[kk]; state.sort = kk;
+    if ([...$('#sort').options].some(o => o.value === kk)) $('#sort').value = kk; saveFilters(); render();
   }));
   loadFilters();
 
@@ -504,6 +514,7 @@ footer a { color: var(--ink); }
   const cmpNum = (a, b) => (a == null ? 0 : a) - (b == null ? 0 : b);  // nulls are moved last before this runs
   const cmpStr = (a, b) => (a || '').localeCompare(b || '');
   const KEYS = {
+    fit2027: (a, b) => FITRANK[a.fit] - FITRANK[b.fit] || TIMING_RANK[a._timing] - TIMING_RANK[b._timing] || cmpStr(b.date, a.date),
     fit: (a, b) => FITRANK[a.fit] - FITRANK[b.fit] || cmpStr(b.date, a.date),
     date: (a, b) => cmpStr(a.date, b.date) || FITRANK[a.fit] - FITRANK[b.fit],
     applyBy: (a, b) => cmpNum(a._dt, b._dt) || FITRANK[a.fit] - FITRANK[b.fit],
@@ -534,6 +545,9 @@ footer a { color: var(--ink); }
     if (st && state.tab !== st && state.tab !== 'saved' && state.tab !== 'applied' && state.tab !== 'hidden')
       t.push(`<span class="tag status ${st}${es.repost ? ' repost' : ''}">${st === 'hidden' ? 'Hidden' : st === 'applied' ? 'Applied' : 'Saved'}${es.repost ? ' (re-post)' : ''}</span>`);
     if (r._dt != null && r._dt >= 0 && r._dt <= 10) t.push(`<span class="tag closing">${r._dt === 0 ? 'Closes today' : 'Closes in ' + r._dt + 'd'}</span>`);
+    if (r._timing === '2027') t.push(`<span class="tag t2027" title="${esc(r.timingNote || 'Names 2027 in the grad or start window')}">2027</span>`);
+    else if (r._timing === 'window') t.push(`<span class="tag twindow" title="${esc(r.timingNote || 'States a grad/start window')}">window</span>`);
+    else if (r._timing === 'immediate') t.push(`<span class="tag tasap" title="${esc(r.timingNote || 'Wants an immediate start')}">ASAP</span>`);
     if (r.workMode) t.push(`<span class="tag">${esc(r.workMode)}</span>`);
     if (r.employment && r.employment !== 'Full-time') t.push(`<span class="tag">${esc(r.employment)}</span>`);
     const pf = peopleFor(r); if (pf && pf.people.length) t.push(`<span class="tag terps">${pf.people.length} Terp${pf.people.length === 1 ? '' : 's'}</span>`);
@@ -643,7 +657,7 @@ footer a { color: var(--ink); }
     const yrs = r.minYears == null ? 'not stated' : r.minYears + (r.schoolExpOk ? ' (school/internship counts)' : '');
     const pay = r.salary ? r.salary + (/\/hr$/.test(r.salary) && r.salaryMin != null ? ' · $' + num(r.salaryMin) + (r.salaryMax != null && r.salaryMax !== r.salaryMin ? '–$' + num(r.salaryMax) : '') + ' annualized' : '') : null;
     const left = [kv('Min experience', yrs), kv('Degree', r.degree), kv('Major', r.majorReq), kv('GPA', r.gpaReq), kv('Clearance', r.clearance), kv('Citizenship', r.citizenship),
-      kv('Grad window', r.gradReq), kv('Start', r.startReq), kv('Start window', r.startWindow), kv('Apply by', r.applyBy ? fmtLong(r.applyBy) + (r._dt != null ? ' (' + (r._dt < 0 ? 'passed' : r._dt + ' days') + ')' : '') : null),
+      kv('Timing', TIMING_LABEL[r._timing] + (r.timingNote ? ' · ' + r.timingNote : '')), kv('Grad window', r.gradReq), kv('Start', r.startReq), kv('Start window', r.startWindow), kv('Apply by', r.applyBy ? fmtLong(r.applyBy) + (r._dt != null ? ' (' + (r._dt < 0 ? 'passed' : r._dt + ' days') + ')' : '') : null),
       kv('Pay', pay), kv('Work mode', r.workMode), kv('Employment', r.employment), kv('Travel', r.travel), kv('Relocation', r.relocation === true ? 'offered' : r.relocation === false ? 'not offered' : null),
       kv('Posted', r.date ? fmtLong(r.date) + ' (' + r.dateKind + ')' : null), kv('First seen', r.firstSeen ? fmtLong(r.firstSeen) : null), kv('Sector', r.sector)].join('');
     const snip = r.reqSnippet ? `<div class="snip"><div class="k mono">Minimum qualifications</div>${esc(r.reqSnippet)}</div>` : `<div class="snip"><div class="k mono">Why</div>${esc(r.why)}</div>`;
@@ -678,6 +692,7 @@ footer a { color: var(--ink); }
     if (state.company) list = list.filter(r => r.company === state.company);
     if (state.closing) list = list.filter(r => state.closing === 'any' ? !!r.applyBy : (r._dt != null && r._dt >= 0 && r._dt <= Number(state.closing)));
     if (state.terps) list = list.filter(r => { const e = peopleFor(r); return e && e.people.length; });
+    if (state.timing) list = list.filter(r => r._timing === state.timing);
     if (state.newonly) list = list.filter(r => r._new);
     const nMore = MORE_KEYS.filter(k => state[k] !== FILTER_DEFAULTS[k]).length;
     $('#more-toggle').textContent = nMore ? 'More filters · ' + nMore : 'More filters';
@@ -686,7 +701,7 @@ footer a { color: var(--ink); }
     if (state.q) { const words = state.q.split(/\s+/).filter(Boolean);  // every word must appear somewhere in the row
       list = list.filter(r => { const h = r._q || [r.company, r.title, r.location].join(' ').toLowerCase(); return words.every(w => h.includes(w)); }); }
     if (!listTab) list = sorted(list);
-    document.querySelectorAll('th.sortable').forEach(th => (!listTab && th.dataset.sort === state.sort) ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
+    document.querySelectorAll('th.sortable').forEach(th => (!listTab && (th.dataset.sort === state.sort || (th.dataset.sort === 'fit' && state.sort === 'fit2027'))) ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = list.length + ' of ' + base.length + ' roles';
     if (!list.length) {
       const msg = {saved: 'Nothing saved yet. Star a role to keep it here.', applied: 'Nothing marked applied yet.', hidden: 'Nothing hidden. The ✕ on a role sends it here.'}[state.tab] || 'Nothing matches these filters.';
