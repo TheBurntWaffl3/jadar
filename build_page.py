@@ -166,6 +166,8 @@ td.acts { white-space: nowrap; width: 96px; padding-left: 4px; padding-right: 4p
 .ic.on.save { color: var(--ember); } .ic.on.applied { color: var(--good); } .ic.on.hide { color: var(--crit); }
 .tag.closed { background: var(--pill); color: var(--muted); } .tag.status.repost { opacity: .85; } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
 tr.row.dim td .role a, tr.row.dim td.co, tr.row.dim td.why { color: var(--muted); }
+.tag.tasap-hidden { background: var(--pill); color: var(--muted); }
+.imm-note { color: var(--muted); margin: -4px 0 10px; } .imm-note a { color: var(--ember); text-decoration: none; }
 .actrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
 .pbtn { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--page); color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; min-height: 32px; }
 .pbtn.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
@@ -293,6 +295,7 @@ footer a { color: var(--ink); }
   <button type="button" class="linkbtn" id="clear-filters" hidden>Clear filters</button>
   <span class="count mono" id="count"></span>
 </div>
+<div class="imm-note mono" id="imm-note" hidden></div>
 <div class="controls more" id="more">
   <select class="ctl" id="mode" aria-label="Work mode"><option value="">Any work mode</option><option value="Remote">Remote</option><option value="Hybrid">Hybrid</option><option value="On-site">On-site</option></select>
   <select class="ctl" id="pay" aria-label="Pay at least"><option value="">Any pay</option><option value="60000">Pay ≥ $60k</option><option value="70000">Pay ≥ $70k</option><option value="80000">Pay ≥ $80k</option><option value="90000">Pay ≥ $90k</option><option value="100000">Pay ≥ $100k</option><option value="120000">Pay ≥ $120k</option></select>
@@ -397,7 +400,9 @@ footer a { color: var(--ink); }
     const own = statusOf(r.url); if (own) return {status: own, repost: false};
     const via = (FPM || (FPM = fpMap()))[fpOf(r)]; return via ? {status: via, repost: true} : {status: null, repost: false};
   }
-  const inInbox = r => { const e = effStatus(r); return e.status !== 'hidden' && e.status !== 'applied'; };
+  const inInbox = r => { const e = effStatus(r); if (e.status === 'hidden' || e.status === 'applied') return false;
+    return r._timing !== 'immediate' || state.timing === 'immediate'; };  // immediate-start roles wait until the Timing filter asks for them
+  const immHidden = r => { const e = effStatus(r); return e.status !== 'hidden' && e.status !== 'applied' && r._timing === 'immediate'; };
   function snapOf(r) { const s = {company: r.company, title: r.title, location: r.location || '', url: r.url, fit: r.fit}; if (r.applyBy) s.applyBy = r.applyBy; return s; }
   function setStatus(r, status) {
     const url = r.url, cur = S.roles[url];
@@ -496,6 +501,7 @@ footer a { color: var(--ink); }
   }));
   ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing', 'timing'].forEach(k => $('#' + k).addEventListener('change', e => { state[k] = e.target.value; saveFilters(); render(); }));
   $('#only2027').addEventListener('click', () => { state.timing = state.timing === '2027' ? '' : '2027'; saveFilters(); render(); });
+  $('#imm-note').addEventListener('click', e => { if (e.target.id === 'imm-show') { e.preventDefault(); state.timing = 'immediate'; saveFilters(); render(); } });
   [['payonly', 'payonly'], ['terps', 'terps'], ['newonly', 'newonly']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { state[k] = e.target.checked; saveFilters(); render(); }));
   $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); saveFilters(); render(); });
   $('#more-toggle').addEventListener('click', () => { state.more = !state.more; $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more); saveFilters(); });
@@ -547,7 +553,8 @@ footer a { color: var(--ink); }
     if (r._dt != null && r._dt >= 0 && r._dt <= 10) t.push(`<span class="tag closing">${r._dt === 0 ? 'Closes today' : 'Closes in ' + r._dt + 'd'}</span>`);
     if (r._timing === '2027') t.push(`<span class="tag t2027" title="${esc(r.timingNote || 'Names 2027 in the grad or start window')}">2027</span>`);
     else if (r._timing === 'window') t.push(`<span class="tag twindow" title="${esc(r.timingNote || 'States a grad/start window')}">window</span>`);
-    else if (r._timing === 'immediate') t.push(`<span class="tag tasap" title="${esc(r.timingNote || 'Wants an immediate start')}">ASAP</span>`);
+    else if (r._timing === 'immediate') { t.push(`<span class="tag tasap" title="${esc(r.timingNote || 'Wants an immediate start')}">ASAP</span>`);
+      if (state.tab === 'all' && state.timing !== 'immediate') t.push(`<span class="tag tasap-hidden" title="${esc(r.timingNote || 'Wants an immediate start')}">hidden until spring</span>`); }
     if (r.workMode) t.push(`<span class="tag">${esc(r.workMode)}</span>`);
     if (r.employment && r.employment !== 'Full-time') t.push(`<span class="tag">${esc(r.employment)}</span>`);
     const pf = peopleFor(r); if (pf && pf.people.length) t.push(`<span class="tag terps">${pf.people.length} Terp${pf.people.length === 1 ? '' : 's'}</span>`);
@@ -703,13 +710,16 @@ footer a { color: var(--ink); }
     if (!listTab) list = sorted(list);
     document.querySelectorAll('th.sortable').forEach(th => (!listTab && (th.dataset.sort === state.sort || (th.dataset.sort === 'fit' && state.sort === 'fit2027'))) ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = list.length + ' of ' + base.length + ' roles';
+    const immN = (state.tab === 'inbox' && state.timing !== 'immediate') ? roles.filter(r => immHidden(r) && (state.fit === 'all' || (state.fit === 'fits' ? r.fit !== 'No' : r.fit === state.fit))).length : 0;
+    $('#imm-note').hidden = !immN;
+    if (immN) $('#imm-note').innerHTML = `${immN} immediate-start role${immN === 1 ? '' : 's'} hidden · <a href="#" id="imm-show">show</a>`;
     if (!list.length) {
       const msg = {saved: 'Nothing saved yet. Star a role to keep it here.', applied: 'Nothing marked applied yet.', hidden: 'Nothing hidden. The ✕ on a role sends it here.'}[state.tab] || 'Nothing matches these filters.';
       $('#rows').innerHTML = `<tr><td colspan="9" class="empty">${msg}</td></tr>`; return;
     }
     $('#rows').innerHTML = list.map(r => {
       const open = !r._closed && state.open === r.id; const es = effStatus(r);
-      const dim = state.tab === 'all' && (es.status === 'hidden');
+      const dim = state.tab === 'all' && (es.status === 'hidden' || (r._timing === 'immediate' && state.timing !== 'immediate'));
       return `<tr class="row${dim ? ' dim' : ''}" data-id="${esc(r.id)}" data-url="${esc(r.url)}" tabindex="0" aria-expanded="${open}">
 <td class="fitco"><span class="fit ${esc(r.fit)}">${esc(r.fit)}</span><span class="co sm-co">${esc(r.company)}</span></td>
 <td class="co">${esc(r.company)}</td>

@@ -9,6 +9,12 @@ def embedded(html):
     return json.loads(html.split('<script id="data" type="application/json">')[1].split("</script>")[0].replace("<\\/", "</"))
 
 class PageTests(unittest.TestCase):
+    def test_immediate_roles_hidden_by_default(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle")
+        self.assertIn("immediate-start role", html); self.assertIn('id="imm-note"', html); self.assertIn("hidden until spring", html)
+        self.assertIn("tasap-hidden", html)
+        self.assertTrue(any(r.get("timing") == "immediate" for r in self.out["roles"]), "fixture keeps an immediate-start role")
+
     def test_timing_sort_filter_pills(self):
         html = build_page.build(self.out, self.src, "Kevin Kyle")
         i = html.index('id="sort"'); first = html[i:].index("<option")
