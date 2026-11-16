@@ -65,6 +65,14 @@ have hidden or applied to:
 
 The public repo and the public page never hold this state.
 
+## Tracker page
+
+`tracker.html` (linked from the radar's header) is the application tracker: one row per role marked Applied on the
+radar, plus rows you add by hand, with Kevin's sheet columns (applied, posted, pay, expected and first response, dates,
+link, contacted, status, notes), row colors by status, Connections and Places-of-interest tables, TSV import from the
+spreadsheet, CSV export. It uses the same browser state and private-repo sync as the radar, so nothing personal is in
+the public page.
+
 ## Terps finder (UMD alumni at each company)
 
 Every role's panel links to LinkedIn's alumni view for the University of Maryland filtered to that company (and

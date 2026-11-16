@@ -1,4 +1,4 @@
-import json, os, sys, tempfile, unittest
+import json, os, shutil, subprocess, sys, tempfile, unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import build_dash, build_page
@@ -134,3 +134,57 @@ class PageTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TrackerTests(unittest.TestCase):
+    """tracker.html: second page, same state file, no roles or personal data embedded."""
+
+    def setUp(self):
+        self.html = build_page.build_tracker("Kevin Kyle", today="2026-11-12")
+
+    def test_main_writes_both_pages(self):
+        with tempfile.TemporaryDirectory() as d:
+            data = os.path.join(d, "data"); site = os.path.join(d, "site"); os.makedirs(data)
+            shutil.copy(FIXTURE, os.path.join(data, "radar_out.json"))
+            env = dict(os.environ, RADAR_DATA=data, SITE_DIR=site)
+            subprocess.run([sys.executable, "-I", build_page.__file__], check=True, env=env, cwd=ROOT, capture_output=True)
+            self.assertTrue(os.path.exists(os.path.join(site, "index.html")))
+            with open(os.path.join(site, "tracker.html")) as f: tracker = f.read()
+            with open(os.path.join(site, "index.html")) as f: index = f.read()
+        self.assertIn("<title>Tracker</title>", tracker)
+        # both pages carry the nav and the same shared JS module (same storage keys, same merge, same sync)
+        for html in (index, tracker):
+            self.assertIn('href="index.html"', html); self.assertIn('href="tracker.html"', html)
+            self.assertIn("window.JADAR = ", html); self.assertIn("'jadar.state.v1'", html); self.assertIn("'jadar.sync.v1'", html)
+        self.assertIn('href="index.html" aria-current="page"', index)
+        self.assertIn('href="tracker.html" aria-current="page"', tracker)
+
+    def test_columns_statuses_import_panel(self):
+        for col in ["Company", "Position", "Benefits", "Applied", "Posted", "Pay range", "Expected response", "First response", "Dates", "Contacted", "Status", "Notes"]:
+            self.assertIn(f">{col}<", self.html, col)
+        for st in ["applied", "screen", "interview", "offer", "rejected", "closed", "withdrawn"]:
+            self.assertIn(f"'{st}'", self.html)
+        self.assertIn("Import from your sheet", self.html); self.assertIn('id="tsv"', self.html)
+        self.assertIn("Company, Position, Benefits, Applied, Posted, Pay Range, Expected Response, First Response, Dates, Appl. Link, Contacted", self.html)
+        self.assertIn('id="export-csv"', self.html); self.assertIn('id="add-toggle"', self.html)
+        self.assertIn('id="conn-add"', self.html); self.assertIn('id="place-add"', self.html)
+        self.assertIn("st-rejected", self.html); self.assertIn("st-interview", self.html); self.assertIn("st-offer", self.html)
+
+    def test_embeds_no_roles_or_personal_data(self):
+        data = embedded(self.html)
+        self.assertEqual(set(data), {"today", "profileName"})
+        self.assertEqual(data["today"], "2026-11-12")
+        with open(FIXTURE) as f: fx = json.load(f)
+        for r in fx["roles"]:
+            self.assertNotIn(r["url"], self.html); self.assertNotIn(r["title"], self.html)
+        self.assertNotIn("Jane Doe", self.html); self.assertNotIn("ghp_", self.html)
+
+    def test_radar_marks_applied_with_tracker_fields(self):
+        # the radar page's setStatus seeds app.appliedOn / pay / posted and snapshots salary + date for the tracker
+        self.assertIn("e.app.appliedOn = D.today", build_page.TEMPLATE)
+        self.assertIn("if (!e.app.pay && r.salary) e.app.pay = r.salary", build_page.TEMPLATE)
+        self.assertIn("if (r.salary) s.salary = r.salary; if (r.date) s.date = r.date", build_page.TEMPLATE)
+        self.assertIn("function adoptManual()", build_page.TEMPLATE)
+        # merge carries manual rows and the tracker lists
+        self.assertIn("out.manual[k] = newer(a.manual[k], b.manual[k])", build_page.SHARED_JS)
+        self.assertIn("out.tracker = newer(a.tracker, b.tracker)", build_page.SHARED_JS)

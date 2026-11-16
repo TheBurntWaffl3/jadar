@@ -234,6 +234,7 @@ footer a { color: var(--ink); }
 <body>
 <main>
 <section class="hero">
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html">Tracker</a></nav>
   <h1>Job radar.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -341,17 +342,16 @@ footer a { color: var(--ink); }
 <footer>Read-only scan; never applies to jobs. Source: <a href="__REPO__">__REPO_SHORT__</a>.</footer>
 </main>
 <script id="data" type="application/json">__DATA__</script>
+__SHARED_JS__
 <script>
 (function () {
   const D = JSON.parse(document.getElementById('data').textContent);
   const NEW = new Set(D.new || []);
+  const J = window.JADAR;
   const today = new Date(D.today + 'T00:00:00');
   const $ = (s, el) => (el || document).querySelector(s);
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const fmt = iso => { if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); return MON[m-1] + ' ' + d + (y !== today.getFullYear() ? ', ' + y : ''); };
-  const fmtLong = iso => { if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number); return MON[m-1] + ' ' + d + ', ' + y; };
-  const daysTo = iso => { if (!iso) return null; const [y,m,d] = iso.split('-').map(Number); return Math.round((new Date(y, m-1, d) - today) / 86400000); };
+  const esc = J.esc, MON = J.MON, companyKey = J.companyKey;
+  const fmt = iso => J.fmt(iso, today), fmtLong = J.fmtLong, daysTo = iso => J.daysTo(iso, today);
   const num = n => n == null ? '' : n.toLocaleString('en-US');
   const FITRANK = {Yes: 0, Maybe: 1, No: 2};
   // ---------- location parsing: two-letter state + remote flag from the free-text location ----------
@@ -381,13 +381,9 @@ footer a { color: var(--ink); }
     _q: [r.company, r.title, r.location, r.why, r.discipline, r.salary].join(' ').toLowerCase()}); });
 
   // ---------- per-role state (saved / applied / hidden), kept in this browser ----------
-  const KEY = 'jadar.state.v1', SKEY = 'jadar.sync.v1';
-  const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-  const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
-  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
-  function loadState() { try { const s = JSON.parse(lsGet(KEY) || 'null'); if (s && s.v === 1 && s.roles) return s; } catch (e) {} return {v: 1, roles: {}}; }
+  const KEY = J.KEY, SKEY = J.SKEY, lsGet = J.lsGet, lsSet = J.lsSet, lsDel = J.lsDel, loadState = J.loadState, mergeStates = J.mergeStates;
   let S = loadState();
-  function persist() { FPM = null; lsSet(KEY, JSON.stringify(S)); schedulePush(); }
+  function persist() { FPM = null; J.saveState(S); schedulePush(); }
   const entry = url => S.roles[url];
   const statusOf = url => (S.roles[url] || {}).status || null;
   // fingerprint = company + normalized title: a re-posted job (new URL, same job) stays hidden / applied
@@ -403,17 +399,25 @@ footer a { color: var(--ink); }
   const inInbox = r => { const e = effStatus(r); if (e.status === 'hidden' || e.status === 'applied') return false;
     return r._timing !== 'immediate' || state.timing === 'immediate'; };  // immediate-start roles wait until the Timing filter asks for them
   const immHidden = r => { const e = effStatus(r); return e.status !== 'hidden' && e.status !== 'applied' && r._timing === 'immediate'; };
-  function snapOf(r) { const s = {company: r.company, title: r.title, location: r.location || '', url: r.url, fit: r.fit}; if (r.applyBy) s.applyBy = r.applyBy; return s; }
+  function snapOf(r) { const s = {company: r.company, title: r.title, location: r.location || '', url: r.url, fit: r.fit}; if (r.applyBy) s.applyBy = r.applyBy; if (r.salary) s.salary = r.salary; if (r.date) s.date = r.date; return s; }
   function setStatus(r, status) {
-    const url = r.url, cur = S.roles[url];
-    if (!status) { if (cur && cur.note) { cur.status = null; cur.at = new Date().toISOString(); } else delete S.roles[url]; }
-    else S.roles[url] = Object.assign({}, cur || {}, {status, at: new Date().toISOString(), snap: (cur && cur.snap && cur.snap.title) ? cur.snap : snapOf(r), fp: fpOf(r)});
+    const url = r.url, cur = S.roles[url]; const now = new Date().toISOString();
+    if (!status) { if (cur && (cur.note || cur.app)) { cur.status = null; cur.at = now; } else delete S.roles[url]; }  // un-applying keeps the tracker data
+    else {
+      const e = Object.assign({}, cur || {}, {status, at: now, snap: (cur && cur.snap && cur.snap.title) ? cur.snap : snapOf(r), fp: fpOf(r)});
+      if (status === 'applied') {  // the Tracker page picks this up: applied date and prefilled pay / posted
+        e.app = Object.assign({}, e.app || {});
+        if (!e.app.appliedOn) e.app.appliedOn = D.today; if (!e.app.status) e.app.status = 'applied';
+        if (!e.app.pay && r.salary) e.app.pay = r.salary; if (!e.app.posted && r.date) e.app.posted = r.date; e.app.updatedAt = now;
+      }
+      S.roles[url] = e;
+    }
     persist();
   }
   function setNote(r, note) {
     const url = r.url, cur = S.roles[url] || {status: null, snap: snapOf(r)};
     cur.note = note || ''; cur.at = new Date().toISOString(); if (!cur.snap) cur.snap = snapOf(r);
-    if (!cur.note && !cur.status) delete S.roles[url]; else S.roles[url] = cur;
+    if (!cur.note && !cur.status && !cur.app) delete S.roles[url]; else S.roles[url] = cur;
     persist();
   }
   function act(r, a) {
@@ -421,11 +425,6 @@ footer a { color: var(--ink); }
     if (a === 'save') setStatus(r, cur === 'saved' ? null : 'saved');
     else if (a === 'applied') setStatus(r, cur === 'applied' ? null : 'applied');
     else if (a === 'hide') setStatus(r, cur === 'hidden' ? null : 'hidden');
-  }
-  function mergeStates(a, b) {  // per-url newer `at` wins; returns a fresh state
-    const out = {v: 1, roles: {}}; const urls = new Set([...Object.keys(a.roles || {}), ...Object.keys(b.roles || {})]);
-    urls.forEach(u => { const x = (a.roles || {})[u], y = (b.roles || {})[u]; out.roles[u] = !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x); });
-    return out;
   }
   const counts = () => { const c = {saved: 0, applied: 0, hidden: 0}; Object.values(S.roles).forEach(e => { if (e.status) c[e.status] = (c[e.status] || 0) + 1; }); return c; };
 
@@ -577,7 +576,6 @@ footer a { color: var(--ink); }
       (st === 'applied' && at ? `<span class="applied-at">Applied ${esc(at)}</span>` : '') +
       `<input type="text" class="note-in" data-note="1" placeholder="Note (contact, referral, follow-up…)" value="${esc(e.note || '')}" aria-label="Note"></div>`;
   }
-  function companyKey(c) { return (c || '').replace(/\s*\(.*?\)\s*/g, ' ').split(' / ')[0].replace(/\s+/g, ' ').trim(); }
   function division(title) {
     const t = title || '';
     let m = t.match(/\(([^)]{3,30})\)\s*$/) || t.match(/[,\u2013\u2014-]\s*([A-Za-z][A-Za-z &/]{2,30})\s*$/);
@@ -781,30 +779,12 @@ footer a { color: var(--ink); }
   });
   $('#clear-hidden').addEventListener('click', () => {
     const n = counts().hidden; if (!n) return;
-    if (confirm(`Un-hide ${n} role${n === 1 ? '' : 's'}?`)) { Object.keys(S.roles).forEach(u => { if (S.roles[u].status === 'hidden') { if (S.roles[u].note) { S.roles[u].status = null; S.roles[u].at = new Date().toISOString(); } else delete S.roles[u]; } }); persist(); render(); }
+    if (confirm(`Un-hide ${n} role${n === 1 ? '' : 's'}?`)) { Object.keys(S.roles).forEach(u => { if (S.roles[u].status === 'hidden') { if (S.roles[u].note || S.roles[u].app) { S.roles[u].status = null; S.roles[u].at = new Date().toISOString(); } else delete S.roles[u]; } }); persist(); render(); }
   });
 
-  // optional sync through a private GitHub repo (token stays in this browser; only api.github.com is contacted)
-  const b64enc = s => { const u = new TextEncoder().encode(s); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
-  const b64dec = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, '')), ch => ch.charCodeAt(0)));
-  function syncCfg() { try { const c = JSON.parse(lsGet(SKEY) || 'null'); return c && c.repo && c.token ? c : null; } catch (e) { return null; } }
-  function setSync(msg) { $('#sync-status').textContent = msg || ''; }
+  // optional sync through a private GitHub repo (token stays in this browser; only api.github.com is contacted) — shared with the Tracker page
+  const syncCfg = J.syncCfg, b64dec = J.b64dec, ghHeaders = J.ghHeaders, peopleUrl = J.peopleUrl;
   function reflectSync() { const c = syncCfg(); $('#sync-connect').style.display = c ? 'none' : ''; $('#sync-disconnect').style.display = c ? '' : 'none'; $('#sync-now').style.display = c ? '' : 'none'; if (c) { $('#sync-repo').value = c.repo; $('#sync-path').value = c.path || 'state.json'; } }
-  const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
-  const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
-  async function ghGet(c) {
-    const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
-    if (r.status === 404) return {state: null, sha: null};
-    if (!r.ok) throw new Error(String(r.status));
-    const j = await r.json(); let st = null; try { st = JSON.parse(b64dec(j.content || '')); } catch (e) { st = null; }
-    return {state: st && st.roles ? st : null, sha: j.sha};
-  }
-  async function ghPut(c, st, sha) {
-    const body = {message: 'jadar state', content: b64enc(JSON.stringify(st, null, 1))}; if (sha) body.sha = sha;
-    const r = await fetch(ghUrl(c), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, ghHeaders(c)), body: JSON.stringify(body)});
-    if (!r.ok) throw new Error(String(r.status));
-  }
-  const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
   async function loadPeople(c) {
     try {
       const r = await fetch(peopleUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
@@ -813,25 +793,8 @@ footer a { color: var(--ink); }
       if (d && typeof d === 'object' && d.companies && typeof d.companies === 'object' && JSON.stringify(d) !== JSON.stringify(PEOPLE)) { PEOPLE = d; render(); }
     } catch (e) { /* quiet: the block says "not searched yet" */ }
   }
-  let syncing = false, pending = false, pushTimer = null;
-  async function syncNow() {
-    const c = syncCfg(); if (!c) return;
-    if (syncing) { pending = true; return; }
-    syncing = true;
-    try {
-      if (navigator.onLine === false) { setSync('offline'); return; }
-      setSync('syncing…');
-      const {state: remote, sha} = await ghGet(c);
-      const before = JSON.stringify(S);
-      const merged = remote ? mergeStates(S, remote) : S;
-      if (JSON.stringify(merged) !== before) { S = merged; lsSet(KEY, JSON.stringify(S)); render(); }
-      if (!remote || JSON.stringify(merged) !== JSON.stringify(remote)) await ghPut(c, merged, sha);
-      const now = new Date(); setSync('synced ' + now.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase());
-      loadPeople(c);
-    } catch (err) { setSync('sync failed: ' + (err.message || 'error')); }
-    finally { syncing = false; if (pending) { pending = false; syncNow(); } }
-  }
-  function schedulePush() { if (!syncCfg()) return; clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
+  const sync = J.makeSync({get: () => S, set: s => { S = s; FPM = null; adoptManual(); render(); }, statusEl: $('#sync-status'), after: c => loadPeople(c)});
+  const setSync = sync.setStatus, syncNow = sync.syncNow, schedulePush = sync.schedulePush;
   $('#sync-connect').addEventListener('click', () => {
     const repo = $('#sync-repo').value.trim(), path = $('#sync-path').value.trim() || 'state.json', token = $('#sync-token').value.trim();
     if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { alert('Repository must look like owner/name'); return; }
@@ -852,8 +815,521 @@ footer a { color: var(--ink); }
     const cls = o.status === 'OK' ? 'ok' : o.status === 'Failing' ? 'failing' : 'gap';
     return `<tr class="${cls === 'failing' ? 'fail' : cls === 'gap' ? 'gap' : ''}"><td>${esc(o.org)}</td><td class="hide-sm">${esc(o.sector)}</td><td>${esc(o.platform)}</td><td><span class="st ${cls}">${esc(o.status)}</span></td><td class="num">${o.roles == null ? '–' : o.roles}</td><td class="num">${o.fits == null ? '–' : o.fits}</td><td class="note">${esc(o.note || '')}</td></tr>`;
   }).join('');
+  // rows added on the Tracker page (or imported from the sheet) with a link to a live posting become that posting's applied entry
+  function adoptManual() {
+    const norm = u => String(u || '').trim().replace(/\/+$/, ''); const live = new Map(roles.map(r => [norm(r.url), r])); let changed = false;
+    Object.entries(S.manual || {}).forEach(([id, m]) => {
+      const r = m.link && live.get(norm(m.link)); if (!r) return;
+      const cur = S.roles[r.url] || {}; const now = new Date().toISOString();
+      S.roles[r.url] = Object.assign({}, cur, {status: 'applied', at: now, snap: (cur.snap && cur.snap.title) ? cur.snap : snapOf(r), fp: fpOf(r), app: Object.assign({status: 'applied', appliedOn: D.today}, cur.app || {}, m.app || {}, {updatedAt: now})});
+      delete S.manual[id]; changed = true;
+    });
+    if (changed) persist();
+  }
+  adoptManual();
   render();
   if (syncCfg()) syncNow();
+})();
+</script>
+</body>
+</html>
+"""
+
+CSS_SHARED_EXTRA = r"""
+/* shared bits (nav, pills, data panel, footer) */
+.topnav { display: flex; align-items: center; gap: 0; margin: 0 0 16px; color: var(--hero-muted); font-size: 11.5px; }
+.topnav a { color: var(--on-hero); text-decoration: none; opacity: .6; } .topnav a[aria-current] { opacity: 1; font-weight: 700; } .topnav a:hover { opacity: 1; }
+.tabsrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
+.ctl.small { min-height: 32px; padding: 6px 12px; font-size: 13px; }
+.sync-status { color: var(--muted); }
+.pbtn { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--page); color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; min-height: 32px; }
+.pbtn.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.pbtn.sm { padding: 3px 10px; font-size: 12px; min-height: 0; }
+#datapanel { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; margin: 0 0 14px; }
+#datapanel.open { display: block; }
+.dp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0; }
+.dp-row + .dp-row { margin-top: 10px; }
+.dp-head { margin: 10px 0 4px; }
+.dp-note { color: var(--muted); font-size: 12.5px; }
+.dp-row input[type="text"], .dp-row input[type="password"], .dp-row input[type="date"], .dp-row input[type="url"] { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); min-width: 140px; }
+.dp-row input.wide { flex: 1 1 220px; }
+.empty { padding: 24px 10px; color: var(--muted); }
+footer { color: var(--muted); font-size: 13px; margin: 36px 0 12px; }
+footer a { color: var(--ink); }
+"""
+
+# JavaScript shared by index.html and tracker.html: same storage keys, same state shape, same merge, same GitHub sync.
+SHARED_JS = r"""<script>
+window.JADAR = (function () {
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const isIso = s => /^\d{4}-\d{2}-\d{2}/.test(String(s || ''));
+  const fmt = (iso, today) => { if (!isIso(iso)) return iso || ''; const [y,m,d] = iso.split('-').map(Number); return MON[m-1] + ' ' + d + (today && y !== today.getFullYear() ? ', ' + y : ''); };
+  const fmtLong = iso => { if (!isIso(iso)) return iso || ''; const [y,m,d] = iso.split('-').map(Number); return MON[m-1] + ' ' + d + ', ' + y; };
+  const daysTo = (iso, today) => { if (!isIso(iso)) return null; const [y,m,d] = iso.split('-').map(Number); return Math.round((new Date(y, m-1, d) - today) / 86400000); };
+  const nowIso = () => new Date().toISOString();
+  function companyKey(c) { return (c || '').replace(/\s*\(.*?\)\s*/g, ' ').split(' / ')[0].replace(/\s+/g, ' ').trim(); }
+  // 9/8/26, 10/12/2026, 11/11 (this year), 2026-09-08, "Nov 11" -> ISO; anything else -> null
+  function parseDate(s, year) {
+    s = String(s || '').trim(); if (!s) return null;
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0');
+    m = s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+    if (m) { let y = m[3] ? Number(m[3]) : year; if (y < 100) y += 2000; const mo = Number(m[1]), d = Number(m[2]); if (mo < 1 || mo > 12 || d < 1 || d > 31) return null; return y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0'); }
+    m = s.match(/^([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?/);
+    if (m) { const mo = MON.findIndex(x => x.toLowerCase() === m[1].toLowerCase()); if (mo < 0) return null; return (m[3] ? Number(m[3]) : year) + '-' + String(mo + 1).padStart(2, '0') + '-' + m[2].padStart(2, '0'); }
+    return null;
+  }
+  // ---- state: one object shared by both pages, in this browser and (optionally) in the private sync repo ----
+  const KEY = 'jadar.state.v1', SKEY = 'jadar.sync.v1';
+  const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
+  const emptyState = () => ({v: 1, roles: {}, manual: {}, tracker: {connections: [], places: [], at: ''}});
+  function normState(s) {  // older files have only `roles`; give them the tracker parts
+    if (!s || s.v !== 1 || !s.roles || typeof s.roles !== 'object') return null;
+    if (!s.manual || typeof s.manual !== 'object') s.manual = {};
+    if (!s.tracker || typeof s.tracker !== 'object') s.tracker = {connections: [], places: [], at: ''};
+    if (!Array.isArray(s.tracker.connections)) s.tracker.connections = []; if (!Array.isArray(s.tracker.places)) s.tracker.places = [];
+    return s;
+  }
+  function loadState() { try { const s = normState(JSON.parse(lsGet(KEY) || 'null')); if (s) return s; } catch (e) {} return emptyState(); }
+  const saveState = s => lsSet(KEY, JSON.stringify(s));
+  function mergeStates(a, b) {  // roles per url and manual rows per id: newer `at` wins; tracker lists: newer `at` wins as a whole
+    a = normState(a) || emptyState(); b = normState(b) || emptyState();
+    const out = emptyState();
+    const newer = (x, y) => !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x);
+    new Set([...Object.keys(a.roles), ...Object.keys(b.roles)]).forEach(u => { out.roles[u] = newer(a.roles[u], b.roles[u]); });
+    new Set([...Object.keys(a.manual), ...Object.keys(b.manual)]).forEach(k => { out.manual[k] = newer(a.manual[k], b.manual[k]); });
+    out.tracker = newer(a.tracker, b.tracker);
+    return out;
+  }
+  // ---- GitHub Contents API (token stays in this browser; only api.github.com is contacted) ----
+  const b64enc = s => { const u = new TextEncoder().encode(s); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
+  const b64dec = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, '')), ch => ch.charCodeAt(0)));
+  function syncCfg() { try { const c = JSON.parse(lsGet(SKEY) || 'null'); return c && c.repo && c.token ? c : null; } catch (e) { return null; } }
+  const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
+  const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
+  const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
+  async function ghGet(c) {
+    const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
+    if (r.status === 404) return {state: null, sha: null};
+    if (!r.ok) throw new Error(String(r.status));
+    const j = await r.json(); let st = null; try { st = normState(JSON.parse(b64dec(j.content || ''))); } catch (e) { st = null; }
+    return {state: st, sha: j.sha};
+  }
+  async function ghPut(c, st, sha) {
+    const body = {message: 'jadar state', content: b64enc(JSON.stringify(st, null, 1))}; if (sha) body.sha = sha;
+    const r = await fetch(ghUrl(c), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, ghHeaders(c)), body: JSON.stringify(body)});
+    if (!r.ok) throw new Error(String(r.status));
+  }
+  function makeSync(o) {  // o: {get: () => state, set: state => void, statusEl, after?: cfg => void}
+    let syncing = false, pending = false, timer = null;
+    const setStatus = m => { if (o.statusEl) o.statusEl.textContent = m || ''; };
+    async function syncNow() {
+      const c = syncCfg(); if (!c) return;
+      if (syncing) { pending = true; return; }
+      syncing = true;
+      try {
+        if (navigator.onLine === false) { setStatus('offline'); return; }
+        setStatus('syncing…');
+        const {state: remote, sha} = await ghGet(c);
+        const S = o.get(); const before = JSON.stringify(S);
+        const merged = remote ? mergeStates(S, remote) : S;
+        if (JSON.stringify(merged) !== before) { saveState(merged); o.set(merged); }
+        if (!remote || JSON.stringify(merged) !== JSON.stringify(remote)) await ghPut(c, merged, sha);
+        setStatus('synced ' + new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase());
+        if (o.after) o.after(c);
+      } catch (err) { setStatus('sync failed: ' + (err.message || 'error')); }
+      finally { syncing = false; if (pending) { pending = false; syncNow(); } }
+    }
+    function schedulePush() { if (!syncCfg()) return; clearTimeout(timer); timer = setTimeout(syncNow, 2000); }
+    return {syncNow, schedulePush, setStatus};
+  }
+  function bindSyncPanel($, sync, onChange) {  // the Data panel's Connect / Disconnect / Sync now controls (same markup on both pages)
+    function reflect() { const c = syncCfg(); $('#sync-connect').style.display = c ? 'none' : ''; $('#sync-disconnect').style.display = c ? '' : 'none'; $('#sync-now').style.display = c ? '' : 'none'; if (c) { $('#sync-repo').value = c.repo; $('#sync-path').value = c.path || 'state.json'; } }
+    $('#sync-connect').addEventListener('click', () => {
+      const repo = $('#sync-repo').value.trim(), path = $('#sync-path').value.trim() || 'state.json', token = $('#sync-token').value.trim();
+      if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { alert('Repository must look like owner/name'); return; }
+      if (!token) { alert('Paste a fine-grained token for that repo (Contents: read and write)'); return; }
+      if (!lsSet(SKEY, JSON.stringify({repo, path, token}))) { alert('This browser blocks storage; sync cannot be kept.'); return; }
+      $('#sync-token').value = ''; reflect(); sync.syncNow();
+    });
+    $('#sync-disconnect').addEventListener('click', () => { lsDel(SKEY); reflect(); sync.setStatus(''); if (onChange) onChange(); });
+    $('#sync-now').addEventListener('click', sync.syncNow);
+    window.addEventListener('online', () => { if (syncCfg()) sync.syncNow(); });
+    reflect();
+  }
+  return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
+          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, ghGet, ghPut, makeSync, bindSyncPanel};
+})();
+</script>"""
+
+TRACKER_TEMPLATE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+__CSS_SHARED__
+/* tracker table */
+.stats.four { grid-template-columns: repeat(4, 1fr); }
+.twrap { overflow-x: auto; border-top: 1px solid var(--line); -webkit-overflow-scrolling: touch; }
+table.tr { border-collapse: collapse; width: 100%; min-width: 1120px; font-size: 13px; }
+.tr th, .tr td { text-align: left; vertical-align: top; padding: 9px 6px; border-bottom: 1px solid var(--line); background: var(--page); }
+.tr th { color: var(--muted); font-weight: 500; white-space: nowrap; user-select: none; }
+.tr th.sortable { cursor: pointer; } .tr th.sortable:hover { color: var(--ink); }
+.tr th .arrow { display: inline-block; width: 1em; opacity: 0; } .tr th[aria-sort] .arrow { opacity: 1; color: var(--ink); }
+.tr th[aria-sort="ascending"] .arrow::after { content: "↑"; } .tr th[aria-sort="descending"] .arrow::after { content: "↓"; }
+.tr th:first-child, .tr td.co { position: sticky; left: 0; z-index: 1; font-weight: 600; min-width: 130px; box-shadow: 1px 0 0 var(--line); }
+.tr td.pos a { font-weight: 600; text-decoration: none; } .tr td.pos a:hover { text-decoration: underline; }
+.tr td.pos { min-width: 180px; }
+tr.st-rejected td, tr.st-closed td, tr.st-withdrawn td { background: color-mix(in srgb, var(--page) 90%, #d03b3b); }
+tr.st-screen td, tr.st-interview td { background: color-mix(in srgb, var(--page) 86%, #f0b400); }
+tr.st-offer td { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
+td.ed { cursor: text; min-width: 96px; } td.ed:hover { box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; }
+td.ed.editing { cursor: default; }
+td.ed input, td.ed textarea { font: inherit; font-size: 13px; width: 100%; min-width: 110px; border: 1px solid var(--ember); border-radius: 6px; padding: 4px 6px; background: var(--page); color: var(--ink); }
+td.ed textarea { min-height: 54px; resize: vertical; }
+.hint { color: var(--muted); font-size: 11.5px; display: block; margin-top: 2px; }
+.late { color: var(--crit); font-weight: 600; }
+select.sel { font: inherit; font-size: 12.5px; font-weight: 500; border: 1px solid var(--line); border-radius: 999px; padding: 4px 22px 4px 10px; background: var(--pill); color: var(--ink); appearance: none; -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 13px) 55%, calc(100% - 8px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.rm { color: var(--muted); background: none; border: 0; cursor: pointer; font-size: 15px; padding: 2px 6px; border-radius: 999px; } .rm:hover { color: var(--crit); background: var(--pill); }
+.src { color: var(--muted); font-size: 11px; } td.pos .src { display: block; margin-top: 2px; }
+.sub2 { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; margin-top: 10px; }
+.sm-table { border-collapse: collapse; width: 100%; font-size: 13.5px; border-top: 1px solid var(--line); }
+.sm-table th, .sm-table td { text-align: left; vertical-align: top; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+.sm-table th { color: var(--muted); font-weight: 500; white-space: nowrap; }
+.sm-table td.ed:hover { box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; }
+.sm-table td.ed input, .sm-table td.ed textarea { font: inherit; font-size: 13px; width: 100%; border: 1px solid var(--ember); border-radius: 6px; padding: 4px 6px; background: var(--page); color: var(--ink); }
+.addrow { margin: 8px 0 0; }
+textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--page); color: var(--ink); }
+.controls.more { display: none; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 12px; } .controls.more.open { display: flex; }
+.controls.more input { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); min-width: 140px; }
+@media (max-width: 900px) { .sub2 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats, .stats.four { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } .count { margin-left: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a></nav>
+  <h1>Tracker.</h1>
+  <div class="meta mono" id="meta"></div>
+  <div class="who" id="who"></div>
+</section>
+
+<section class="stats four" id="stats" aria-label="Summary"></section>
+
+<h2>Applications.</h2>
+<p class="lede">Every role you marked applied on the radar, plus anything you add here. Click a cell to edit; it saves on Enter or when you click away.</p>
+<div class="tabsrow">
+  <button type="button" class="ctl small" id="add-toggle" aria-expanded="false" aria-controls="addform">Add row</button>
+  <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
+  <span class="sync-status mono" id="sync-status"></span>
+  <span class="count mono" id="count"></span>
+</div>
+<div class="controls more" id="addform">
+  <input type="text" id="add-company" placeholder="Company" aria-label="Company">
+  <input type="text" id="add-position" placeholder="Position" aria-label="Position" style="flex:1 1 220px">
+  <input type="url" id="add-link" placeholder="Link (optional)" aria-label="Link" style="flex:1 1 220px">
+  <input type="date" id="add-applied" aria-label="Applied on">
+  <button type="button" class="pbtn on" id="add-save">Add</button>
+  <button type="button" class="pbtn" id="add-cancel">Cancel</button>
+</div>
+<div id="datapanel">
+  <div class="dp-row">
+    <button type="button" class="pbtn" id="export-csv">Export CSV</button>
+    <button type="button" class="pbtn" id="export-btn">Export jadar-state.json</button>
+    <span class="dp-note">The same state file as the radar: applied roles, your edits here, connections and places.</span>
+  </div>
+  <div class="dp-head mono">Import from your sheet</div>
+  <div class="dp-note">Select the rows in Google Sheets (header row optional), copy, paste here. Columns by header name, or in this order: Company, Position, Benefits, Applied, Posted, Pay Range, Expected Response, First Response, Dates, Appl. Link, Contacted.</div>
+  <textarea class="tsv" id="tsv" aria-label="Pasted rows" placeholder="Company	Position	Benefits	Applied	Posted	Pay Range	…"></textarea>
+  <div class="dp-row">
+    <button type="button" class="pbtn" id="tsv-preview">Preview</button>
+    <button type="button" class="pbtn on" id="tsv-import" disabled>Import</button>
+    <span class="dp-note" id="tsv-note"></span>
+  </div>
+  <div class="dp-head mono">Sync with GitHub</div>
+  <div class="dp-row">
+    <input type="text" id="sync-repo" placeholder="owner/name" value="TheBurntWaffl3/jadar-state" aria-label="Repository">
+    <input type="text" id="sync-path" placeholder="state.json" value="state.json" aria-label="File path">
+    <input type="password" id="sync-token" class="wide" placeholder="fine-grained token" aria-label="Token" autocomplete="off">
+    <button type="button" class="pbtn" id="sync-connect">Connect</button>
+    <button type="button" class="pbtn" id="sync-disconnect">Disconnect</button>
+    <button type="button" class="pbtn" id="sync-now">Sync now</button>
+  </div>
+  <div class="dp-note">The token stays in this browser only; scope it to that one private repo, Contents read/write. Nothing is sent anywhere but api.github.com.</div>
+</div>
+<div class="twrap">
+  <table class="tr" id="apps">
+    <thead><tr>
+      <th class="sortable" data-sort="company">Company<span class="arrow"></span></th>
+      <th>Position</th>
+      <th>Benefits</th>
+      <th class="sortable" data-sort="applied">Applied<span class="arrow"></span></th>
+      <th class="sortable" data-sort="posted">Posted<span class="arrow"></span></th>
+      <th>Pay range</th>
+      <th>Expected response</th>
+      <th>First response</th>
+      <th>Dates</th>
+      <th>Contacted</th>
+      <th class="sortable" data-sort="status">Status<span class="arrow"></span></th>
+      <th>Notes</th>
+      <th></th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<div class="sub2">
+  <section>
+    <h2>Connections.</h2>
+    <p class="lede">Who you know where, and what they told you.</p>
+    <table class="sm-table" id="conn"><thead><tr><th>Company</th><th>Connections</th><th>Advice</th><th></th></tr></thead><tbody id="conn-rows"></tbody></table>
+    <button type="button" class="pbtn addrow" id="conn-add">Add connection</button>
+  </section>
+  <section>
+    <h2>Places of interest.</h2>
+    <p class="lede">Where you'd want to be, and why.</p>
+    <table class="sm-table" id="places"><thead><tr><th>Place</th><th>Reason</th><th></th></tr></thead><tbody id="place-rows"></tbody></table>
+    <button type="button" class="pbtn addrow" id="place-add">Add place</button>
+  </section>
+</div>
+
+<footer>Nothing here is sent to any company. Source: <a href="__REPO__">__REPO_SHORT__</a>.</footer>
+</main>
+<script id="data" type="application/json">__DATA__</script>
+__SHARED_JS__
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const J = window.JADAR; const $ = (s, el) => (el || document).querySelector(s); const esc = J.esc;
+  const today = new Date(D.today + 'T00:00:00'); const YEAR = today.getFullYear();
+  const fmt = iso => J.fmt(iso, today), daysTo = iso => J.daysTo(iso, today), isIso = J.isIso;
+  let S = J.loadState();
+  if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
+  const STATUSES = ['applied', 'screen', 'interview', 'offer', 'rejected', 'closed', 'withdrawn'];
+  const LABEL = {applied: 'Applied', screen: 'Phone screen', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', closed: 'Closed', withdrawn: 'Withdrawn'};
+  const RANK = {offer: 0, interview: 1, screen: 2, applied: 3, withdrawn: 4, closed: 5, rejected: 6};
+  const APP_FIELDS = ['benefits', 'appliedOn', 'posted', 'pay', 'expected', 'firstResponse', 'dates', 'contacted', 'notes'];
+  const DATE_FIELDS = new Set(['appliedOn', 'posted', 'expected', 'firstResponse']);
+  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status')});
+  function persist() { J.saveState(S); sync.schedulePush(); }
+  const stamp = (t) => { t.at = J.nowIso(); return t; };
+
+  // ---- rows: applied radar roles + manual rows, read from the shared state (no roles data is embedded in this page) ----
+  function target(row) { return row.kind === 'radar' ? S.roles[row.key] : S.manual[row.key]; }
+  function rowsAll() {
+    const out = [];
+    Object.entries(S.roles).forEach(([url, e]) => {
+      if (e.status !== 'applied') return; const s = e.snap || {}; const app = e.app || {};
+      out.push({kind: 'radar', key: url, company: s.company || '', position: s.title || '', link: url, app,
+                get: f => f === 'pay' ? (app.pay || s.salary || '') : f === 'posted' ? (app.posted || s.date || '') : f === 'appliedOn' ? (app.appliedOn || (e.at || '').slice(0, 10)) : (app[f] || '')});
+    });
+    Object.entries(S.manual || {}).forEach(([id, m]) => {
+      const app = m.app || {};
+      out.push({kind: 'manual', key: id, company: m.company || '', position: m.position || '', link: m.link || '', app, get: f => f === 'posted' ? (app.posted || m.posted || '') : (app[f] || '')});
+    });
+    return out;
+  }
+  function setApp(row, field, value) {
+    const t = target(row); if (!t) return;
+    t.app = t.app || {}; value = (value == null ? '' : String(value)).trim();
+    if (DATE_FIELDS.has(field)) { const iso = J.parseDate(value, YEAR); value = iso || value; }
+    if (value) t.app[field] = value; else delete t.app[field];
+    t.app.updatedAt = J.nowIso(); stamp(t); persist(); render();
+  }
+  function setManualField(row, field, value) { const t = S.manual[row.key]; if (!t) return; t[field] = (value || '').trim(); stamp(t); persist(); render(); }
+  function removeManual(row) { if (!S.manual[row.key]) return; if (!confirm('Remove this row?')) return; delete S.manual[row.key]; persist(); render(); }
+  const newId = () => 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function addManual(company, position, link, appliedOn) {
+    const id = newId(); S.manual[id] = stamp({company: (company || '').trim(), position: (position || '').trim(), link: (link || '').trim(), app: {status: 'applied', appliedOn: appliedOn || D.today, updatedAt: J.nowIso()}});
+    persist(); render(); return id;
+  }
+
+  // ---- hero + stats ----
+  function renderStats() {
+    const rows = rowsAll(); const st = r => r.app.status || 'applied';
+    const n = rows.length, waiting = rows.filter(r => st(r) === 'applied' && !r.get('firstResponse')).length;
+    const inter = rows.filter(r => ['screen', 'interview'].includes(st(r))).length, rej = rows.filter(r => ['rejected', 'closed', 'withdrawn'].includes(st(r))).length;
+    const offers = rows.filter(r => st(r) === 'offer').length;
+    $('#meta').innerHTML = [n + ' application' + (n === 1 ? '' : 's'), waiting + ' awaiting response', inter + ' interview' + (inter === 1 ? '' : 's'), rej + ' rejected'].map(esc).join('<span class="sep">·</span>');
+    const stats = [['Applications', n, 'tracked', ''], ['Awaiting', waiting, 'no response yet', waiting ? 'ember' : ''], ['Interviews', inter + offers, offers ? offers + ' offer' + (offers === 1 ? '' : 's') : 'screens + interviews', inter + offers ? 'good' : ''], ['Closed out', rej, 'rejected / closed', '']];
+    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+  }
+
+  // ---- main table ----
+  const state = {sort: 'applied', dir: 'desc', editing: null};
+  const cmpStr = (a, b) => String(a || '').localeCompare(String(b || ''));
+  const SORTS = {
+    applied: (a, b) => cmpStr(a.get('appliedOn'), b.get('appliedOn')),
+    posted: (a, b) => cmpStr(isIso(a.get('posted')) ? a.get('posted') : '', isIso(b.get('posted')) ? b.get('posted') : ''),
+    company: (a, b) => cmpStr(a.company, b.company) || cmpStr(b.get('appliedOn'), a.get('appliedOn')),
+    status: (a, b) => (RANK[a.app.status || 'applied'] - RANK[b.app.status || 'applied']) || cmpStr(b.get('appliedOn'), a.get('appliedOn')),
+  };
+  const DEFAULT_DIR = {applied: 'desc', posted: 'desc', company: 'asc', status: 'asc'};
+  function cell(row, f, kind) {  // kind: 'text' | 'date' | 'long'
+    const v = row.get(f); const id = `${row.kind}:${row.key}:${f}`;
+    if (state.editing === id) {
+      const input = kind === 'date' ? `<input type="date" value="${esc(isIso(v) ? v.slice(0, 10) : '')}" data-f="${f}" aria-label="${f}">` :
+        kind === 'long' ? `<textarea data-f="${f}" aria-label="${f}">${esc(v)}</textarea>` : `<input type="text" value="${esc(v)}" data-f="${f}" aria-label="${f}">`;
+      return `<td class="ed editing" data-f="${f}" data-kind="${kind}">${input}</td>`;
+    }
+    let shown = kind === 'date' ? esc(fmt(v)) : esc(v); let extra = '';
+    if (f === 'appliedOn' && isIso(v)) { const d = -daysTo(v); extra = `<span class="hint">${d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago'}</span>`; }
+    if (f === 'expected' && isIso(v) && daysTo(v) < 0 && !row.get('firstResponse')) shown = `<span class="late" title="Expected response date passed with no reply">${shown}</span>`;
+    return `<td class="ed" data-f="${f}" data-kind="${kind}" tabindex="0">${shown || '<span class="src">—</span>'}${extra}</td>`;
+  }
+  function render() {
+    renderStats();
+    let rows = rowsAll(); const sign = state.dir === 'desc' ? -1 : 1; rows.sort((a, b) => sign * SORTS[state.sort](a, b));
+    document.querySelectorAll('#apps th.sortable').forEach(th => th.dataset.sort === state.sort ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
+    $('#count').textContent = rows.length + ' row' + (rows.length === 1 ? '' : 's');
+    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="13" class="empty">Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.</td></tr>`; renderSide(); return; }
+    $('#rows').innerHTML = rows.map(r => {
+      const st = r.app.status || 'applied';
+      const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position);
+      const manual = r.kind === 'manual';
+      const coCell = manual ? cell(Object.assign({}, r, {get: f => r.company}), 'company', 'text').replace('class="ed"', 'class="ed co"').replace('class="ed editing"', 'class="ed editing co"') : `<td class="co">${esc(r.company)}</td>`;
+      const posCell = manual ? cell(Object.assign({}, r, {get: f => r.position}), 'position', 'text').replace('class="ed"', 'class="ed pos"').replace('class="ed editing"', 'class="ed editing pos"') : `<td class="pos">${link}<span class="src">from the radar</span></td>`;
+      const sel = `<select class="sel" data-f="status" aria-label="Status">${STATUSES.map(x => `<option value="${x}"${x === st ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
+      return `<tr class="st-${esc(st)}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
+    }).join('');
+    if (state.editing) { const el = $('#rows td.editing input, #rows td.editing textarea'); if (el) { el.focus({preventScroll: true}); if (el.select && el.type !== 'date') el.select(); } }
+    renderSide();
+  }
+  function rowFromEl(el) { const tr = el.closest('tr[data-kind]'); if (!tr) return null; return rowsAll().find(r => r.kind === tr.dataset.kind && r.key === tr.dataset.key) || null; }
+  function commit(el) {
+    const td = el.closest('td.ed'); const row = rowFromEl(el); if (!td || !row) { state.editing = null; render(); return; }
+    const f = td.dataset.f; const v = el.value;
+    state.editing = null;
+    if (row.kind === 'manual' && (f === 'company' || f === 'position')) setManualField(row, f, v); else setApp(row, f, v);
+  }
+  $('#rows').addEventListener('click', e => {
+    if (e.target.closest('a') || e.target.closest('select') || e.target.closest('input') || e.target.closest('textarea')) return;
+    const rm = e.target.closest('button[data-rm]'); if (rm) { const row = rowFromEl(rm); if (row) removeManual(row); return; }
+    const td = e.target.closest('td.ed'); if (!td) return; const row = rowFromEl(td); if (!row) return;
+    state.editing = `${row.kind}:${row.key}:${td.dataset.f}`; render();
+  });
+  $('#rows').addEventListener('keydown', e => {
+    if (e.target.matches('td.ed') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.target.click(); return; }
+    if (!e.target.matches('input, textarea')) return;
+    if (e.key === 'Escape') { state.editing = null; render(); }
+    else if (e.key === 'Enter' && !(e.target.matches('textarea') && e.shiftKey) && !e.target.matches('textarea')) { e.preventDefault(); commit(e.target); }
+    else if (e.key === 'Enter' && e.target.matches('textarea') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); commit(e.target); }
+  });
+  $('#rows').addEventListener('focusout', e => { if (e.target.matches('td.editing input, td.editing textarea')) setTimeout(() => { if (state.editing && document.activeElement !== e.target) commit(e.target); }, 0); });
+  $('#rows').addEventListener('change', e => { if (e.target.matches('select[data-f="status"]')) { const row = rowFromEl(e.target); if (row) setApp(row, 'status', e.target.value); } });
+  document.querySelectorAll('#apps th.sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.sort; state.dir = state.sort === k ? (state.dir === 'asc' ? 'desc' : 'asc') : DEFAULT_DIR[k]; state.sort = k; render(); }));
+
+  // ---- add row ----
+  $('#add-toggle').addEventListener('click', e => { const o = $('#addform').classList.toggle('open'); e.target.setAttribute('aria-expanded', o); if (o) { $('#add-applied').value = D.today; $('#add-company').focus(); } });
+  $('#add-cancel').addEventListener('click', () => { $('#addform').classList.remove('open'); $('#add-toggle').setAttribute('aria-expanded', 'false'); });
+  $('#add-save').addEventListener('click', () => {
+    const co = $('#add-company').value.trim(), pos = $('#add-position').value.trim(); if (!co && !pos) { alert('Company or position, at least.'); return; }
+    addManual(co, pos, $('#add-link').value, $('#add-applied').value); ['add-company', 'add-position', 'add-link'].forEach(id => $('#' + id).value = '');
+    $('#addform').classList.remove('open'); $('#add-toggle').setAttribute('aria-expanded', 'false');
+  });
+
+  // ---- connections + places (S.tracker) ----
+  const side = {editing: null};
+  function sideCell(list, i, f, kind) {
+    const v = (S.tracker[list][i] || {})[f] || ''; const id = `${list}:${i}:${f}`;
+    if (side.editing === id) return `<td class="ed editing" data-list="${list}" data-i="${i}" data-f="${f}">${kind === 'long' ? `<textarea aria-label="${f}">${esc(v)}</textarea>` : `<input type="text" value="${esc(v)}" aria-label="${f}">`}</td>`;
+    return `<td class="ed" data-list="${list}" data-i="${i}" data-f="${f}" tabindex="0">${esc(v) || '<span class="src">—</span>'}</td>`;
+  }
+  function renderSide() {
+    const C = S.tracker.connections, P = S.tracker.places;
+    $('#conn-rows').innerHTML = C.length ? C.map((c, i) => `<tr>${sideCell('connections', i, 'company', 'text')}${sideCell('connections', i, 'people', 'text')}${sideCell('connections', i, 'advice', 'long')}<td><button type="button" class="rm" data-side-rm="connections" data-i="${i}" aria-label="Remove">✕</button></td></tr>`).join('')
+      : `<tr><td colspan="4" class="empty">No connections yet.</td></tr>`;
+    $('#place-rows').innerHTML = P.length ? P.map((p, i) => `<tr>${sideCell('places', i, 'place', 'text')}${sideCell('places', i, 'reason', 'long')}<td><button type="button" class="rm" data-side-rm="places" data-i="${i}" aria-label="Remove">✕</button></td></tr>`).join('')
+      : `<tr><td colspan="3" class="empty">No places yet.</td></tr>`;
+    if (side.editing) { const el = $('.sm-table td.editing input, .sm-table td.editing textarea'); if (el) { el.focus({preventScroll: true}); if (el.select) el.select(); } }
+  }
+  function sideCommit(el) {
+    const td = el.closest('td.ed'); side.editing = null; if (!td) { renderSide(); return; }
+    const list = td.dataset.list, i = Number(td.dataset.i), f = td.dataset.f; const item = S.tracker[list][i]; if (!item) { renderSide(); return; }
+    item[f] = el.value.trim(); stamp(S.tracker); persist(); renderSide();
+  }
+  ['#conn', '#places'].forEach(sel => {
+    $(sel).addEventListener('click', e => {
+      const rm = e.target.closest('button[data-side-rm]'); if (rm) { if (confirm('Remove?')) { S.tracker[rm.dataset.sideRm].splice(Number(rm.dataset.i), 1); stamp(S.tracker); persist(); renderSide(); } return; }
+      if (e.target.closest('input, textarea')) return;
+      const td = e.target.closest('td.ed'); if (!td) return; side.editing = `${td.dataset.list}:${td.dataset.i}:${td.dataset.f}`; renderSide();
+    });
+    $(sel).addEventListener('keydown', e => {
+      if (e.target.matches('td.ed') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.target.click(); return; }
+      if (!e.target.matches('input, textarea')) return;
+      if (e.key === 'Escape') { side.editing = null; renderSide(); }
+      else if (e.key === 'Enter' && (!e.target.matches('textarea') || e.metaKey || e.ctrlKey)) { e.preventDefault(); sideCommit(e.target); }
+    });
+    $(sel).addEventListener('focusout', e => { if (e.target.matches('td.editing input, td.editing textarea')) setTimeout(() => { if (side.editing && document.activeElement !== e.target) sideCommit(e.target); }, 0); });
+  });
+  $('#conn-add').addEventListener('click', () => { S.tracker.connections.push({company: '', people: '', advice: ''}); stamp(S.tracker); persist(); side.editing = `connections:${S.tracker.connections.length - 1}:company`; renderSide(); });
+  $('#place-add').addEventListener('click', () => { S.tracker.places.push({place: '', reason: ''}); stamp(S.tracker); persist(); side.editing = `places:${S.tracker.places.length - 1}:place`; renderSide(); });
+
+  // ---- Data panel: CSV export, state export, TSV import, sync ----
+  $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('open'); e.target.setAttribute('aria-expanded', o); });
+  function download(name, text, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+  $('#export-btn').addEventListener('click', () => download('jadar-state.json', JSON.stringify(S, null, 1), 'application/json'));
+  const COLS = [['Company', r => r.company], ['Position', r => r.position], ['Benefits', r => r.get('benefits')], ['Applied', r => r.get('appliedOn')], ['Posted', r => r.get('posted')], ['Pay Range', r => r.get('pay')],
+    ['Expected Response', r => r.get('expected')], ['First Response', r => r.get('firstResponse')], ['Dates', r => r.get('dates')], ['Appl. Link', r => r.link], ['Contacted', r => r.get('contacted')], ['Status', r => LABEL[r.app.status || 'applied']], ['Notes', r => r.get('notes')]];
+  const csvCell = v => { v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  $('#export-csv').addEventListener('click', () => {
+    let rows = rowsAll(); rows.sort((a, b) => -SORTS.applied(a, b));
+    download('jadar-tracker.csv', [COLS.map(c => c[0]).join(',')].concat(rows.map(r => COLS.map(c => csvCell(c[1](r))).join(','))).join('\r\n'), 'text/csv');
+  });
+  const HEADERS = {company: 'company', position: 'position', role: 'position', title: 'position', benefits: 'benefits', applied: 'appliedOn', 'applied on': 'appliedOn', 'date applied': 'appliedOn', posted: 'posted', 'pay range': 'pay', pay: 'pay', salary: 'pay',
+    'expected response': 'expected', expected: 'expected', 'first response': 'firstResponse', response: 'firstResponse', dates: 'dates', 'appl link': 'link', 'appl. link': 'link', link: 'link', url: 'link', 'application link': 'link', contacted: 'contacted', contact: 'contacted', status: 'status', notes: 'notes', note: 'notes'};
+  const ORDER = ['company', 'position', 'benefits', 'appliedOn', 'posted', 'pay', 'expected', 'firstResponse', 'dates', 'link', 'contacted'];
+  const normH = h => String(h || '').toLowerCase().replace(/[:.]/g, '').replace(/\s+/g, ' ').trim();
+  function parseTsv(text) {
+    const lines = text.replace(/\r/g, '').split('\n').filter(l => l.trim()); if (!lines.length) return {rows: [], hasHeader: false};
+    const split = l => l.split('\t').map(x => x.trim());
+    let cols = ORDER, hasHeader = false; const first = split(lines[0]).map(normH);
+    if (first.includes('company') && (first.includes('position') || first.includes('role') || first.includes('title'))) { hasHeader = true; cols = first.map(h => HEADERS[h.replace(/\s*\(.*\)$/, '')] || HEADERS[h] || null); }
+    const rows = [];
+    lines.slice(hasHeader ? 1 : 0).forEach(l => {
+      const cells = split(l); const o = {};
+      cells.forEach((v, i) => { const k = cols[i]; if (k && v) o[k] = v; });
+      if (!o.company && !o.position) return;
+      ['appliedOn', 'posted', 'expected', 'firstResponse'].forEach(k => { if (o[k]) { const iso = J.parseDate(o[k], YEAR); if (iso) o[k] = iso; } });
+      if (o.status) { const st = STATUSES.find(x => LABEL[x].toLowerCase() === o.status.toLowerCase() || x === o.status.toLowerCase()); o.status = st || null; if (!o.status) delete o.status; }
+      rows.push(o);
+    });
+    return {rows, hasHeader};
+  }
+  const normUrl = u => String(u || '').trim().replace(/\/+$/, '');
+  function planImport(rows) { const byUrl = Object.keys(S.roles).reduce((m, u) => (m[normUrl(u)] = u, m), {}); return rows.map(o => ({o, attach: o.link ? (byUrl[normUrl(o.link)] || null) : null})); }
+  let PREVIEW = null;
+  $('#tsv-preview').addEventListener('click', () => {
+    const {rows, hasHeader} = parseTsv($('#tsv').value); PREVIEW = planImport(rows);
+    const attach = PREVIEW.filter(x => x.attach).length;
+    const linked = PREVIEW.filter(x => !x.attach && x.o.link).length;
+    $('#tsv-note').textContent = rows.length ? `${rows.length} row${rows.length === 1 ? '' : 's'} found${hasHeader ? ' (header row detected)' : ''}: ${attach} match postings you already acted on, ${rows.length - attach} will be added as your own rows${linked ? ' (' + linked + ' with a link; a link to a live posting joins that posting next time you open the radar)' : ''}.` : 'No rows found. Paste tab-separated rows copied from the sheet.';
+    $('#tsv-import').disabled = !rows.length;
+  });
+  $('#tsv-import').addEventListener('click', () => {
+    if (!PREVIEW || !PREVIEW.length) return; const now = J.nowIso(); let n = 0;
+    PREVIEW.forEach(({o, attach}) => {
+      const app = {}; ['benefits', 'appliedOn', 'posted', 'pay', 'expected', 'firstResponse', 'dates', 'contacted', 'notes'].forEach(k => { if (o[k]) app[k] = o[k]; });
+      app.status = o.status || 'applied'; if (!app.appliedOn) app.appliedOn = D.today; app.updatedAt = now;
+      if (attach) { const e = S.roles[attach]; e.status = 'applied'; e.at = now; e.app = Object.assign({}, e.app || {}, app); }
+      else S.manual[newId()] = {company: o.company || '', position: o.position || '', link: o.link || '', app, at: now};
+      n++;
+    });
+    persist(); render(); PREVIEW = null; $('#tsv').value = ''; $('#tsv-import').disabled = true; $('#tsv-note').textContent = `Imported ${n} row${n === 1 ? '' : 's'}.`;
+  });
+  J.bindSyncPanel($, sync, () => render());
+  render();
+  if (J.syncCfg()) sync.syncNow();
 })();
 </script>
 </body>
@@ -875,6 +1351,17 @@ def note_template(profile):
     signoff = (profile.get("name") or "Kevin").split()[0]
     return DEFAULT_NOTE.replace("{major}", major).replace("{grad}", grad).replace("{signoff}", signoff)
 
+CSS_SHARED = TEMPLATE[TEMPLATE.index(":root {"):TEMPLATE.index("/* table */")] + CSS_SHARED_EXTRA
+
+def build_tracker(profile_name=None, profile=None, today=None):
+    """Return the HTML string for tracker.html. It embeds no roles data: rows come from the shared state (applied roles'
+    snapshots + manual rows) in the browser / private sync repo."""
+    data = dict(today=today or dt.date.today().isoformat(), profileName=profile_name or (profile or {}).get("name"))
+    blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+    short = REPO_URL.replace("https://github.com/", "")
+    return (TRACKER_TEMPLATE.replace("__CSS_SHARED__", CSS_SHARED).replace("__SHARED_JS__", SHARED_JS).replace("__DATA__", blob)
+            .replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short))
+
 def build(out, src, profile_name=None, profile=None):
     """Return the HTML string for a radar_out.json dict and sources.json list."""
     roles, orgs = build_dash.datasets(out, src)
@@ -891,7 +1378,7 @@ def build(out, src, profile_name=None, profile=None):
                 noteTemplate=note_template(profile))
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     short = REPO_URL.replace("https://github.com/", "")
-    return TEMPLATE.replace("__DATA__", blob).replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short)
+    return TEMPLATE.replace("__SHARED_JS__", SHARED_JS).replace("__DATA__", blob).replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short)
 
 def main():
     data = os.environ.get("RADAR_DATA", os.path.join(ROOT, "data"))
@@ -907,7 +1394,9 @@ def main():
     html = build(out, src, name, profile)
     os.makedirs(site, exist_ok=True)
     with open(os.path.join(site, "index.html"), "w") as f: f.write(html)
-    print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles")
+    tracker = build_tracker(name, profile, (out.get("scanned") or dt.date.today().isoformat())[:10])
+    with open(os.path.join(site, "tracker.html"), "w") as f: f.write(tracker)
+    print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles; site/tracker.html: {len(tracker) // 1024} KB")
 
 if __name__ == "__main__":
     main()

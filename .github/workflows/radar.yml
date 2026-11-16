@@ -78,6 +78,7 @@ jobs:
           python3 -I build_dash.py
           python3 -I build_page.py
           cp site/index.html data/index.html
+          cp site/tracker.html data/tracker.html
 
       - name: Send alert
         if: steps.scan.outcome == 'success' && inputs.only == ''

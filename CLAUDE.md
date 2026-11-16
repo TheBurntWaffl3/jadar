@@ -81,6 +81,10 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   2027-01-01): do not go back to it. Results -> `people.json` in the private state repo;
   page shows "Terps found here" when sync is connected, `alert.py` adds "N Terps there". Public page never embeds names.
   LinkedIn itself is never fetched or automated; the page only links to LinkedIn's own alumni search.
+- **Tracker** (`build_page.py` also writes `site/tracker.html`, shared JS module `SHARED_JS` = `window.JADAR`): per-application
+  fields live in the same state (`app{...}` on applied role entries, `manual{}` rows, `tracker{connections, places}`),
+  merged by `at`; marking Applied on the radar seeds `app.appliedOn/pay/posted`; a manual row whose link matches a live
+  posting is adopted by the radar page (`adoptManual()`). The page embeds no roles data.
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 
