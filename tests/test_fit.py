@@ -309,6 +309,30 @@ class TestPreferredHeadings(unittest.TestCase):
         r = scan.requirements("Minimum Qualifications:\nBS in Mechanical Engineering\nExperience with ANSYS preferred\n3+ years of experience required\n")
         self.assertEqual(r["minYears"], 3)
 
+class TestTiming(unittest.TestCase):
+    def setUp(self): scan.TODAY = TODAY
+
+    def test_grad_phrasings(self):
+        for txt, want in [("Open to Class of 2027 graduates in Mechanical Engineering.", "2027"),
+                          ("This role is for Spring 2027 graduates.", "2027"),
+                          ("Candidates graduating between December 2026 and June 2027 are encouraged to apply.", "2027"),
+                          ("Must have graduated by May 2026.", None)]:
+            r = scan.requirements("BS in Aerospace Engineering. " + txt)
+            if want: self.assertIn(want, r["gradReq"] or "", txt)
+            else: self.assertIn("2026", r["gradReq"] or "")
+
+    def test_timing_kinds(self):
+        P = scan.PROFILE
+        r = scan.requirements("BS in Aerospace Engineering. Open to Class of 2027 graduates.")
+        self.assertEqual(scan.timing(P, r, "Associate Engineer"), ("2027", "Class of 2027"))
+        r = scan.requirements("BS in Aerospace Engineering.")
+        self.assertEqual(scan.timing(P, r, "2027 New Grad Thermal Engineer")[0], "2027")
+        self.assertEqual(scan.timing(P, r, "Associate Thermal Engineer"), ("unstated", None))
+        r = scan.requirements("BS in Aerospace Engineering. Candidates must be available to begin within 30-60 days of applying.")
+        self.assertEqual(scan.timing(P, r, "Propulsion Engineer")[0], "immediate")
+        r = scan.requirements("BS in Aerospace Engineering. Graduating between December 2026 and August 2028.")
+        self.assertEqual(scan.timing(P, r, "Engineer I")[0], "window")
+
 class TestLocations(unittest.TestCase):
     def test_uk_locations_are_not_us(self):
         # GE Aerospace "Modern Engineering Apprenticeship, Prestwick, 2027 intake" leaked into the first live run

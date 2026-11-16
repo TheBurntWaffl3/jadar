@@ -98,15 +98,17 @@ def compose(out, today=None, state=None, alerted=None, people=None):
     fps = {k[3:] for k, st in state.items() if k.startswith("fp:") and st in ("hidden", "applied")}
     if fps: skip |= {r["url"] for r in out.get("roles", []) + out.get("new", []) if fingerprint(r.get("company"), r.get("title")) in fps}
     star = lambda r: "* " if state.get(r["url"]) == "saved" else ""
-    new = sorted([r for r in out.get("new", []) if r["fit"] in rank and r["url"] not in skip], key=lambda r: (rank[r["fit"]], r.get("date") or ""), reverse=False)
-    new.sort(key=lambda r: rank[r["fit"]])
+    trank = {"2027": 0, "window": 1, "unstated": 2, "immediate": 3}
+    new = sorted([r for r in out.get("new", []) if r["fit"] in rank and r["url"] not in skip],
+                 key=lambda r: (rank[r["fit"]], trank.get(r.get("timing") or "unstated", 2), r.get("date") or ""))
     lines = []
     if new:
         lines.append(f"{len(new)} new fit{'s' if len(new) != 1 else ''} ({sum(r['fit']=='Yes' for r in new)} Yes):")
         for r in new[:MAX_NEW]:
             loc = f" ({r['location']})" if r.get("location") else ""
             terps = people.get(company_key(r["company"]), 0)
-            lines.append(f"- {star(r)}{r['company']}: {r['title']}{loc} - {r['fit']}, {r['why']}" + (f" ({terps} Terps there)" if terps else "") + f"\n  {r['url']}")
+            tag = " [2027]" if r.get("timing") == "2027" else " [ASAP]" if r.get("timing") == "immediate" else ""
+            lines.append(f"- {star(r)}{r['company']}: {r['title']}{tag}{loc} - {r['fit']}, {r['why']}" + (f" ({terps} Terps there)" if terps else "") + f"\n  {r['url']}")
         if len(new) > MAX_NEW: lines.append(f"  ... and {len(new) - MAX_NEW} more on the page")
     else:
         lines.append("No new Yes/Maybe fits today.")
@@ -141,6 +143,8 @@ def render_html(parts):
         terps = p.get("people", {}).get(company_key(r["company"]), 0)
         meta = " · ".join(x for x in [r.get("location") or "", r.get("salary") or "", extra, (f"{terps} Terps there" if terps else "")] if x)
         saved = ' <span style="color:#2f5bea">★</span>' if r["url"] in p["saved"] else ""
+        if r.get("timing") == "2027": saved += ' <span style="font:11px Menlo,Consolas,monospace;letter-spacing:.06em;color:#0ca30c;border:1px solid #0ca30c;border-radius:999px;padding:1px 6px;vertical-align:middle">2027</span>'
+        elif r.get("timing") == "immediate": saved += ' <span style="font:11px Menlo,Consolas,monospace;letter-spacing:.06em;color:#737379;border:1px solid #ececee;border-radius:999px;padding:1px 6px;vertical-align:middle">ASAP</span>'
         color = "#0ca30c" if r["fit"] == "Yes" else "#2f5bea"
         return (f'<tr><td style="padding:10px 0;border-bottom:1px solid #ececee;vertical-align:top">'
                 f'<div style="font:12px/1.4 Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:{color}">{e(r["fit"])}'

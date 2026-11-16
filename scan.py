@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-12.3"
+RULES_VERSION = "2026-11-16.1"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -197,6 +197,8 @@ def requirements(text):
 
     grad = None
     gm = re.search(rf"(?is)(graduat\w*|degree (conferred|completed|by)|complet\w* (your|their|a) degree)[^.\n]{{0,90}}?(({MONTHS})[a-z]*\.?\s*(20\d\d)|(20\d\d))[^.\n]{{0,60}}", t)
+    if not gm:  # "Class of 2027", "Spring 2027 graduates", "December 2026 - June 2027 grads", "2027 graduates"
+        gm = re.search(rf"(?is)\bclass of (20\d\d)[^.\n]{{0,40}}|(?:(?:spring|summer|fall|winter|{MONTHS})[a-z]*\.?\s*20\d\d\s*(?:-|–|to|and|through)?\s*)?(?:(?:spring|summer|fall|winter|{MONTHS})[a-z]*\.?\s*)?(20\d\d)\s+(?:grad(?:uate)?s?\b|graduating)[^.\n]{{0,40}}", t)
     if gm: grad = re.sub(r"\s+", " ", gm.group(0))[:160]
     start = None
     sm = re.search(rf"(?is)(start date|start dates|available to start|able to start|begin (work|employment|full[- ]time))[^.\n]{{0,80}}?(({MONTHS})[a-z]*\.?\s*(20\d\d)|summer 20\d\d|fall 20\d\d|spring 20\d\d|20\d\d)[^.\n]{{0,40}}", t)
@@ -378,6 +380,18 @@ def fit(profile, r, title):
     mj = r.get("majorReq") or ""
     if f == "Yes" and mj.startswith("related:"): return "Maybe", f"{why}; major not named ({mj[9:][:30]} or related)"
     return f, why
+
+def timing(profile, r, title):
+    """When can this role actually take the profile's grad? -> (kind, note). kinds: '2027' (names the grad year),
+    'window' (states a grad/start window), 'immediate' (start within N days of applying), 'unstated' (nothing said)."""
+    gy = str(profile["_gradYear"])
+    txt = " ".join(x for x in (r.get("gradReq"), r.get("startReq"), title) if x)
+    if re.search(rf"\b{gy}\b|'{gy[2:]}\b", txt):
+        m = re.search(rf"(?i)(class of {gy}|[^.\n]{{0,40}}\b{gy}\b[^.\n]{{0,25}})", txt)
+        return gy, re.sub(r"\s+", " ", m.group(0)).strip()[:60] if m else gy
+    if r.get("startWindow"): return "immediate", (r["startWindow"] or "")[:60]
+    if r.get("gradReq") or r.get("startReq"): return "window", (r.get("gradReq") or r.get("startReq"))[:60]
+    return "unstated", None
 
 def _fit(profile, r, title):
     gy = profile["_gradYear"]; prev = str(gy - 1)
@@ -718,8 +732,9 @@ def judge_entry(s, e, profile=PROFILE):
     rq = dict(e["facts"])
     if rq.get("applyBy") and rq["applyBy"] < TODAY.isoformat(): rq["applyBy"] = None  # deadline passed, posting still up
     f, why = fit(profile, rq, e["title"])
+    tk, tn = timing(profile, rq, e["title"])
     return dict(company=s["org"], sector=s["sector"], title=e["title"], location=e["location"].strip(), url=e["url"],
-                date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why,
+                date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why, timing=tk, timingNote=tn,
                 desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen"))
 
 STALE_DAYS = 3  # a board that fails this run keeps its roles from a read within this many days
