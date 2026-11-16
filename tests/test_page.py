@@ -9,6 +9,14 @@ def embedded(html):
     return json.loads(html.split('<script id="data" type="application/json">')[1].split("</script>")[0].replace("<\\/", "</"))
 
 class PageTests(unittest.TestCase):
+    def test_filters(self):
+        html = build_page.build(self.out, self.src, "Kevin Kyle")
+        for needle in ("jadar.filters.v1", "DMV (MD · DC · VA)", "West Coast (CA OR WA AK HI)", "More filters", "Clear filters",
+                       "function parseLoc(", 'id="loc"', 'id="pay"', 'id="closing"', "has Terps found", "new today", "only roles that state pay"):
+            self.assertIn(needle, html)
+        locs = [r["location"] for r in self.out["roles"]]
+        self.assertTrue(any(", WA" in l for l in locs) and any(", CA" in l for l in locs) and any("Remote" in l for l in locs))
+
     def test_terps_found_block(self):
         html = build_page.build(self.out, self.src, "Kevin Kyle")
         self.assertIn("people.json", html)

@@ -78,6 +78,14 @@ h2 + .lede { color: var(--muted); margin: 0 0 14px; }
 .ctl { font: inherit; font-size: 13.5px; font-weight: 500; padding: 8px 14px; border: 0; border-radius: 999px; background: var(--pill); color: var(--ink); min-height: 38px; }
 select.ctl { appearance: none; -webkit-appearance: none; padding-right: 30px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat; cursor: pointer; }
 input.ctl { flex: 1 1 180px; min-width: 150px; }
+#loc, #company { max-width: 280px; text-overflow: ellipsis; }
+.ctl.more-toggle[aria-expanded="true"] { background: var(--ink); color: var(--page); }
+.controls.more { display: none; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.controls.more.open { display: flex; }
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink); padding: 6px 4px; cursor: pointer; }
+.chk input { accent-color: var(--ink); width: 15px; height: 15px; margin: 0; }
+.chk.off { opacity: .45; cursor: not-allowed; }
+.linkbtn { background: none; border: 0; padding: 6px 4px; font: inherit; font-size: 13px; color: var(--ember); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 input.ctl::placeholder { color: var(--muted); }
 .count { color: var(--muted); margin-left: auto; white-space: nowrap; }
 
@@ -271,12 +279,27 @@ footer a { color: var(--ink); }
   <select class="ctl" id="days" aria-label="Posted within">
     <option value="">Any date</option><option value="7">Posted in 7 days</option><option value="30">Posted in 30 days</option>
   </select>
+  <select class="ctl" id="loc" aria-label="Location"><option value="">All locations</option></select>
   <select class="ctl" id="sort" aria-label="Sort by">
     <option value="fit">Sort: Fit</option><option value="date">Sort: Newest</option><option value="applyBy">Sort: Apply-by soonest</option>
     <option value="salary">Sort: Salary high→low</option><option value="company">Sort: Company</option><option value="minYears">Sort: Min yrs</option>
   </select>
   <input class="ctl" type="search" id="q" placeholder="Search company, title, location, why" aria-label="Search">
+  <button type="button" class="ctl more-toggle" id="more-toggle" aria-expanded="false" aria-controls="more">More filters</button>
+  <button type="button" class="linkbtn" id="clear-filters" hidden>Clear filters</button>
   <span class="count mono" id="count"></span>
+</div>
+<div class="controls more" id="more">
+  <select class="ctl" id="mode" aria-label="Work mode"><option value="">Any work mode</option><option value="Remote">Remote</option><option value="Hybrid">Hybrid</option><option value="On-site">On-site</option></select>
+  <select class="ctl" id="pay" aria-label="Pay at least"><option value="">Any pay</option><option value="60000">Pay ≥ $60k</option><option value="70000">Pay ≥ $70k</option><option value="80000">Pay ≥ $80k</option><option value="90000">Pay ≥ $90k</option><option value="100000">Pay ≥ $100k</option><option value="120000">Pay ≥ $120k</option></select>
+  <label class="chk"><input type="checkbox" id="payonly"> only roles that state pay</label>
+  <select class="ctl" id="exp" aria-label="Experience"><option value="">Any experience</option><option value="0">0 years</option><option value="1">Up to 1 year</option><option value="ns">Not stated</option></select>
+  <select class="ctl" id="clr" aria-label="Clearance"><option value="">Any clearance</option><option value="none">None mentioned</option><option value="obtain">Obtainable</option></select>
+  <select class="ctl" id="cit" aria-label="Citizenship"><option value="">Any citizenship</option><option value="none">No requirement stated</option><option value="citizen">US citizen required</option><option value="itar">US person (ITAR)</option></select>
+  <select class="ctl" id="company" aria-label="Company"><option value="">All companies</option></select>
+  <select class="ctl" id="closing" aria-label="Closing"><option value="">Any closing date</option><option value="7">Closes within 7 days</option><option value="14">Closes within 14 days</option><option value="30">Closes within 30 days</option><option value="any">Has a deadline</option></select>
+  <label class="chk" id="terps-chk"><input type="checkbox" id="terps"> has Terps found</label>
+  <label class="chk"><input type="checkbox" id="newonly"> new today</label>
 </div>
 <div class="wrap">
   <table id="roles">
@@ -323,7 +346,29 @@ footer a { color: var(--ink); }
   const daysTo = iso => { if (!iso) return null; const [y,m,d] = iso.split('-').map(Number); return Math.round((new Date(y, m-1, d) - today) / 86400000); };
   const num = n => n == null ? '' : n.toLocaleString('en-US');
   const FITRANK = {Yes: 0, Maybe: 1, No: 2};
-  const roles = D.roles.map(r => Object.assign({}, r, {_new: NEW.has(r.url), _dt: daysTo(r.applyBy), _q: [r.company, r.title, r.location, r.why, r.discipline, r.salary].join(' ').toLowerCase()}));
+  // ---------- location parsing: two-letter state + remote flag from the free-text location ----------
+  const STATE_NAMES = {'alabama':'AL','alaska':'AK','arizona':'AZ','arkansas':'AR','california':'CA','colorado':'CO','connecticut':'CT','delaware':'DE','florida':'FL','georgia':'GA','hawaii':'HI','idaho':'ID','illinois':'IL','indiana':'IN','iowa':'IA','kansas':'KS','kentucky':'KY','louisiana':'LA','maine':'ME','maryland':'MD','massachusetts':'MA','michigan':'MI','minnesota':'MN','mississippi':'MS','missouri':'MO','montana':'MT','nebraska':'NE','nevada':'NV','new hampshire':'NH','new jersey':'NJ','new mexico':'NM','new york':'NY','north carolina':'NC','north dakota':'ND','ohio':'OH','oklahoma':'OK','oregon':'OR','pennsylvania':'PA','rhode island':'RI','south carolina':'SC','south dakota':'SD','tennessee':'TN','texas':'TX','utah':'UT','vermont':'VT','virginia':'VA','washington':'WA','west virginia':'WV','wisconsin':'WI','wyoming':'WY','district of columbia':'DC'};
+  const STATE_CODES = new Set(Object.values(STATE_NAMES));
+  const CITY_STATE = {'hawthorne':'CA','starbase':'TX','boca chica':'TX','huntsville':'AL','laurel':'MD','chantilly':'VA','wallops island':'VA','schenectady':'NY','niskayuna':'NY','kent':'WA','long beach':'CA','el segundo':'CA','pasadena':'CA','littleton':'CO','denver':'CO','tucson':'AZ','orlando':'FL','cape canaveral':'FL','everett':'WA','seattle':'WA','marina':'CA','costa mesa':'CA','irvine':'CA','austin':'TX','houston':'TX','boston':'MA','cambridge':'MA','bedford':'MA','lexington':'MA','groton':'CT','new london':'CT','newport news':'VA','ingalls':'MS','pascagoula':'MS','bath':'ME','lynchburg':'VA','pittsburgh':'PA','cranberry township':'PA','idaho falls':'ID','los alamos':'NM','albuquerque':'NM','livermore':'CA','oak ridge':'TN','palmdale':'CA','fort worth':'TX','stennis':'MS','mojave':'CA','berkeley':'CA','redmond':'WA','columbia':'MD','silver spring':'MD','greenbelt':'MD','elkton':'MD','orange':'VA','camden':'AR','canoga park':'CA','goleta':'CA','marlborough':'MA','sterling':'VA','mclean':'VA','reston':'VA','dulles':'VA','arlington':'VA','washington':'DC','los angeles':'CA','san francisco':'CA','san diego':'CA','sunnyvale':'CA','mountain view':'CA','university park':'PA','state college':'PA','colorado springs':'CO','melbourne':'FL','titusville':'FL','st. louis':'MO','st louis':'MO','ridley park':'PA','ocean springs':'MS','new orleans':'LA','portland':'OR','phoenix':'AZ','mesa':'AZ','salt lake city':'UT','ogden':'UT','cedar rapids':'IA','dayton':'OH','cincinnati':'OH','evendale':'OH','lynn':'MA','andover':'MA','wilmington':'MA','tewksbury':'MA','nashua':'NH','manchester':'NH','burlington':'VT','hartford':'CT','east hartford':'CT','windsor locks':'CT','syracuse':'NY','rochester':'NY','binghamton':'NY','owego':'NY','moorestown':'NJ','mount laurel':'NJ','baltimore':'MD','annapolis':'MD','bethesda':'MD','rockville':'MD','linthicum':'MD','hanover':'MD','lexington park':'MD','charlottesville':'VA','norfolk':'VA','virginia beach':'VA','dahlgren':'VA','fairfax':'VA','manassas':'VA','herndon':'VA','roanoke':'VA','richmond':'VA'};
+  const STATE_NAME_RX = new RegExp('\\b(' + Object.keys(STATE_NAMES).sort((a, b) => b.length - a.length).map(n => n.replace(/ /g, '\\s+')).join('|') + ')\\b', 'i');
+  const CITY_RX = new RegExp('\\b(' + Object.keys(CITY_STATE).sort((a, b) => b.length - a.length).map(n => n.replace(/ /g, '\\s+')).join('|') + ')\\b', 'i');
+  function parseLoc(loc) {
+    const s = String(loc || ''); const remote = /\bremote\b/i.test(s) && !/\b(not|no)\s+remote\b/i.test(s);
+    if (/\bD\.?C\.?\b/.test(s) && /washington/i.test(s)) return {state: 'DC', remote};
+    const codeRx = /(?:^|[\s,\-–\/(])([A-Z]{2})(?=$|[\s,)\-–\/.;])/g; let m;
+    while ((m = codeRx.exec(s))) if (STATE_CODES.has(m[1])) return {state: m[1], remote};
+    const n = STATE_NAME_RX.exec(s); if (n) return {state: STATE_NAMES[n[1].toLowerCase().replace(/\s+/g, ' ')], remote};
+    const c = CITY_RX.exec(s); if (c) return {state: CITY_STATE[c[1].toLowerCase().replace(/\s+/g, ' ')], remote};
+    return {state: null, remote};
+  }
+  const REGIONS = [['dmv', 'DMV (MD · DC · VA)', ['MD','DC','VA']], ['ne', 'Northeast (CT MA ME NH NJ NY PA RI VT)', ['CT','MA','ME','NH','NJ','NY','PA','RI','VT']],
+    ['se', 'Southeast (AL FL GA MS NC SC TN KY)', ['AL','FL','GA','MS','NC','SC','TN','KY']], ['mw', 'Midwest (IL IN IA KS MI MN MO NE ND OH SD WI)', ['IL','IN','IA','KS','MI','MN','MO','NE','ND','OH','SD','WI']],
+    ['tx', 'Texas & South (TX OK AR LA)', ['TX','OK','AR','LA']], ['mt', 'Mountain (AZ CO ID MT NM NV UT WY)', ['AZ','CO','ID','MT','NM','NV','UT','WY']],
+    ['wc', 'West Coast (CA OR WA AK HI)', ['CA','OR','WA','AK','HI']]];
+  const REGION_STATES = Object.fromEntries(REGIONS.map(([k, , st]) => [k, new Set(st)]));
+  const locMatch = (r, v) => !v ? true : v === 'remote' ? r._remote : v === 'unknown' ? !r._state : REGION_STATES[v] ? REGION_STATES[v].has(r._state) : r._state === v;
+  const roles = D.roles.map(r => { const pl = parseLoc(r.location); return Object.assign({}, r, {_new: NEW.has(r.url), _dt: daysTo(r.applyBy), _state: pl.state, _remote: pl.remote,
+    _q: [r.company, r.title, r.location, r.why, r.discipline, r.salary].join(' ').toLowerCase()}); });
 
   // ---------- per-role state (saved / applied / hidden), kept in this browser ----------
   const KEY = 'jadar.state.v1', SKEY = 'jadar.sync.v1';
@@ -398,25 +443,62 @@ footer a { color: var(--ink); }
   }
 
   // controls
-  const state = {tab: 'inbox', fit: 'fits', sector: '', disc: '', days: '', q: '', sort: 'fit', dir: 'asc', open: null, draft: null};
+  const FILTER_DEFAULTS = {sector: '', disc: '', days: '', loc: '', q: '', mode: '', pay: '', payonly: false, exp: '', clr: '', cit: '', company: '', closing: '', terps: false, newonly: false};
+  const state = Object.assign({tab: 'inbox', fit: 'fits', sort: 'fit', dir: 'asc', more: false, open: null, draft: null}, FILTER_DEFAULTS);
+  const FKEY = 'jadar.filters.v1';
+  function saveFilters() { const o = {v: 1, fit: state.fit, sort: state.sort, dir: state.dir, more: state.more}; Object.keys(FILTER_DEFAULTS).forEach(k => o[k] = state[k]); lsSet(FKEY, JSON.stringify(o)); }
+  function loadFilters() { try { const o = JSON.parse(lsGet(FKEY) || 'null'); if (!o || o.v !== 1) return; Object.keys(FILTER_DEFAULTS).forEach(k => { if (k in o && typeof o[k] === typeof FILTER_DEFAULTS[k]) state[k] = o[k]; });
+    if (['fits', 'Yes', 'all'].includes(o.fit)) state.fit = o.fit; if (typeof o.sort === 'string') state.sort = o.sort; if (o.dir === 'asc' || o.dir === 'desc') state.dir = o.dir; state.more = !!o.more; } catch (e) {} }
   const fill = (sel, vals) => { vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); }); };
   fill($('#sector'), [...new Set(roles.map(r => r.sector).filter(Boolean))].sort());
   fill($('#disc'), [...new Set(roles.map(r => r.discipline).filter(Boolean))].sort());
+  function setOptions(sel, groups, keep) {  // groups: [[label, [[value, text], ...]], ...]; first option stays
+    const first = sel.options[0]; sel.innerHTML = ''; sel.appendChild(first);
+    groups.forEach(([label, opts]) => { if (!opts.length) return; const g = label ? document.createElement('optgroup') : sel; if (label) { g.label = label; sel.appendChild(g); }
+      opts.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; g.appendChild(o); }); });
+    sel.value = [...sel.options].some(o => o.value === keep) ? keep : '';
+    return sel.value;
+  }
+  let fillTab = null;
+  function fillDynamic(tab) {  // location and company options with counts from the current tab's roles
+    if (fillTab === tab) return; fillTab = tab;
+    const base = listFor(tab);
+    const stc = {}; let remote = 0, unknown = 0;
+    base.forEach(r => { if (r._state) stc[r._state] = (stc[r._state] || 0) + 1; else unknown++; if (r._remote) remote++; });
+    const reg = REGIONS.map(([k, label, st]) => [k, label, st.reduce((n, c) => n + (stc[c] || 0), 0)]).filter(x => x[2]).map(([k, label, n]) => [k, label + ' · ' + n]);
+    if (remote) reg.push(['remote', 'Remote · ' + remote]); if (unknown) reg.push(['unknown', 'Multiple / unknown · ' + unknown]);
+    const st = Object.entries(stc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([c, n]) => [c, c + ' · ' + n]);
+    state.loc = setOptions($('#loc'), [['Regions', reg], ['States', st]], state.loc);
+    const cc = {}; base.forEach(r => { if (r.company) cc[r.company] = (cc[r.company] || 0) + 1; });
+    state.company = setOptions($('#company'), [['', Object.keys(cc).sort().map(c => [c, c + ' · ' + cc[c]])]], state.company);
+  }
+  function reflectFilters() {  // push state into the controls
+    ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing', 'sort'].forEach(k => { const el = $('#' + k); if (el) el.value = state[k]; });
+    $('#q').value = state.q; $('#payonly').checked = state.payonly; $('#terps').checked = state.terps; $('#newonly').checked = state.newonly;
+    document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x.dataset.fit === state.fit));
+    $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more);
+  }
+  const activeFilters = () => Object.keys(FILTER_DEFAULTS).filter(k => state[k] !== FILTER_DEFAULTS[k]);
+  const MORE_KEYS = ['mode', 'pay', 'payonly', 'exp', 'clr', 'cit', 'company', 'closing', 'terps', 'newonly'];
   document.querySelectorAll('.seg:not(.tabs) button').forEach(b => b.addEventListener('click', () => {
-    document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.fit = b.dataset.fit; render();
+    document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.fit = b.dataset.fit; saveFilters(); render();
   }));
   document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b)); state.tab = b.dataset.tab; state.open = null; render();
   }));
-  ['sector', 'disc', 'days'].forEach(k => $('#' + k).addEventListener('change', e => { state[k] = e.target.value; render(); }));
-  $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
+  ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing'].forEach(k => $('#' + k).addEventListener('change', e => { state[k] = e.target.value; saveFilters(); render(); }));
+  [['payonly', 'payonly'], ['terps', 'terps'], ['newonly', 'newonly']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { state[k] = e.target.checked; saveFilters(); render(); }));
+  $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); saveFilters(); render(); });
+  $('#more-toggle').addEventListener('click', () => { state.more = !state.more; $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more); saveFilters(); });
+  $('#clear-filters').addEventListener('click', () => { Object.assign(state, FILTER_DEFAULTS); fillTab = null; reflectFilters(); saveFilters(); render(); });
   const DEFAULT_DIR = {fit: 'asc', date: 'desc', applyBy: 'asc', salary: 'desc', company: 'asc', minYears: 'asc', discipline: 'asc'};
-  $('#sort').addEventListener('change', e => { state.sort = e.target.value; state.dir = DEFAULT_DIR[state.sort]; render(); });
+  $('#sort').addEventListener('change', e => { state.sort = e.target.value; state.dir = DEFAULT_DIR[state.sort]; saveFilters(); render(); });
   document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
     const k = th.dataset.sort;
     state.dir = state.sort === k ? (state.dir === 'asc' ? 'desc' : 'asc') : DEFAULT_DIR[k]; state.sort = k;
-    if ([...$('#sort').options].some(o => o.value === k)) $('#sort').value = k; render();
+    if ([...$('#sort').options].some(o => o.value === k)) $('#sort').value = k; saveFilters(); render();
   }));
+  loadFilters();
 
   // sorting
   const cmpNum = (a, b) => (a == null ? 0 : a) - (b == null ? 0 : b);  // nulls are moved last before this runs
@@ -580,11 +662,27 @@ footer a { color: var(--ink); }
     const badges = {inbox: inboxN, saved: c.saved, applied: c.applied, hidden: c.hidden, all: roles.length};
     document.querySelectorAll('.tabs [data-badge]').forEach(b => b.textContent = badges[b.dataset.badge] ? ' ' + badges[b.dataset.badge] : '');
     $('#state-sum').textContent = (c.saved || c.applied || c.hidden) ? `${c.saved} saved · ${c.applied} applied · ${c.hidden} hidden` : '';
+    fillDynamic(state.tab); reflectFilters();
     const base = listFor(state.tab); const listTab = ['saved', 'applied', 'hidden'].includes(state.tab);
     let list = listTab ? base : base.filter(r => state.fit === 'all' || (state.fit === 'fits' ? r.fit !== 'No' : r.fit === state.fit));
     if (state.sector) list = list.filter(r => r.sector === state.sector);
     if (state.disc) list = list.filter(r => r.discipline === state.disc);
     if (state.days) list = list.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -Number(state.days));
+    if (state.loc) list = list.filter(r => locMatch(r, state.loc));
+    if (state.mode) list = list.filter(r => r.workMode === state.mode || (state.mode === 'Remote' && r._remote));
+    if (state.pay) list = list.filter(r => r.salaryMax == null ? !state.payonly : r.salaryMax >= Number(state.pay));
+    else if (state.payonly) list = list.filter(r => r.salaryMax != null);
+    if (state.exp) list = list.filter(r => state.exp === 'ns' ? r.minYears == null : state.exp === '0' ? r.minYears === 0 : (r.minYears != null && r.minYears <= 1));
+    if (state.clr) list = list.filter(r => state.clr === 'none' ? !r.clearance : /obtain/i.test(r.clearance || ''));
+    if (state.cit) list = list.filter(r => state.cit === 'none' ? !r.citizenship : state.cit === 'citizen' ? /citizen/i.test(r.citizenship || '') : /itar|person/i.test(r.citizenship || ''));
+    if (state.company) list = list.filter(r => r.company === state.company);
+    if (state.closing) list = list.filter(r => state.closing === 'any' ? !!r.applyBy : (r._dt != null && r._dt >= 0 && r._dt <= Number(state.closing)));
+    if (state.terps) list = list.filter(r => { const e = peopleFor(r); return e && e.people.length; });
+    if (state.newonly) list = list.filter(r => r._new);
+    const nMore = MORE_KEYS.filter(k => state[k] !== FILTER_DEFAULTS[k]).length;
+    $('#more-toggle').textContent = nMore ? 'More filters · ' + nMore : 'More filters';
+    $('#clear-filters').hidden = !activeFilters().length;
+    const tc = $('#terps-chk'); tc.classList.toggle('off', !PEOPLE); $('#terps').disabled = !PEOPLE; tc.title = PEOPLE ? '' : 'Connect sync in Data to use this';
     if (state.q) { const words = state.q.split(/\s+/).filter(Boolean);  // every word must appear somewhere in the row
       list = list.filter(r => { const h = r._q || [r.company, r.title, r.location].join(' ').toLowerCase(); return words.every(w => h.includes(w)); }); }
     if (!listTab) list = sorted(list);
