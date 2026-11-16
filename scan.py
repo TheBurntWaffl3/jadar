@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-16.2"
+RULES_VERSION = "2026-11-16.3"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -126,9 +126,9 @@ def strip_html(s):
     s = html.unescape(s)
     return re.sub(r"[ \t\r\f\v]+", " ", s)
 
-NUMW = {"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10}
-YRS = re.compile(r"(?<![\d.])(\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*(?:\(\d+\)\s*)?(?:\+|or more|plus)?\s*"
-                 r"(?:(?:-|–|to)\s*\d{1,2}\s*)?\+?\s*(?:years?|yrs?)\b(?:[^.\n]{0,80}?)\b(experience|exp\b|industry|engineering|relevant|related|work)", re.I)
+NUMW = dict(zip("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty".split(), range(21)))
+YRS = re.compile(r"(?<![\d.])(\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\s*(?:\(\d+\)\s*)?(?:\+|or more|plus)?\s*"
+                 r"(?:(?:-|–|to)\s*(?:\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\s*)?\+?\s*(?:years?|yrs?)\b(?:[^.\n]{0,80}?)\b(experience|exp\b|industry|engineering|relevant|related|work)", re.I)
 ZERO_EXP = re.compile(r"(no (prior |professional )?experience (is )?required|\b0\s*(\+)?\s*years|new grad|recent grad|entry[- ]level (position|role|engineer)|early[- ]career (position|role|engineer|program))", re.I)
 TITLE_ENTRY = re.compile(r"(?i)(new ?grad|graduate engineer|early[- ]career|entry[- ]level|university grad|college grad|recent grad|\bassociate\b[\w ,&/-]{0,50}?(engineer|scientist|analyst)|(engineer|scientist|analyst|physicist)[\w ,&/()-]{0,50}?\bassociate\b|engineer (i|1)\b|\blevel (i|1)\b|\b(i|1)\s*$|rotational|development program|\bLDP\b|\bEDP\b)")
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
@@ -743,11 +743,16 @@ def judge_entry(s, e, profile=PROFILE):
     rq = dict(e["facts"])
     if rq.get("applyBy") and rq["applyBy"] < TODAY.isoformat(): rq["applyBy"] = None  # deadline passed, posting still up
     f, why = fit(profile, rq, e["title"])
+    # the posting's own URL slug can say "senior" when the page title doesn't (X-energy "Senior Piping and Valve Design
+    # Engineer" served under the title "Mechanical Design Engineer")
+    if f != "No" and URL_SENIOR.search(e["url"]) and not re.search(rf"(?i)\b{profile['_gradYear']}\b|new ?grad|early[- ]career|entry[- ]level|associate", e["title"] + " " + e["url"]):
+        f, why = "No", "senior per posting URL"
     tk, tn = timing(profile, rq, e["title"])
     return dict(company=s["org"], sector=s["sector"], title=e["title"], location=e["location"].strip(), url=e["url"],
                 date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why, timing=tk, timingNote=tn,
                 desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen"))
 
+URL_SENIOR = re.compile(r"(?i)/(?:[a-z0-9-]*-)?(senior|sr|principal|staff|lead|chief|director)[-_]")
 STALE_DAYS = 3  # a board that fails this run keeps its roles from a read within this many days
 
 def run_source(s, cache=None, full=False, profile=PROFILE):

@@ -309,6 +309,17 @@ class TestPreferredHeadings(unittest.TestCase):
         r = scan.requirements("Minimum Qualifications:\nBS in Mechanical Engineering\nExperience with ANSYS preferred\n3+ years of experience required\n")
         self.assertEqual(r["minYears"], 3)
 
+class TestWordNumbers(unittest.TestCase):
+    def test_fifteen_to_twenty_years(self):
+        # X-energy "Mechanical Design Engineer (Steam Generator)" R100796-1, 2026-11-16: word numbers above ten and a
+        # spaced word range were not read, so a 15-20 year role showed as "1 yr required" (Maybe)
+        r = scan.requirements("Minimum Qualifications\nBachelor's degree in mechanical engineering required.\n"
+                              "Typically, fifteen- twenty years of experience in an engineering role required.\n"
+                              "One plus years of demonstrated hands-on experience developing hardware.")
+        self.assertEqual(r["minYears"], 15)
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Mechanical Design Engineer")[0], "No")
+        self.assertEqual(scan.requirements("Requirements\nTwelve years of engineering experience.")["minYears"], 12)
+
 class TestLateRequiredSections(unittest.TestCase):
     def test_xenergy_level_qualifications_after_preferred(self):
         # X-energy "Mechanical Design Engineer" (2026-11-16): Minimum Qualifications say 1+ years, but the Job Level

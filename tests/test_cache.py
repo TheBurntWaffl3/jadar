@@ -19,6 +19,18 @@ class Board:
             yield dict(title=TITLE[k], location="Hawthorne, CA", url=f"https://{s['org'].split()[0].lower()}.test/{k}",
                        date="2026-11-10", dateKind="posted", desc=desc)
 
+class UrlSeniorTests(unittest.TestCase):
+    def test_url_slug_says_senior(self):
+        s = dict(org="X-energy", sector="Nuclear & fusion", type="workday")
+        base = dict(title="Mechanical Design Engineer", location="Houston, TX", date="2026-11-16", dateKind="posted", desc_ok=True, fieldInDesc=True,
+                    facts=scan.requirements("Bachelor's degree in mechanical engineering required. 1+ years of experience."), firstSeen="2026-11-16")
+        r = scan.judge_entry(s, dict(base, url="https://xenergy.wd5.myworkdayjobs.com/en-US/X-energyUS/job/Houston-TX/Senior-Piping-and-Valve-Design-Engineer_R100796-1"))
+        self.assertEqual((r["fit"], r["why"]), ("No", "senior per posting URL"))
+        r = scan.judge_entry(s, dict(base, url="https://xenergy.wd5.myworkdayjobs.com/en-US/X-energyUS/job/Houston-TX/Mechanical-Design-Engineer_R101443"))
+        self.assertEqual(r["fit"], "Maybe")
+        r = scan.judge_entry(s, dict(base, title="2027 Early Career Mechanical Engineer", url="https://x.test/job/Senior-Program-2027-Early-Career-Mechanical-Engineer_R1"))
+        self.assertNotEqual(r["fit"], "No", "an entry-level title wins over a slug word")
+
 class CacheTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); d = self.tmp.name
