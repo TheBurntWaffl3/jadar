@@ -98,6 +98,10 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 - A required section that comes AFTER the preferred one counts again: X-energy "Mechanical Design Engineer" (2026-11-16) listed
   "Minimum Qualifications: one plus years", then "Preferred Qualifications", then "Job Level Qualifications: Level IV ... ten
   years"; the cut at Preferred hid the ten years (`RQ_HEAD` resumes at the next required heading).
+- Years in words go up to "twenty", and a spaced word range counts: X-energy R100796-1 "Typically, fifteen- twenty years of
+  experience" read as 1 yr (2026-11-16). The same posting's URL slug said "Senior-Piping-and-Valve-Design-Engineer" while the
+  page title said "Mechanical Design Engineer": `URL_SENIOR` in `judge_entry()` drops a Yes/Maybe whose slug has
+  senior/sr/principal/staff/lead/chief/director unless the title or slug also says new grad / early career / 2027 / associate.
 - Years: stated years >= 2 beat entry-sounding titles ("Engineer I"). Tiered postings ("Level I: 0 yrs / Level II: 2 yrs") use the entry tier; otherwise the max of listed minimums. Skip experience that only applies to no-degree paths ("in lieu of a degree", "Associate's degree with five years", high school/GED). Do NOT skip "or an equivalent combination of education and experience" (Boeing "3+ years ... or equivalent combination" is a real 3-year minimum).
 - School/internship experience counts only when said on the same requirement line.
 - Major: if the bachelor's sentence names only other majors -> No (BWXT Radiation Shielding: nuclear engineering or radiation health physics only); "X or related" without his major -> Yes becomes Maybe; "any engineering"/"STEM"/"technical discipline" -> fine.
@@ -108,7 +112,7 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 - Titles: "Associate, Instrumentation and Controls ... Engineer" and "Nuclear Engineer (Associate)" are entry-level.
 - Out of field (dropped): security analyst, health and safety, full-stack, site reliability, IT infrastructure, communication systems, cable harness, etc. Keep: "Mechanical Engineer - Cable Magnets", "Nuclear Safety Analyst", "Flight Safety Analyst", "Fluid Systems Engineer, Starlink Infrastructure".
 
-`tests/test_fit.py` holds these as regression tests (36 tests). Keep it passing.
+`tests/test_fit.py` holds these as regression tests. Keep it passing (84 tests across `tests/` as of 2026-11-16).
 
 ## Organizations not covered yet (and why)
 
