@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-16.1"
+RULES_VERSION = "2026-11-16.2"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -133,6 +133,7 @@ ZERO_EXP = re.compile(r"(no (prior |professional )?experience (is )?required|\b0
 TITLE_ENTRY = re.compile(r"(?i)(new ?grad|graduate engineer|early[- ]career|entry[- ]level|university grad|college grad|recent grad|\bassociate\b[\w ,&/-]{0,50}?(engineer|scientist|analyst)|(engineer|scientist|analyst|physicist)[\w ,&/()-]{0,50}?\bassociate\b|engineer (i|1)\b|\blevel (i|1)\b|\b(i|1)\s*$|rotational|development program|\bLDP\b|\bEDP\b)")
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
 
+RQ_HEAD = re.compile(r"(?im)^\W*(basic|minimum|required|requirements|qualifications|what you.ll need|what you.ll bring|what qualifications|you have|must have|what we.re looking for|education/experience|(job )?level (minimum )?qualifications|level minimum)\b")
 PREF_WORD = re.compile(r"(?i)\b(preferred|desired|nice[- ]to[- ]have|bonus|plusses|pluses|would be (a )?(plus|great|nice)|good to have)\b")
 PREF_START = re.compile(r"(?i)^\W*(preferred|desired|nice|bonus|plus|these|what|the following|it would|it'?s a plus|good to have)")
 def preferred_heading(t, start, had_required):
@@ -155,9 +156,16 @@ def requirements(text):
     t = re.sub(r"(?i)\b(zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*\(\d+\)", r"\1", t)
     t = re.sub(r"\((\d{1,2}\s*\+?)\)", r"\1", t)
     req = t
-    rq = re.search(r"(?im)^\W*(basic|minimum|required|requirements|qualifications|what you.ll need|what you.ll bring|what qualifications|you have|must have|what we.re looking for|education/experience)\b", t)
+    rq = RQ_HEAD.search(t)
     cut = preferred_heading(t, rq.end() if rq else 0, bool(rq))
-    if cut is not None: req = t[:cut]
+    if cut is not None:
+        req = t[:cut]
+        # a later required section (X-energy: "Job Level Qualifications" after "Preferred Qualifications") counts again
+        rq2 = RQ_HEAD.search(t, cut + 1)
+        while rq2 and re.search(r"(?i)preferred|desired|nice", t[rq2.start():rq2.start() + 40]): rq2 = RQ_HEAD.search(t, rq2.end())
+        if rq2:
+            cut2 = preferred_heading(t, rq2.end(), True)
+            req += "\n" + t[rq2.start():cut2 if cut2 is not None else len(t)]
     nums = []; school_ok = False
     for mm in YRS.finditer(req):
         v = mm.group(1).lower(); v = NUMW.get(v, v)

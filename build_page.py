@@ -686,6 +686,7 @@ footer a { color: var(--ink); }
     fillDynamic(state.tab); reflectFilters();
     const base = listFor(state.tab); const listTab = ['saved', 'applied', 'hidden'].includes(state.tab);
     let list = listTab ? base : base.filter(r => state.fit === 'all' || (state.fit === 'fits' ? r.fit !== 'No' : r.fit === state.fit));
+    if (!listTab) {  // your own lists (Saved / Applied / Disliked) show everything you marked; only the search box narrows them
     if (state.sector) list = list.filter(r => r.sector === state.sector);
     if (state.disc) list = list.filter(r => r.discipline === state.disc);
     if (state.days) list = list.filter(r => r.dateKind === 'posted' && r.date && daysTo(r.date) >= -Number(state.days));
@@ -701,6 +702,7 @@ footer a { color: var(--ink); }
     if (state.terps) list = list.filter(r => { const e = peopleFor(r); return e && e.people.length; });
     if (state.timing) list = list.filter(r => r._timing === state.timing);
     if (state.newonly) list = list.filter(r => r._new);
+    }
     const nMore = MORE_KEYS.filter(k => state[k] !== FILTER_DEFAULTS[k]).length;
     $('#more-toggle').textContent = nMore ? 'More filters · ' + nMore : 'More filters';
     $('#clear-filters').hidden = !activeFilters().length;

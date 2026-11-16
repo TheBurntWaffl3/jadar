@@ -309,6 +309,34 @@ class TestPreferredHeadings(unittest.TestCase):
         r = scan.requirements("Minimum Qualifications:\nBS in Mechanical Engineering\nExperience with ANSYS preferred\n3+ years of experience required\n")
         self.assertEqual(r["minYears"], 3)
 
+class TestLateRequiredSections(unittest.TestCase):
+    def test_xenergy_level_qualifications_after_preferred(self):
+        # X-energy "Mechanical Design Engineer" (2026-11-16): Minimum Qualifications say 1+ years, but the Job Level
+        # Qualifications section AFTER Preferred Qualifications says Level IV = ten years, Level V = fifteen. Was judged Maybe.
+        txt = ("Minimum Qualifications\n"
+               "Bachelor's degree in mechanical engineering, or related engineering discipline from an accredited institution required.\n"
+               "One plus years of demonstrated hands-on experience developing and delivering hardware is required. May include industry internship experience.\n"
+               "Preferred Qualifications\n"
+               "Experience with commercial nuclear power plant operations.\n"
+               "Experience with NRC regulations.\n"
+               "Job Level Qualifications:\n"
+               "Level IV\n"
+               "Level Tasks/Responsibilities\n"
+               "Lead the execution of the core tasks without close supervision.\n"
+               "Level Minimum Qualifications\n"
+               "Typically, ten years of experience in an engineering role required.\n"
+               "A master's degree in engineering may be in lieu of two years of experience.\n"
+               "Level V\n"
+               "Level Minimum Qualifications\n"
+               "Typically, fifteen years of experience in an engineering role required.\n")
+        scan.TODAY = TODAY
+        r = scan.requirements(txt)
+        self.assertGreaterEqual(r["minYears"], 10)
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Mechanical Design Engineer")[0], "No")
+        # the ordinary case is unchanged: preferred section at the end is still cut
+        r = scan.requirements("Minimum Qualifications\nBS in Aerospace Engineering\n0-2 years of experience\nPreferred Qualifications\n5+ years of experience with CFD\n")
+        self.assertEqual(r["minYears"], 0)
+
 class TestTiming(unittest.TestCase):
     def setUp(self): scan.TODAY = TODAY
 
