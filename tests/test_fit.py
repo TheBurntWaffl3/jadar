@@ -319,6 +319,16 @@ class TestScopeWords(unittest.TestCase):
         self.assertEqual(scan.discipline("Manufacturing Engineer, Propellant"), "Propulsion")
         self.assertFalse(scan.in_scope("Manufacturing Engineer - General"))
         self.assertFalse(scan.in_scope("Composites Engineering Tech - 1st Shift"))  # GE Aerospace 2026-11-17: a technician role
+        # generic boards (Leidos, Electric Boat, Aerospace Corp, Westinghouse) let these through as Yes/Maybe on 2026-11-17
+        for t in ("Data Analyst", "Middleware Engineer", "Platform Engineer", "Enterprise Architect", "GIS Production Engineer",
+                  "Scientist I - Inhalation Toxicologist Research Scientist", "BIM Engineer", "Computer Systems Analyst",
+                  "Intermediate Health Physicist", "2027 Battery Engineer", "2027 Entry Level DSP & SDR Engineer",
+                  "2027 Time and Frequency Systems Scientist", "ENGINEER METROLOGY 1", "Imbedded Engineer I/II", "SONAR Systems Engineer",
+                  "Simulator Operation Engineer", "2027 Systems Architect", "Systems Analyst", "Digital Enterprise Design Disclosure Engineer",
+                  "Quality Control Analyst - Work Package Control (Hawaii)", "Part-Time Research Support - Biomedical Engineering (Wong)"):
+            self.assertFalse(scan.in_scope(t, True), t)
+        for t in ("Mechanical Engineer - Battery Pack, Satellites (Starlink)", "Nuclear Safety Analyst", "Flight Safety Analyst", "Structural Analyst"):
+            self.assertTrue(scan.in_scope(t, True), t)
 
 class TestWordNumbers(unittest.TestCase):
     def test_fifteen_to_twenty_years(self):
