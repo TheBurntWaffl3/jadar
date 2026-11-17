@@ -330,6 +330,14 @@ class TestScopeWords(unittest.TestCase):
         for t in ("Mechanical Engineer - Battery Pack, Satellites (Starlink)", "Nuclear Safety Analyst", "Flight Safety Analyst", "Structural Analyst"):
             self.assertTrue(scan.in_scope(t, True), t)
 
+class TestTitleLevels(unittest.TestCase):
+    def test_phd_and_leading_staff_titles(self):
+        r = scan.requirements("Bachelor's degree in aerospace engineering. 0+ years of experience.")
+        self.assertEqual(scan.fit(scan.PROFILE, r, "2027 PhD Graduate - Trajectory Optimization Engineer")[0], "No")
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Staff GNC Analysis Engineer")[0], "No")
+        self.assertNotEqual(scan.fit(scan.PROFILE, r, "Thermal Engineer - Assistant Staff")[0], "No")
+        self.assertEqual(scan.fit(scan.PROFILE, r, "2027 Graduate - Missile GNC Engineer")[0], "Yes")
+
 class TestGNC(unittest.TestCase):
     def test_gnc_is_a_field(self):
         # Kevin 2026-11-17: entry-level GNC roles are wanted too
