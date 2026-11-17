@@ -309,6 +309,16 @@ class TestPreferredHeadings(unittest.TestCase):
         r = scan.requirements("Minimum Qualifications:\nBS in Mechanical Engineering\nExperience with ANSYS preferred\n3+ years of experience required\n")
         self.assertEqual(r["minYears"], 3)
 
+class TestScopeWords(unittest.TestCase):
+    def test_composites_and_propellant_are_in_field(self):
+        # Castelion 2026-11-17: these manufacturing roles were dropped for lacking a field word while
+        # "Manufacturing Engineer, Solid Rocket Motors" passed
+        self.assertTrue(scan.in_scope("Manufacturing Engineer – Composite Motor Cases"))
+        self.assertTrue(scan.in_scope("Manufacturing Engineer, Propellant"))
+        self.assertEqual(scan.discipline("Manufacturing Engineer – Composite Motor Cases"), "Structures")
+        self.assertEqual(scan.discipline("Manufacturing Engineer, Propellant"), "Propulsion")
+        self.assertFalse(scan.in_scope("Manufacturing Engineer - General"))
+
 class TestWordNumbers(unittest.TestCase):
     def test_fifteen_to_twenty_years(self):
         # X-energy "Mechanical Design Engineer (Steam Generator)" R100796-1, 2026-11-16: word numbers above ten and a

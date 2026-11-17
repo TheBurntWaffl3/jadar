@@ -95,7 +95,7 @@ def fetch(url, body=None, check_robots=False, text=False, headers=None, tries=4)
 FIELD = re.compile(r"(hypersonic|thermal|aerotherm|thermo|heat transfer|propuls|rocket|\bengines?\b|combust|turbine|"
     r"structur|stress|loads|dynamic|vibration|test|aero|cfd|fluid|flight|vehicle|mechanical|mechanism|design engineer|"
     r"nuclear|reactor|fusion|plasma|criticality|radiation|naval|marine|ship|hull|submarine|"
-    r"materials|analyst.*(thermal|struct|aero)|launch|payload|integration)", re.I)
+    r"materials|composite|propellant|analyst.*(thermal|struct|aero)|launch|payload|integration)", re.I)
 NOT_FIELD = re.compile(r"(software|firmware|electrical|electronic|\brf\b|fpga|asic|cyber|network|\bit\b|data (engineer|scien)|"
     r"machine learning|\bai\b|civil|facilit|account|finance|sales|recruit|marketing|legal|counsel|supply chain|buyer|"
     r"procure|technician|machinist|welder|operator|electrician|mechanic\b|planner|scheduler|hr\b|payroll|security officer|"
@@ -111,8 +111,8 @@ def in_scope(title, generic=False):
 
 def discipline(t):
     t = t.lower()
-    for k, rx in [("Thermal", r"therm|heat"), ("Propulsion", r"propul|rocket|\bengines?\b|combust|turbine"),
-                  ("Structures", r"(?<!infra)struct|stress|loads|vibrat|dynamic"), ("Test", r"\btest"), ("Nuclear", r"nuclear|reactor|fusion|plasma|critical|radiat"),
+    for k, rx in [("Thermal", r"therm|heat"), ("Propulsion", r"propul|propellant|rocket|\bengines?\b|combust|turbine"),
+                  ("Structures", r"(?<!infra)struct|stress|loads|vibrat|dynamic|composite"), ("Test", r"\btest"), ("Nuclear", r"nuclear|reactor|fusion|plasma|critical|radiat"),
                   ("Naval", r"naval|marine|\bship|hull|submarine|vessel"), ("Aero", r"aero|cfd|fluid|flight|hypersonic"),
                   ("Mechanical", r"mechanic|design")]:
         if re.search(rx, t): return k
