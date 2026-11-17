@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-17T02:51:21.095065+00:00",
+ "scanned": "2026-11-17T02:59:42.488743+00:00",
  "profile": "kevin",
  "rulesVersion": "2026-11-16.3",
  "fullRead": null,
@@ -11997,42 +11997,6 @@
    "sector": "Primes",
    "title": "Circuit Design Engineer Asc - Early Career",
    "location": "Littleton, CO",
-   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477889301",
-   "date": "2026-11-11",
-   "dateKind": "posted",
-   "discipline": "Mechanical",
-   "minYears": null,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Secret (obtain)",
-   "citizenship": null,
-   "salary": "$75,400\u2013$140,000/yr",
-   "salaryMin": 75400,
-   "salaryMax": 140000,
-   "workMode": null,
-   "employment": "Full-time",
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Experience designing analog electrical circuits to meet system requirements \u00b7 Bachelor of Science or higher from an accredited college in Electrical Engineering or related discipline \u00b7 Experience in electronics design, with a focus on CCA design and development. \u00b7 Ability to obtain DoD Secret Clearance; US Citizenship.",
-   "majorReq": "related: electrical engineering",
-   "fit": "Maybe",
-   "why": "new-grad / entry title; major not named (electrical engineering or related)",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r0334"
-  },
-  {
-   "company": "Lockheed Martin",
-   "sector": "Primes",
-   "title": "Circuit Design Engineer Asc - Early Career",
-   "location": "Littleton, CO",
    "url": "https://lockheedmartin.eightfold.ai/careers/job/996477890060",
    "date": "2026-11-11",
    "dateKind": "posted",
@@ -12062,6 +12026,42 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-12",
+   "id": "r0334"
+  },
+  {
+   "company": "Lockheed Martin",
+   "sector": "Primes",
+   "title": "Circuit Design Engineer Asc - Early Career",
+   "location": "Littleton, CO",
+   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477889301",
+   "date": "2026-11-11",
+   "dateKind": "posted",
+   "discipline": "Mechanical",
+   "minYears": null,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Secret (obtain)",
+   "citizenship": null,
+   "salary": "$75,400\u2013$140,000/yr",
+   "salaryMin": 75400,
+   "salaryMax": 140000,
+   "workMode": null,
+   "employment": "Full-time",
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Experience designing analog electrical circuits to meet system requirements \u00b7 Bachelor of Science or higher from an accredited college in Electrical Engineering or related discipline \u00b7 Experience in electronics design, with a focus on CCA design and development. \u00b7 Ability to obtain DoD Secret Clearance; US Citizenship.",
+   "majorReq": "related: electrical engineering",
+   "fit": "Maybe",
+   "why": "new-grad / entry title; major not named (electrical engineering or related)",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
    "id": "r0335"
   },
   {
@@ -12069,7 +12069,7 @@
    "sector": "Primes",
    "title": "Circuit Design Engineer Asc - Early Career",
    "location": "Littleton, CO",
-   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477890215",
+   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477890193",
    "date": "2026-11-11",
    "dateKind": "posted",
    "discipline": "Mechanical",
@@ -12105,7 +12105,7 @@
    "sector": "Primes",
    "title": "Circuit Design Engineer Asc - Early Career",
    "location": "Littleton, CO",
-   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477890193",
+   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477890215",
    "date": "2026-11-11",
    "dateKind": "posted",
    "discipline": "Mechanical",
@@ -91159,42 +91159,6 @@
   {
    "company": "Lockheed Martin",
    "sector": "Primes",
-   "title": "Thermal Analysis Engineer (Level 3)",
-   "location": "Highlands Ranch, CO",
-   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477383106",
-   "date": "2026-10-14",
-   "dateKind": "posted",
-   "discipline": "Thermal",
-   "minYears": null,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Clearance (obtain)",
-   "citizenship": null,
-   "salary": "$95,900\u2013$178,100/yr",
-   "salaryMin": 95900,
-   "salaryMax": 178100,
-   "workMode": null,
-   "employment": "Full-time",
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor's degree in Mechanical Engineering, Aerospace Engineering, or a related technical field and/or equivalent work experience \u00b7 Thorough knowledge of heat transfer and thermodynamic principles and their practical engineering application. \u00b7 Experience executing engineering design, analysis, and verification across the product development lifecycle. \u00b7 Proficiency with CAD and thermal analysis tools (e.g., Creo, Thermal Desktop, ANSYS, or equivalent).",
-   "majorReq": null,
-   "fit": "No",
-   "why": "senior title",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "id": "r2533"
-  },
-  {
-   "company": "Lockheed Martin",
-   "sector": "Primes",
    "title": "Thermal Analysis Engineer (Level 4)",
    "location": "Highlands Ranch, CO",
    "url": "https://lockheedmartin.eightfold.ai/careers/job/996477383457",
@@ -91219,6 +91183,42 @@
    "travel": null,
    "relocation": null,
    "reqSnippet": "Bachelor's degree in Mechanical Engineering, Aerospace Engineering, or a related technical field and/or equivalent work experience \u00b7 Thorough knowledge of heat transfer and thermodynamic principles and their practical engineering application. \u00b7 Experience executing engineering design, analysis, and verification across the product development lifecycle. \u00b7 Proficiency with CAD and thermal analysis tools (e.g., Creo, Thermal Desktop, ANSYS, or equivalent). \u00b7 Hands on experience with Thermal\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "senior title",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "id": "r2533"
+  },
+  {
+   "company": "Lockheed Martin",
+   "sector": "Primes",
+   "title": "Thermal Analysis Engineer (Level 3)",
+   "location": "Highlands Ranch, CO",
+   "url": "https://lockheedmartin.eightfold.ai/careers/job/996477383106",
+   "date": "2026-10-14",
+   "dateKind": "posted",
+   "discipline": "Thermal",
+   "minYears": null,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Clearance (obtain)",
+   "citizenship": null,
+   "salary": "$95,900\u2013$178,100/yr",
+   "salaryMin": 95900,
+   "salaryMax": 178100,
+   "workMode": null,
+   "employment": "Full-time",
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor's degree in Mechanical Engineering, Aerospace Engineering, or a related technical field and/or equivalent work experience \u00b7 Thorough knowledge of heat transfer and thermodynamic principles and their practical engineering application. \u00b7 Experience executing engineering design, analysis, and verification across the product development lifecycle. \u00b7 Proficiency with CAD and thermal analysis tools (e.g., Creo, Thermal Desktop, ANSYS, or equivalent).",
    "majorReq": null,
    "fit": "No",
    "why": "senior title",
@@ -146323,7 +146323,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 27
+   "secs": 13
   },
   {
    "org": "Castelion",
@@ -146336,7 +146336,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 11,
+   "secs": 10,
    "bulkImport": "2026-09-07"
   },
   {
@@ -146350,7 +146350,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 2
   },
   {
    "org": "Ursa Major",
@@ -146363,7 +146363,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Epirus",
@@ -146376,7 +146376,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 3
   },
   {
    "org": "Mach Industries",
@@ -146389,7 +146389,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 11
+   "secs": 9
   },
   {
    "org": "Divergent",
@@ -146402,7 +146402,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 7
   },
   {
    "org": "Zone 5",
@@ -146415,7 +146415,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "JetZero",
@@ -146428,7 +146428,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "Electra",
@@ -146441,7 +146441,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 1
   },
   {
    "org": "SpaceX",
@@ -146454,7 +146454,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 27
+   "secs": 18
   },
   {
    "org": "Rocket Lab",
@@ -146467,7 +146467,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 14
   },
   {
    "org": "Relativity Space",
@@ -146480,7 +146480,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 12
+   "secs": 9
   },
   {
    "org": "Stoke Space",
@@ -146506,7 +146506,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 10
+   "secs": 4
   },
   {
    "org": "Vast",
@@ -146519,7 +146519,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 1
   },
   {
    "org": "Astranis",
@@ -146532,7 +146532,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 10
   },
   {
    "org": "True Anomaly",
@@ -146545,7 +146545,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 11
   },
   {
    "org": "Inversion Space",
@@ -146558,7 +146558,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 6
   },
   {
    "org": "Muon Space",
@@ -146571,20 +146571,20 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 1
   },
   {
    "org": "Momentus",
    "type": "greenhouse",
    "ok": true,
-   "total": 9,
+   "total": 8,
    "matches": 2,
    "fetched": 2,
    "cached": 0,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Planet",
@@ -146597,7 +146597,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 8
   },
   {
    "org": "Portal Space",
@@ -146623,7 +146623,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Hawkeye 360",
@@ -146636,7 +146636,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 2
   },
   {
    "org": "Albedo",
@@ -146649,7 +146649,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "Voyager / Astrobotic-adjacent",
@@ -146662,7 +146662,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 2
   },
   {
    "org": "Kairos Power",
@@ -146675,7 +146675,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 8
   },
   {
    "org": "Oklo",
@@ -146688,7 +146688,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 1
   },
   {
    "org": "TerraPower",
@@ -146701,7 +146701,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 6
   },
   {
    "org": "Valar Atomics",
@@ -146714,7 +146714,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 9
   },
   {
    "org": "Deep Fission",
@@ -146727,7 +146727,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "General Matter",
@@ -146740,7 +146740,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "Pacific Fusion",
@@ -146753,7 +146753,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 3
   },
   {
    "org": "Standard Nuclear",
@@ -146779,7 +146779,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Hermeus",
@@ -146818,7 +146818,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Merlin Labs",
@@ -146831,7 +146831,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "CX2",
@@ -146844,7 +146844,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Last Energy",
@@ -146870,7 +146870,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 7
   },
   {
    "org": "Xcimer",
@@ -146883,7 +146883,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Exowatt",
@@ -146896,7 +146896,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Thea Energy",
@@ -146909,7 +146909,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Radiant",
@@ -146961,7 +146961,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 6
   },
   {
    "org": "HavocAI",
@@ -146974,7 +146974,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Reliable Robotics",
@@ -146987,7 +146987,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Skydio",
@@ -147000,7 +147000,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "Picogrid",
@@ -147013,7 +147013,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Integrate",
@@ -147026,7 +147026,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Hadrian",
@@ -147078,7 +147078,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 5
   },
   {
    "org": "Blue Origin",
@@ -147104,7 +147104,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 12
+   "secs": 15
   },
   {
    "org": "X-energy",
@@ -147117,7 +147117,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 19
   },
   {
    "org": "Leidos",
@@ -147130,7 +147130,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 42
+   "secs": 43
   },
   {
    "org": "Aerospace Corp",
@@ -147143,7 +147143,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 24,
+   "secs": 23,
    "refreshes": true
   },
   {
@@ -147183,7 +147183,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 32
+   "secs": 22
   },
   {
    "org": "GE Aerospace",
@@ -147196,7 +147196,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 17
   },
   {
    "org": "Firefly Aerospace",
@@ -147209,7 +147209,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15,
+   "secs": 17,
    "bulkImport": "2026-10-20"
   },
   {
@@ -147223,7 +147223,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 14
+   "secs": 17
   },
   {
    "org": "AeroVironment",
@@ -147236,7 +147236,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 20
+   "secs": 18
   },
   {
    "org": "Curtiss-Wright",
@@ -147249,7 +147249,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 26
+   "secs": 23
   },
   {
    "org": "Axiom Space",
@@ -147262,7 +147262,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 21
+   "secs": 17
   },
   {
    "org": "GE Vernova (incl. GE-Hitachi)",
@@ -147275,7 +147275,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 23
+   "secs": 19
   },
   {
    "org": "Draper",
@@ -147301,7 +147301,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 13
   },
   {
    "org": "L3Harris (incl. Aerojet Rocketdyne)",
@@ -147314,7 +147314,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "HII (Newport News, Ingalls)",
@@ -147366,7 +147366,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Parsons",
@@ -147379,7 +147379,7 @@
    "error": null,
    "detailErrors": 11,
    "detailErr": "HTTP Error 404: Not Found",
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "LANL",
@@ -147392,7 +147392,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Sandia",
@@ -147431,7 +147431,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Electric Boat",
@@ -147444,7 +147444,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Calspan",
@@ -147457,7 +147457,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0,
+   "secs": 1,
    "placeholderDate": "2024-11-16"
   },
   {
@@ -147485,7 +147485,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Oceaneering",
@@ -147498,7 +147498,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "Zap Energy",
@@ -147511,7 +147511,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Aalo Atomics",
@@ -147524,7 +147524,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "Blue Water Autonomy",
@@ -147537,7 +147537,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "JHU APL",
@@ -147563,20 +147563,20 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 83
+   "secs": 88
   },
   {
    "org": "Northrop Grumman",
    "type": "eightfold",
    "ok": true,
-   "total": 471,
+   "total": 472,
    "matches": 83,
    "fetched": 0,
    "cached": 84,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 85
+   "secs": 75
   },
   {
    "org": "BAE Systems",
@@ -147602,7 +147602,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 8
   },
   {
    "org": "Impulse Space",
@@ -147641,7 +147641,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Lunar Outpost",
@@ -147667,7 +147667,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "MIT Lincoln Lab",
@@ -147680,7 +147680,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 8
+   "secs": 9
   },
   {
    "org": "Bath Iron Works",
@@ -147719,7 +147719,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 12
   },
   {
    "org": "Honeywell Aerospace",
@@ -147732,7 +147732,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 6
   },
   {
    "org": "Centrus",
@@ -147745,7 +147745,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "K2 Space",
@@ -147758,7 +147758,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "Beta Technologies",
@@ -147811,7 +147811,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 35
   }
  ]
 }
