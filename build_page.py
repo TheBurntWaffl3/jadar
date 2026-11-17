@@ -56,6 +56,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px; }
 .hero h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1; letter-spacing: -0.035em; font-weight: 600; margin: 0 0 18px; }
 .hero .meta { opacity: .92; }
 .hero .meta .sep { opacity: .55; margin: 0 .35em; }
+.topnav { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 22px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-size: 13px; letter-spacing: .01em; }
+.topnav .sep { display: none; }
+.topnav a { color: var(--on-hero); text-decoration: none; opacity: .72; padding: 7px 16px; border-radius: 999px; font-weight: 600; transition: background .12s, opacity .12s; }
+.topnav a:hover { opacity: 1; background: rgba(255,255,255,.10); }
+.topnav a[aria-current] { opacity: 1; background: var(--ember); color: #fff; }
+.topnav a:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
 .hero .who { margin-top: 6px; font-size: 14px; opacity: .85; }
 
 /* stat strip */
@@ -234,7 +240,7 @@ footer a { color: var(--ink); }
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html">Tracker</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a></nav>
   <h1>Job radar.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -837,8 +843,12 @@ __SHARED_JS__
 
 CSS_SHARED_EXTRA = r"""
 /* shared bits (nav, pills, data panel, footer) */
-.topnav { display: flex; align-items: center; gap: 0; margin: 0 0 16px; color: var(--hero-muted); font-size: 11.5px; }
-.topnav a { color: var(--on-hero); text-decoration: none; opacity: .6; } .topnav a[aria-current] { opacity: 1; font-weight: 700; } .topnav a:hover { opacity: 1; }
+.topnav { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 22px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-size: 13px; letter-spacing: .01em; }
+.topnav .sep { display: none; }
+.topnav a { color: var(--on-hero); text-decoration: none; opacity: .72; padding: 7px 16px; border-radius: 999px; font-weight: 600; transition: background .12s, opacity .12s; }
+.topnav a:hover { opacity: 1; background: rgba(255,255,255,.10); }
+.topnav a[aria-current] { opacity: 1; background: var(--ember); color: #fff; }
+.topnav a:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
 .tabsrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
 .ctl.small { min-height: 32px; padding: 6px 12px; font-size: 13px; }
 .sync-status { color: var(--muted); }
@@ -1018,7 +1028,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a></nav>
   <h1>Tracker.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
