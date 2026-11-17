@@ -318,6 +318,7 @@ class TestScopeWords(unittest.TestCase):
         self.assertEqual(scan.discipline("Manufacturing Engineer – Composite Motor Cases"), "Structures")
         self.assertEqual(scan.discipline("Manufacturing Engineer, Propellant"), "Propulsion")
         self.assertFalse(scan.in_scope("Manufacturing Engineer - General"))
+        self.assertFalse(scan.in_scope("Composites Engineering Tech - 1st Shift"))  # GE Aerospace 2026-11-17: a technician role
 
 class TestWordNumbers(unittest.TestCase):
     def test_fifteen_to_twenty_years(self):
