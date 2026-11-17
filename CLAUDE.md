@@ -85,6 +85,11 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   fields live in the same state (`app{...}` on applied role entries, `manual{}` rows, `tracker{connections, places}`),
   merged by `at`; marking Applied on the radar seeds `app.appliedOn/pay/posted`; a manual row whose link matches a live
   posting is adopted by the radar page (`adoptManual()`). The page embeds no roles data.
+  **Follow-up queue** (2026-11-17): `needsFollowUp()` = status applied, no first response, no `app.followedUp` within 14 days,
+  and (expected date passed or applied 14+ days ago); tile + "Needs follow-up" filter + per-row "Followed up today" button
+  (sets `app.followedUp`, appends to Contacted). `alert.tracker_summary()` applies the same rule to the state file
+  (`load_state()` now also returns `_doc`) and the digest gets a "Follow up" section. **Up next**: saved radar roles with
+  `snap.applyBy`, soonest first, at the top of the tracker.
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 

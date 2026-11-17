@@ -998,6 +998,10 @@ table.tr { border-collapse: collapse; width: 100%; min-width: 1120px; font-size:
 .tr th:first-child, .tr td.co { position: sticky; left: 0; z-index: 1; font-weight: 600; min-width: 130px; box-shadow: 1px 0 0 var(--line); }
 .tr td.pos a { font-weight: 600; text-decoration: none; } .tr td.pos a:hover { text-decoration: underline; }
 .tr td.pos { min-width: 180px; }
+.stats.five { grid-template-columns: repeat(5, 1fr); }
+tr.fu td:first-child { box-shadow: inset 3px 0 0 #f0b400; }
+.pbtn.tiny { font-size: 11.5px; padding: 3px 9px; min-height: 0; margin-top: 4px; }
+#upnext { margin: 0 0 26px; } #upnext .sm-table td.n { white-space: nowrap; } .due-soon { color: var(--crit); font-weight: 600; }
 tr.st-rejected td, tr.st-closed td, tr.st-withdrawn td { background: color-mix(in srgb, var(--page) 90%, #d03b3b); }
 tr.st-screen td, tr.st-interview td { background: color-mix(in srgb, var(--page) 86%, #f0b400); }
 tr.st-offer td { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
@@ -1022,7 +1026,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 .controls.more { display: none; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 12px; } .controls.more.open { display: flex; }
 .controls.more input { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); min-width: 140px; }
 @media (max-width: 900px) { .sub2 { grid-template-columns: 1fr; } }
-@media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats, .stats.four { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } .count { margin-left: 0; width: 100%; } }
+@media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats, .stats.four, .stats.five { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } .count { margin-left: 0; width: 100%; } }
 </style>
 </head>
 <body>
@@ -1034,13 +1038,21 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
   <div class="who" id="who"></div>
 </section>
 
-<section class="stats four" id="stats" aria-label="Summary"></section>
+<section class="stats five" id="stats" aria-label="Summary"></section>
+
+<section id="upnext" hidden>
+<h2>Up next.</h2>
+<p class="lede">Roles you saved on the radar that have a deadline, soonest first.</p>
+<table class="sm-table" id="next"><thead><tr><th>Company</th><th>Role</th><th>Apply by</th><th>Fit</th></tr></thead><tbody id="next-rows"></tbody></table>
+<p class="dp-note" id="next-note"></p>
+</section>
 
 <h2>Applications.</h2>
 <p class="lede">Every role you marked applied on the radar, plus anything you add here. Click a cell to edit; it saves on Enter or when you click away.</p>
 <div class="tabsrow">
   <button type="button" class="ctl small" id="add-toggle" aria-expanded="false" aria-controls="addform">Add row</button>
   <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
+  <button type="button" class="ctl small" id="fu-toggle" aria-pressed="false" title="Applied 14+ days ago (or past the expected date) with no reply and no follow-up in the last 14 days">Needs follow-up</button>
   <span class="sync-status mono" id="sync-status"></span>
   <span class="count mono" id="count"></span>
 </div>
@@ -1129,6 +1141,18 @@ __SHARED_JS__
   const LABEL = {applied: 'Applied', screen: 'Phone screen', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', closed: 'Closed', withdrawn: 'Withdrawn'};
   const RANK = {offer: 0, interview: 1, screen: 2, applied: 3, withdrawn: 4, closed: 5, rejected: 6};
   const APP_FIELDS = ['benefits', 'appliedOn', 'posted', 'pay', 'expected', 'firstResponse', 'dates', 'contacted', 'notes'];
+  const FU_DAYS = 14;  // no reply after this many days -> nudge; a follow-up resets the clock
+  function needsFollowUp(r) {
+    if ((r.app.status || 'applied') !== 'applied' || r.get('firstResponse')) return false;
+    const last = r.app.followedUp; if (isIso(last) && -daysTo(last) < FU_DAYS) return false;
+    const exp = r.get('expected'), ap = r.get('appliedOn');
+    return (isIso(exp) && daysTo(exp) < 0) || (isIso(ap) && -daysTo(ap) >= FU_DAYS);
+  }
+  function markFollowedUp(row) {
+    const t = target(row); if (!t) return; t.app = t.app || {}; t.app.followedUp = D.today;
+    const note = 'Followed up ' + fmt(D.today); t.app.contacted = t.app.contacted ? t.app.contacted + '; ' + note : note;
+    t.app.updatedAt = J.nowIso(); stamp(t); persist(); render();
+  }
   const DATE_FIELDS = new Set(['appliedOn', 'posted', 'expected', 'firstResponse']);
   const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status')});
   function persist() { J.saveState(S); sync.schedulePush(); }
@@ -1169,14 +1193,15 @@ __SHARED_JS__
     const rows = rowsAll(); const st = r => r.app.status || 'applied';
     const n = rows.length, waiting = rows.filter(r => st(r) === 'applied' && !r.get('firstResponse')).length;
     const inter = rows.filter(r => ['screen', 'interview'].includes(st(r))).length, rej = rows.filter(r => ['rejected', 'closed', 'withdrawn'].includes(st(r))).length;
-    const offers = rows.filter(r => st(r) === 'offer').length;
-    $('#meta').innerHTML = [n + ' application' + (n === 1 ? '' : 's'), waiting + ' awaiting response', inter + ' interview' + (inter === 1 ? '' : 's'), rej + ' rejected'].map(esc).join('<span class="sep">·</span>');
-    const stats = [['Applications', n, 'tracked', ''], ['Awaiting', waiting, 'no response yet', waiting ? 'ember' : ''], ['Interviews', inter + offers, offers ? offers + ' offer' + (offers === 1 ? '' : 's') : 'screens + interviews', inter + offers ? 'good' : ''], ['Closed out', rej, 'rejected / closed', '']];
+    const offers = rows.filter(r => st(r) === 'offer').length, fu = rows.filter(needsFollowUp).length;
+    $('#meta').innerHTML = [n + ' application' + (n === 1 ? '' : 's'), waiting + ' awaiting response', fu + ' to follow up', inter + ' interview' + (inter === 1 ? '' : 's'), rej + ' rejected'].map(esc).join('<span class="sep">·</span>');
+    $('#fu-toggle').textContent = 'Needs follow-up' + (fu ? ' · ' + fu : '');
+    const stats = [['Applications', n, 'tracked', ''], ['Awaiting', waiting, 'no response yet', waiting ? 'ember' : ''], ['Follow up', fu, fu ? FU_DAYS + '+ days, no reply' : 'nothing overdue', fu ? 'ember' : ''], ['Interviews', inter + offers, offers ? offers + ' offer' + (offers === 1 ? '' : 's') : 'screens + interviews', inter + offers ? 'good' : ''], ['Closed out', rej, 'rejected / closed', '']];
     $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
   }
 
   // ---- main table ----
-  const state = {sort: 'applied', dir: 'desc', editing: null};
+  const state = {sort: 'applied', dir: 'desc', editing: null, fuOnly: false};
   const cmpStr = (a, b) => String(a || '').localeCompare(String(b || ''));
   const SORTS = {
     applied: (a, b) => cmpStr(a.get('appliedOn'), b.get('appliedOn')),
@@ -1195,14 +1220,16 @@ __SHARED_JS__
     let shown = kind === 'date' ? esc(fmt(v)) : esc(v); let extra = '';
     if (f === 'appliedOn' && isIso(v)) { const d = -daysTo(v); extra = `<span class="hint">${d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago'}</span>`; }
     if (f === 'expected' && isIso(v) && daysTo(v) < 0 && !row.get('firstResponse')) shown = `<span class="late" title="Expected response date passed with no reply">${shown}</span>`;
+    if (f === 'contacted' && needsFollowUp(row)) { const ap = row.get('appliedOn'); extra = `<button type="button" class="pbtn tiny" data-fu="1" title="Logs today's date here and resets the ${FU_DAYS}-day nudge">Followed up today</button>` + (isIso(ap) ? `<span class="hint">${-daysTo(ap)} days, no reply</span>` : ''); }
     return `<td class="ed" data-f="${f}" data-kind="${kind}" tabindex="0">${shown || '<span class="src">—</span>'}${extra}</td>`;
   }
   function render() {
     renderStats();
-    let rows = rowsAll(); const sign = state.dir === 'desc' ? -1 : 1; rows.sort((a, b) => sign * SORTS[state.sort](a, b));
+    let rows = rowsAll(); if (state.fuOnly) rows = rows.filter(needsFollowUp);
+    const sign = state.dir === 'desc' ? -1 : 1; rows.sort((a, b) => sign * SORTS[state.sort](a, b));
     document.querySelectorAll('#apps th.sortable').forEach(th => th.dataset.sort === state.sort ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = rows.length + ' row' + (rows.length === 1 ? '' : 's');
-    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="13" class="empty">Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.</td></tr>`; renderSide(); return; }
+    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="13" class="empty">${state.fuOnly ? 'Nothing needs a follow-up right now.' : 'Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.'}</td></tr>`; renderSide(); renderNext(); return; }
     $('#rows').innerHTML = rows.map(r => {
       const st = r.app.status || 'applied';
       const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position);
@@ -1210,11 +1237,23 @@ __SHARED_JS__
       const coCell = manual ? cell(Object.assign({}, r, {get: f => r.company}), 'company', 'text').replace('class="ed"', 'class="ed co"').replace('class="ed editing"', 'class="ed editing co"') : `<td class="co">${esc(r.company)}</td>`;
       const posCell = manual ? cell(Object.assign({}, r, {get: f => r.position}), 'position', 'text').replace('class="ed"', 'class="ed pos"').replace('class="ed editing"', 'class="ed editing pos"') : `<td class="pos">${link}<span class="src">from the radar</span></td>`;
       const sel = `<select class="sel" data-f="status" aria-label="Status">${STATUSES.map(x => `<option value="${x}"${x === st ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
-      return `<tr class="st-${esc(st)}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
+      return `<tr class="st-${esc(st)}${needsFollowUp(r) ? ' fu' : ''}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
     }).join('');
     if (state.editing) { const el = $('#rows td.editing input, #rows td.editing textarea'); if (el) { el.focus({preventScroll: true}); if (el.select && el.type !== 'date') el.select(); } }
-    renderSide();
+    renderSide(); renderNext();
   }
+  // ---- up next: saved radar roles with a deadline (from their snapshots; nothing embedded in the page) ----
+  function renderNext() {
+    const saved = Object.entries(S.roles).filter(([u, e]) => e.status === 'saved').map(([u, e]) => Object.assign({url: u}, e.snap || {}));
+    const dated = saved.filter(r => isIso(r.applyBy) && daysTo(r.applyBy) >= 0).sort((a, b) => cmpStr(a.applyBy, b.applyBy));
+    const sec = $('#upnext'); sec.hidden = !saved.length; if (!saved.length) return;
+    $('#next-rows').innerHTML = dated.length ? dated.map(r => { const d = daysTo(r.applyBy); const when = d === 0 ? 'today' : d === 1 ? 'tomorrow' : 'in ' + d + ' days';
+      return `<tr><td class="co">${esc(r.company || '')}</td><td><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title || r.url)}</a>${r.location ? `<span class="src"> · ${esc(r.location)}</span>` : ''}</td><td class="n"><span class="${d <= 7 ? 'due-soon' : ''}">${esc(fmt(r.applyBy))}</span><span class="hint">${when}</span></td><td>${esc(r.fit || '')}</td></tr>`; }).join('')
+      : `<tr><td colspan="4" class="empty">None of your saved roles lists a deadline.</td></tr>`;
+    const rest = saved.length - dated.length;
+    $('#next-note').innerHTML = (rest ? `${rest} more saved role${rest === 1 ? '' : 's'} without a deadline` : `${saved.length} saved role${saved.length === 1 ? '' : 's'}`) + ' · <a href="index.html">Saved on the radar</a>';
+  }
+  $('#fu-toggle').addEventListener('click', e => { state.fuOnly = !state.fuOnly; e.currentTarget.setAttribute('aria-pressed', state.fuOnly); e.currentTarget.classList.toggle('on', state.fuOnly); render(); });
   function rowFromEl(el) { const tr = el.closest('tr[data-kind]'); if (!tr) return null; return rowsAll().find(r => r.kind === tr.dataset.kind && r.key === tr.dataset.key) || null; }
   function commit(el) {
     const td = el.closest('td.ed'); const row = rowFromEl(el); if (!td || !row) { state.editing = null; render(); return; }
@@ -1225,6 +1264,7 @@ __SHARED_JS__
   $('#rows').addEventListener('click', e => {
     if (e.target.closest('a') || e.target.closest('select') || e.target.closest('input') || e.target.closest('textarea')) return;
     const rm = e.target.closest('button[data-rm]'); if (rm) { const row = rowFromEl(rm); if (row) removeManual(row); return; }
+    const fu = e.target.closest('button[data-fu]'); if (fu) { const row = rowFromEl(fu); if (row) markFollowedUp(row); return; }
     const td = e.target.closest('td.ed'); if (!td) return; const row = rowFromEl(td); if (!row) return;
     state.editing = `${row.kind}:${row.key}:${td.dataset.f}`; render();
   });

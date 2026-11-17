@@ -74,3 +74,29 @@ class AlertTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TrackerSummaryTests(unittest.TestCase):
+    DOC = {"roles": {
+        "https://x/a": {"status": "applied", "snap": {"company": "SpaceX", "title": "Thermal Engineer"}, "app": {"appliedOn": "2026-10-20"}},
+        "https://x/b": {"status": "applied", "snap": {"company": "Blue Origin", "title": "Test Engineer"}, "app": {"appliedOn": "2026-11-10"}},
+        "https://x/c": {"status": "applied", "snap": {"company": "ULA", "title": "Loads Engineer"}, "app": {"appliedOn": "2026-10-01", "firstResponse": "2026-10-15"}},
+        "https://x/d": {"status": "applied", "snap": {"company": "Anduril", "title": "GNC Engineer"}, "app": {"appliedOn": "2026-10-01", "followedUp": "2026-11-05"}},
+        "https://x/e": {"status": "applied", "snap": {"company": "Varda", "title": "Mechanical Engineer"}, "app": {"appliedOn": "2026-11-08", "expected": "2026-11-11"}},
+        "https://x/f": {"status": "saved", "snap": {"company": "Boeing", "title": "Composites Engineer", "applyBy": "2026-11-30"}},
+    }, "manual": {"m1": {"company": "Hermeus", "position": "Build Engineer", "app": {"status": "rejected", "appliedOn": "2026-09-01"}},
+                  "m2": {"company": "Castelion", "position": "Flight Test Engineer", "app": {"status": "applied", "appliedOn": "2026-10-25"}}}}
+
+    def test_rule(self):
+        got = alert.tracker_summary(self.DOC, TODAY)
+        self.assertEqual([(c, t) for d, c, t in got], [("SpaceX", "Thermal Engineer"), ("Castelion", "Flight Test Engineer"), ("Varda", "Mechanical Engineer")])
+        self.assertEqual(got[0][0], 23)  # oldest first; Blue Origin is 2 days old, ULA replied, Anduril was followed up 7 days ago, m1 is rejected
+        self.assertEqual(alert.tracker_summary(None, TODAY), [])
+
+    def test_in_digest(self):
+        state = {"https://x/a": "applied", "_doc": self.DOC}
+        title, body, prio, parts = alert.compose(OUT, TODAY, state)
+        self.assertIn("Follow up (3, no reply yet): SpaceX Thermal Engineer (23d)", body)
+        h = alert.render_html(dict(parts, url="https://example.test/jadar/"))
+        self.assertIn("Follow up</h2>", h); self.assertIn("https://example.test/jadar/tracker.html", h)
+        self.assertNotIn("Follow up", alert.compose(OUT, TODAY, {"https://x/a": "applied"})[1])

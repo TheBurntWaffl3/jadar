@@ -62,7 +62,7 @@ def load_state():
         req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "User-Agent": "job-radar"})
         with urllib.request.urlopen(req, timeout=30) as r: j = json.load(r)
         doc = json.loads(base64.b64decode(j["content"]).decode("utf-8"))
-        out = {}
+        out = {"_doc": doc}  # the raw file, for tracker_summary()
         for u, e in (doc.get("roles") or {}).items():
             st = e.get("status") or ""; out[u] = st
             if st in ("hidden", "applied"):
@@ -71,6 +71,31 @@ def load_state():
         return out
     except Exception as e:
         print(f"state not read ({type(e).__name__}); alert ignores saved/applied/hidden"); return {}
+
+FOLLOWUP_DAYS = 14
+
+def tracker_summary(doc, today):
+    """Applications that need a nudge: status applied, no first response, not followed up in the last FOLLOWUP_DAYS, and either
+    past the expected-response date or applied FOLLOWUP_DAYS+ days ago. Same rule as the tracker page's 'Needs follow-up'.
+    -> [(days since applied or None, company, title)], oldest first."""
+    if not isinstance(doc, dict): return []
+    def iso(s):
+        try: return dt.date.fromisoformat(str(s)[:10])
+        except ValueError: return None
+    rows = []
+    for u, e in (doc.get("roles") or {}).items():
+        if e.get("status") == "applied": s = e.get("snap") or {}; rows.append((s.get("company") or "", s.get("title") or u, e.get("app") or {}, (e.get("at") or "")[:10]))
+    for m in (doc.get("manual") or {}).values():
+        rows.append((m.get("company") or "", m.get("position") or "", m.get("app") or {}, ""))
+    out = []
+    for company, title, app, at in rows:
+        if (app.get("status") or "applied") != "applied" or app.get("firstResponse"): continue
+        last = iso(app.get("followedUp"))
+        if last and (today - last).days < FOLLOWUP_DAYS: continue
+        exp, ap = iso(app.get("expected")), iso(app.get("appliedOn") or at)
+        days = (today - ap).days if ap else None
+        if (exp and exp < today) or (days is not None and days >= FOLLOWUP_DAYS): out.append((days, company, title))
+    return sorted(out, key=lambda x: -(x[0] or 0))
 
 def load_people():
     """{companyKey: n} Terps found per company from the private people.json written by finder.py; {} when unavailable."""
@@ -127,6 +152,8 @@ def compose(out, today=None, state=None, alerted=None, people=None):
         lines.append("Closing soon: " + "; ".join(f"{star(r)}{r['company']} {r['title']} ({d}d)" for d, r in soon[:6]))
     applied = sum(1 for st in state.values() if st == "applied")
     if applied: lines.append(f"Applied so far: {applied}")
+    followup = tracker_summary(state.get("_doc"), today)
+    if followup: lines.append(f"Follow up ({len(followup)}, no reply yet): " + "; ".join(f"{c} {t}" + (f" ({d}d)" if d is not None else "") for d, c, t in followup[:6]))
     url = page_url()
     if url: lines.append(url)
     yes = sum(r["fit"] == "Yes" for r in new)
@@ -134,7 +161,7 @@ def compose(out, today=None, state=None, alerted=None, people=None):
     if bad and not new: title += f" ({len(bad)} feed{'s' if len(bad) != 1 else ''} failing)"
     parts = dict(new=new, soon=soon, ok=len(ok), total=len(st), bad=[s["org"] for s in bad], applied=applied, url=url,
                  saved={u for u, s_ in state.items() if s_ == "saved"}, today=today, scanned=out.get("scanned", ""),
-                 fits=sum(1 for r in out.get("roles", []) if r["fit"] in rank and r["url"] not in skip), people=people)
+                 fits=sum(1 for r in out.get("roles", []) if r["fit"] in rank and r["url"] not in skip), people=people, followup=followup)
     return title, "\n".join(lines), ("high" if yes else "default"), parts
 
 def render_html(parts):
@@ -161,6 +188,11 @@ def render_html(parts):
     if p["soon"]:
         sections.append('<h2 style="font:600 14px/1 system-ui,sans-serif;margin:22px 0 4px">Closing within 7 days</h2><table style="border-collapse:collapse;width:100%">' +
                         "".join(row(r, f"closes in {d} day{'s' if d != 1 else ''}" if d else "closes today") for d, r in p["soon"][:8]) + "</table>")
+    if p.get("followup"):
+        items = "".join(f'<li style="margin:4px 0"><b>{e(c)}</b> {e(t)}' + (f' <span style="color:#737379">· {d} days, no reply</span>' if d is not None else '') + '</li>' for d, c, t in p["followup"][:8])
+        sections.append('<h2 style="font:600 14px/1 system-ui,sans-serif;margin:22px 0 4px">Follow up</h2>'
+                        f'<ul style="font:14px/1.4 system-ui,sans-serif;color:#3f3f44;margin:6px 0 0;padding-left:18px">{items}</ul>'
+                        + (f'<p style="font:13px system-ui,sans-serif;color:#737379;margin:6px 0 0"><a href="{e(p["url"].rsplit("/", 1)[0])}/tracker.html" style="color:#2f5bea">Open the tracker</a></p>' if p.get("url") else ''))
     feeds = f'{p["ok"]}/{p["total"]} boards read' + (f' · failing: {e(", ".join(p["bad"]))}' if p["bad"] else "")
     head = (f'<div style="background:#0b0b0c;color:#fff;border-radius:16px;padding:20px 22px">'
             f'<div style="font:600 28px/1 \'Inter Tight\',system-ui,sans-serif;letter-spacing:-.02em">Job radar.</div>'

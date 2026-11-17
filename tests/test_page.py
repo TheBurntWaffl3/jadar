@@ -142,6 +142,10 @@ class TrackerTests(unittest.TestCase):
     def setUp(self):
         self.html = build_page.build_tracker("Kevin Kyle", today="2026-11-12")
 
+    def test_follow_up_and_up_next(self):
+        for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today", 'id="upnext"', "Up next.", "stats five"):
+            self.assertIn(needle, self.html, needle)
+
     def test_main_writes_both_pages(self):
         with tempfile.TemporaryDirectory() as d:
             data = os.path.join(d, "data"); site = os.path.join(d, "site"); os.makedirs(data)
