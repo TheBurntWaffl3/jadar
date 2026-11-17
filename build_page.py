@@ -605,7 +605,7 @@ __SHARED_JS__
   const linkedinOk = u => typeof u === 'string' && /^https?:\/\/([a-z0-9-]+\.)*linkedin\.com\//i.test(u);
   const TKEY = 'jadar.terps.v1', NKEY = 'jadar.notetpl.v1';
   const terpsMode = () => lsGet(TKEY) === 'all' ? 'all' : 'likely';
-  const FIELD_OF = {Thermal: 'thermal', Propulsion: 'propulsion', Structures: 'structures', Test: 'test', Nuclear: 'nuclear', Naval: 'naval', Aero: 'aero', Mechanical: 'mechanical'};
+  const FIELD_OF = {Thermal: 'thermal', Propulsion: 'propulsion', Structures: 'structures', Test: 'test', Nuclear: 'nuclear', Naval: 'naval', Aero: 'aero', Mechanical: 'mechanical', GNC: 'gnc'};
   function rankPeople(list, r) {  // who is most likely to answer a student: recruiters, same field, recent grads
     const field = FIELD_OF[r.discipline] || null;
     const scored = list.map((p, i) => {

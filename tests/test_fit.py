@@ -330,6 +330,14 @@ class TestScopeWords(unittest.TestCase):
         for t in ("Mechanical Engineer - Battery Pack, Satellites (Starlink)", "Nuclear Safety Analyst", "Flight Safety Analyst", "Structural Analyst"):
             self.assertTrue(scan.in_scope(t, True), t)
 
+class TestGNC(unittest.TestCase):
+    def test_gnc_is_a_field(self):
+        # Kevin 2026-11-17: entry-level GNC roles are wanted too
+        for t in ("GNC Engineer", "2027 GNC Spacecraft/Payload Control Systems Analyst", "Guidance and Control Engineer", "2027 Trajectory Optimization Engineer"):
+            self.assertTrue(scan.in_scope(t), t); self.assertEqual(scan.discipline(t), "GNC", t)
+        self.assertFalse(scan.in_scope("Systems Analyst", True))
+        self.assertIn("GNC", scan.PROFILE["fields"])
+
 class TestWordNumbers(unittest.TestCase):
     def test_fifteen_to_twenty_years(self):
         # X-energy "Mechanical Design Engineer (Steam Generator)" R100796-1, 2026-11-16: word numbers above ten and a

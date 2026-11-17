@@ -28,7 +28,7 @@ def company_key(c):
 # Field-narrowed searches for companies with many fits: discipline (as the page labels it) -> search word; `via` stores the
 # lowercased discipline so the page can match a person to the role's field.
 FIELD_WORD = {"Thermal": "thermal", "Propulsion": "propulsion", "Structures": "structural", "Test": "test", "Nuclear": "nuclear",
-              "Naval": "naval", "Aero": "aerodynamics", "Mechanical": "mechanical"}
+              "Naval": "naval", "Aero": "aerodynamics", "Mechanical": "mechanical", "GNC": "GNC"}
 BIG = 8  # fits at or above this -> also search the company's top disciplines
 
 def query_for(key, term=None, site_in_query=False):
