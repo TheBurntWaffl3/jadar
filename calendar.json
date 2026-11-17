@@ -1,0 +1,147 @@
+{
+  "_about": "Curated notes for the hiring calendar page (build_calendar.py). Observed postings come from the scan (radar_out.json + history.json on the data branch); these are the hand-checked prior-cycle examples and the pattern each organization follows. `org` must match sources.json. Dates are ISO; `cycle` is the graduating class the posting was for. Every example carries the public page it was read from.",
+  "patterns": [
+    {"id": "pool", "name": "Class-year pool",
+     "summary": "One requisition per discipline, labeled with the graduating class (\"2027 Associate\", \"New Graduate Engineer\", \"Early Career (2027 Starts)\"). Posted from early summer through the fall of senior year, interviews in the fall, most offers out by January to March. Hired people are routed to teams after the offer. This is the main new-grad channel at primes, FFRDCs and the large new-space companies.",
+     "advice": "Apply the week the req appears. Lockheed tells campuses that 75% of its early-career roles are filled by January and 90% by April."},
+    {"id": "now", "name": "Hire-now Level 1",
+     "summary": "\"Engineer I\", \"Associate\" or \"Entry Level\" reqs opened when a seat is empty, with a start expected within about two months of the offer. Posted all year. For a May graduate the ones that line up with a June start appear from February onward; a fall posting is usually meant for someone who can start that winter.",
+     "advice": "Keep the application profile current and treat February to May as the real season. A fall application is a long shot unless the posting names next year's grads."},
+    {"id": "cohort", "name": "Start-season cohorts",
+     "summary": "Requisitions named for a start season (\"Winter 2027\", \"Spring 2027\") or filled on a quarterly schedule. Each cohort's req opens roughly four to six months before its start date and closes when the cohort is full.",
+     "advice": "For a June 2027 start, the Spring or Summer 2027 cohort reqs appear around December to February."},
+    {"id": "gov", "name": "Government labs, year-round",
+     "summary": "Entry-level reqs posted continuously, often several per year for the same title, with long lead times for clearance and onboarding paperwork.",
+     "advice": "Apply as early as a req appears; a four-month lead between offer and start is normal."}
+  ],
+  "orgs": [
+    {"org": "Boeing", "pattern": "now",
+     "window": "Level 1 \"Entry Level\" reqs appear in late winter to spring for that May's class; open windows have been as short as four days. \"Associate\" (Level 2) reqs carry a 1+ years line and are backfills for an empty seat.",
+     "notes": "Boeing writes the level into the title and never names a graduation date: \"Entry Level\" means degree only, \"Associate\" means 1+ years, \"Experienced\" means 3 to 5+.",
+     "examples": [
+       {"title": "Structures Test & Evaluation Instrumentation Engineer (Entry-Level or Associate)", "location": "Berkeley, MO", "posted": "2025-05-09", "closed": "2025-06-18", "cycle": 2025,
+        "source": "https://www.ziprecruiter.com/c/The-Boeing-Company/Job/Structures-Test-&-Evaluation-Instrumentation-Engineer-(Entry-Level-or-Associate)/-in-Berkeley,MO?jid=c123b41f8aa505a2"},
+       {"title": "Test & Evaluation Instrumentation Engineer (Entry & Associate Level)", "location": "Berkeley, MO", "posted": "2026-02-27", "closed": "2026-03-02", "cycle": 2026,
+        "source": "https://jobs.boeing.com/job/berkeley/posting-title-test-and-evaluation-instrumentation-engineer-entry-and-associate-level/185/92218266592"},
+       {"title": "Test & Evaluation Engineer (Entry-Level, Associate, and Experienced)", "location": "Berkeley, MO", "cycle": 2026,
+        "source": "https://jobs.boeing.com/job/berkeley/test-and-evaluation-engineer-entry-level-associate-and-experienced/185/85468320608"},
+       {"title": "Test & Evaluation Instrumentation Engineer (Associate and Experienced)", "location": "Ridley Park, PA", "posted": "2026-11-11", "closed": "2026-11-26", "cycle": null, "note": "No Entry Level option: a backfill, not a class-of-2027 req.",
+        "source": "https://jobs.boeing.com/job/ridley-park/test-and-evaluation-instrumentation-engineer-associate-and-experienced/185/103176570656"}
+     ]},
+    {"org": "Lockheed Martin", "pattern": "pool",
+     "window": "Early-career hiring runs September 1 through May. Lockheed tells campuses that 75% of roles are filled by January and 90% by April, and that each posting stays open about 90 days with the best odds in the first 5 to 30 days.",
+     "notes": "Titles read \"... Engineer Asc - Early Career\" or \"... - Early Career\"; the level code (Asc = Associate) is Lockheed's Level 1.",
+     "examples": [
+       {"title": "Early-career hiring window (campus notice)", "location": "All sites", "posted": "2026-09-01", "cycle": 2027, "note": "Sept 1 to May; 75% filled by January, 90% by April.",
+        "source": "https://cs.purdue.edu/corporate/employment/lm_event.html"},
+       {"title": "Mechanical Engineer - Early Career", "location": "Englewood, CO", "cycle": 2026,
+        "source": "https://www.lockheedmartinjobs.com/job/englewood/mechanical-engineer-early-career/694/89367277296"}
+     ]},
+    {"org": "Northrop Grumman", "pattern": "pool",
+     "window": "Pooled reqs labeled with the class year (\"2027 Associate Mechanical Engineer - Baltimore MD\") open from late summer through November and close when filled; several 2026-labeled reqs were already closed by mid-November 2026.",
+     "notes": "Unlabeled \"Associate\" reqs (0 to 2 years) are also entry level at Northrop, unlike Boeing's use of the word.",
+     "examples": [
+       {"title": "2026 Associate Structural Engineer / Structural Engineer", "location": "Clearfield, UT", "posted": "2026-09-01", "cycle": 2026, "note": "Posted September 2026; pay $65,800 to $98,800 at the Associate level.",
+        "source": "https://jobs.hireheroesusa.org/jobs/595968475-2026-associate-structural-engineer-structural-engineer-r10249838-at-northrop-grumman"},
+       {"title": "2026 Associate Structural Engineer - Dulles VA", "location": "Dulles, VA", "cycle": 2026, "note": "Closed by November 2026.",
+        "source": "https://jobs.northropgrumman.com/careers/job/1340072827097-2026-associate-structural-engineer-dulles-va-united-states-virginia-dulles?domain=ngc.com"},
+       {"title": "2026 Associate Mechanical Engineer - Philadelphia PA", "location": "Philadelphia, PA", "cycle": 2026, "note": "Closed by November 2026.",
+        "source": "https://jobs.northropgrumman.com/careers/job/1340070503432?domain=ngc.com"},
+       {"title": "Associate Mechanical Engineer", "location": "Annapolis, MD", "posted": "2026-11-05", "cycle": 2027,
+        "source": "https://zapply.jobs/jobs/1876d810-8204-42a8-9554-a2a36e7a96a2/"}
+     ]},
+    {"org": "SpaceX", "pattern": "pool",
+     "window": "\"New Graduate Engineer\" reqs for the next class are posted on a rolling basis from April through October of the year before graduation, and each names the eligible classes (\"graduating in 2026 or 2027\"). Everything else on the board is hire-now.",
+     "notes": "A standard SpaceX req with a \"1+ years (internships count)\" line still expects a start within weeks; students who apply to those get the generic rejection.",
+     "examples": [
+       {"title": "New Graduate Engineer, Propulsion (Raptor)", "location": "Hawthorne, CA", "posted": "2026-04-29", "cycle": 2027, "source": "https://zapply.jobs/jobs/b4889737-a09c-4f17-9453-3fc0366b51ed/"},
+       {"title": "New Graduate Engineer, Launch & Test (Starship)", "location": "Starbase, TX", "posted": "2026-06-09", "cycle": 2027, "source": "https://zapply.jobs/jobs/097dd770-e137-4c45-bc52-4d7dfda8e0e7/"},
+       {"title": "New Graduate Engineer, Mechanical (Cape Canaveral)", "location": "Cape Canaveral, FL", "posted": "2026-07-07", "cycle": 2026, "source": "https://zapply.jobs/jobs/29345b18-506d-441e-9536-6246bfcfa3bf/"},
+       {"title": "New Graduate Engineer, Mechanical - '26/'27 (Starlink)", "location": "Bastrop, TX", "posted": "2026-08-14", "cycle": 2027, "source": "https://zapply.jobs/jobs/df4419b1-b9e0-4d53-b8e0-d8c57a79e42b/"},
+       {"title": "New Graduate Engineer, Propulsion / Manufacturing / Electrical / Software (Starship)", "location": "Starbase, TX", "posted": "2026-08-19", "cycle": 2027, "source": "https://zapply.jobs/jobs/f369e7ce-97f1-4e59-8634-f2432b9495f5/"},
+       {"title": "New Graduate Engineer, Power Generation (Starship)", "location": "Starbase, TX", "posted": "2026-09-11", "cycle": 2027, "source": "https://zapply.jobs/jobs/16ced7be-891d-4158-810d-5fe8c6c513d0/"},
+       {"title": "New Graduate Engineer, Infrastructure", "location": "Starbase, TX", "posted": "2026-10-16", "cycle": 2027, "source": "https://zapply.jobs/jobs/f002cf2a-21f5-4255-8669-6d1d93acc388/"},
+       {"title": "Structural Test Engineer (Starship)", "location": "Starbase, TX", "posted": "2026-09-08", "cycle": null, "note": "Standard req: hire now. Not a new-grad posting despite \"internships count\".",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8782041002"}
+     ]},
+    {"org": "Blue Origin", "pattern": "pool",
+     "window": "\"Engineer I - Early Career (YEAR Starts)\" reqs. The next year's series opens in August and September; the current year's series stays open from spring into summer for people who can start right away.",
+     "notes": "The 2027 Starts reqs say \"able to start by Fall 2027\", so a June start is inside the window.",
+     "examples": [
+       {"title": "Manufacturing Engineer I - Early Career (2026 Starts)", "location": "Multiple", "posted": "2026-05-01", "cycle": 2026, "source": "https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Manufacturing-Engineer-I---Early-Career--2026-Starts-_R58494"},
+       {"title": "Fluid Systems & Propulsion Engineer I - Early Career (2026 Starts)", "location": "Multiple", "posted": "2026-06-15", "cycle": 2026, "source": "https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Fluid-Systems---Propulsion-Engineer-I---Early-Career--2026-Starts-_R58487"},
+       {"title": "Structural & Mechanical Engineer I - Early Career (2026 Starts)", "location": "Multiple", "posted": "2026-07-02", "cycle": 2026, "source": "https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Structural---Mechanical-Engineer-I---Early-Career--2026-Starts-_R65762"},
+       {"title": "Aerospace Systems Engineer I - Early Career (2026 Starts)", "location": "Multiple", "posted": "2026-08-10", "cycle": 2026, "source": "https://blueorigin.wd5.myworkdayjobs.com/BlueOrigin/job/Aerospace-Systems-Engineer-I---Early-Career--2026-Starts-_R70060"}
+     ]},
+    {"org": "JHU APL", "pattern": "pool",
+     "window": "\"YEAR Graduate - ...\" reqs, one per group, open from July of the year before graduation and keep being added through the spring; applications are rolling.",
+     "notes": "The 2026 series was still adding reqs in April 2026, so a late posting is not a sign the cycle is over.",
+     "examples": [
+       {"title": "2026 New Graduate - Autonomous Systems Mechanical Engineer", "location": "Laurel, MD", "posted": "2026-04-26", "cycle": 2026, "source": "https://jobs.anitab.org/companies/johns-hopkins-university-applied-physics-laboratory-2/jobs/76290203-2026-new-graduate-autonomous-systems-mechanical-engineer"},
+       {"title": "2026 Graduate - Mechanical Engineer - Space Science Instrumentation", "location": "Laurel, MD", "cycle": 2026, "source": "https://careers.jhuapl.edu/new-grads/jobs/59457?lang=en-us"},
+       {"title": "2026 Graduate - Hypersonics Engineer, Vehicle Design and Technologies", "location": "Laurel, MD", "cycle": 2026, "source": "https://www.phdjobs.com/jobdetail-427122-2026-graduate-hypersonics-engineer-vehicle-design-and-technologies"}
+     ]},
+    {"org": "Aerospace Corp", "pattern": "pool",
+     "window": "\"2027 ...\" reqs appear in October and November of the prior year, one req per role and level. The board re-dates its postings daily, so the radar shows them by first-seen date.",
+     "notes": "",
+     "examples": [
+       {"title": "2027 Entry Level DSP & SDR Engineer", "location": "Chantilly, VA", "posted": "2026-10-30", "cycle": 2027, "source": "https://github.com/spacejobsnow/New-Grad-Space-Jobs"},
+       {"title": "2026 Communications System and DSP Engineer", "location": "El Segundo, CA", "cycle": 2026, "note": "\"Degree pursuing or conferred within last 12 months.\"", "source": "https://www.glassdoor.com/Job/virginia-entry-level-aerospace-engineer-jobs-SRCH_IL.0,8_IS323_KO9,39.htm"}
+     ]},
+    {"org": "Anduril", "pattern": "cohort",
+     "window": "\"YEAR Early Career ...\" pooled reqs open around August of the prior year, with quarterly start dates through the named year. Everything titled \"Associate\" is Anduril's first professional level (1 to 4 years), not new grad.",
+     "notes": "",
+     "examples": [
+       {"title": "2026 Early Career Mechanical Engineer", "location": "Costa Mesa, CA", "posted": "2025-08-11", "cycle": 2026, "note": "\"Targeted to start on a quarterly basis beginning in 2026.\"", "source": "https://zapply.jobs/jobs/d757dd40-0915-419d-ac9b-85d6f503f31f/"},
+       {"title": "2026 Early Career Electrical Engineer", "location": "Costa Mesa, CA", "posted": "2025-08-11", "cycle": 2026, "source": "https://zapply.jobs/jobs/67a70632-d734-46db-8646-308359df3da7/"},
+       {"title": "2026 Early Career Manufacturing Engineer", "location": "Multiple", "posted": "2026-07-02", "cycle": 2026, "source": "https://zapply.jobs/jobs/67cb557b-4ede-473f-aedd-cb8d429cf450/"}
+     ]},
+    {"org": "Naval Nuclear Laboratory", "pattern": "gov",
+     "window": "\"Entry Level ...\" and \"Associate (Entry Level)\" reqs all year, often several a year for the same title.",
+     "notes": "DOE-contractor onboarding takes months, so a spring offer for a June start is normal.",
+     "examples": [
+       {"title": "Entry Level Nuclear Engineer - Fleet Reactor Engineering", "location": "Niskayuna, NY", "posted": "2026-01-12", "cycle": 2026, "source": "https://navalnuclearlab.energy.gov/job-search/job-detail/?job-id=7001"},
+       {"title": "Entry Level Mechanical Engineer", "location": "West Mifflin, PA", "posted": "2026-01-30", "cycle": 2026, "source": "https://navalnuclearlab.energy.gov/job-search/job-detail/?job-id=7212"},
+       {"title": "Entry Level Nuclear Engineer and Physicist", "location": "West Mifflin, PA / Niskayuna, NY", "posted": "2026-03-04", "cycle": 2026, "source": "https://navalnuclearlab.energy.gov/job-search/job-detail/?job-id=7458"},
+       {"title": "Nuclear Engineer, Entry Level", "location": "Niskayuna, NY", "posted": "2026-05-27", "cycle": 2026, "source": "https://navalnuclearlab.energy.gov/job-search/job-detail/?job-id=7912"},
+       {"title": "Entry Level Engineer", "location": "West Mifflin, PA", "posted": "2026-08-27", "cycle": 2027, "source": "https://navalnuclearlab.energy.gov/job-search/job-detail/?job-id=8602"},
+       {"title": "Entry Level Nuclear Engineer and Physicist", "location": "West Mifflin, PA / Niskayuna, NY", "posted": "2026-08-31", "cycle": 2027, "source": "https://navalnuclearlab.energy.gov/job-search/job-detail/?job-id=8449"}
+     ]},
+    {"org": "Rocket Lab", "pattern": "now",
+     "window": "\"Engineer I\" reqs are hire-now and appear every month. A few \"(Future Grad YEAR)\" reqs for the next class show up in the fall.",
+     "notes": "",
+     "examples": [
+       {"title": "Mechanical Engineer I (Future Grad 2027)", "location": "Long Beach, CA", "posted": "2026-09-24", "cycle": 2027, "note": "\"For future grads of Spring 2027.\"", "source": "https://zapply.jobs/jobs/88823688-0aa9-4b70-a049-a81285df87a0/"},
+       {"title": "Electrical Engineer I", "location": "Long Beach, CA", "posted": "2026-09-15", "cycle": null, "source": "https://zapply.jobs/jobs/bb58dc0a-0618-49ff-bd3e-3af31e15eb46/"},
+       {"title": "Manufacturing Engineer I - Propulsion", "location": "Long Beach, CA", "posted": "2026-11-09", "cycle": null, "source": "https://zapply.jobs/jobs/ff9e55da-daaf-4f9b-98d1-eda9c1774c8d/"}
+     ]},
+    {"org": "Electric Boat", "pattern": "now",
+     "window": "\"Engineer I/II\" reqs (0 to 4 years) open all year, often with several openings each. A pooled \"YEAR College Graduate - Engineering\" recruitment also runs in the spring of the graduation year.",
+     "notes": "",
+     "examples": [
+       {"title": "Mechanical Engineer I/II (Groton Shipyard, 6 openings)", "location": "Groton, CT", "posted": "2026-02-10", "cycle": 2026, "source": "https://www.jobtarget.com/jobs/jt-lu4wsheub8/mechanical-engineer-iii-groton-connecticut"},
+       {"title": "2026 College Graduate - Engineering (campus recruitment)", "location": "Groton, CT", "posted": "2026-03-21", "closed": "2026-06-01", "cycle": 2026, "source": "https://career.uconn.edu/jobs/general-dynamics-electric-boat-entry-level-engineering-opportunities/"},
+       {"title": "Mechanical Engineer I/II (Waterfront Mechanical Engineering)", "location": "Groton, CT", "posted": "2026-09-16", "cycle": null, "source": "https://jobs.buildsubmarines.com/jobs/599369164-mechanical-engineer-i-ii-at-general-dynamics-electric-boat"},
+       {"title": "Entry Level Mechanical Engineer (Dept. 492)", "location": "Groton, CT", "posted": "2026-10-08", "cycle": null, "source": "https://www.glassdoor.com/job-listing/jv?jl=1010289225697"}
+     ]},
+    {"org": "Astranis", "pattern": "cohort",
+     "window": "\"... Associate Engineer (Season YEAR)\" cohort reqs, each posted four to six months before its start season and closed once the cohort fills.",
+     "notes": "For a June 2027 start, watch for Spring 2027 and Summer 2027 cohorts from about December 2026.",
+     "examples": [
+       {"title": "Avionics Engineer Associate (Spring 2026)", "location": "San Francisco, CA", "posted": "2026-01-21", "closed": "2026-03-13", "cycle": 2026, "source": "https://jobs.venrock.com/companies/astranis-2/jobs/65600175-avionics-engineer-associate-spring-2026"},
+       {"title": "Radiation Effects Associate Engineer (Fall 2026)", "location": "San Francisco, CA", "posted": "2026-07-06", "cycle": 2026, "source": "https://zapply.jobs/jobs/b45c2a27-3af5-4782-b355-6c7e4ead51ed/"},
+       {"title": "Avionics Associate Engineer (Winter 2027)", "location": "San Francisco, CA", "posted": "2026-09-23", "cycle": 2027, "source": "https://zapply.jobs/jobs/83149cd2-c52e-41bc-b9b8-55771da52c2e/"}
+     ]},
+    {"org": "Mach Industries", "pattern": "pool",
+     "window": "\"May YEAR New Graduate Engineer\" reqs posted in September of the prior year, each naming the graduation term.",
+     "notes": "", "examples": []},
+    {"org": "Relativity Space", "pattern": "now",
+     "window": "\"Engineer I\" reqs every month, hire-now, with a start expected within 30 to 60 days of applying.",
+     "notes": "The radar shows these as Maybe with an \"apply after\" date computed from the start window.", "examples": []},
+    {"org": "ULA", "pattern": "now", "window": "\"... Engineer 1\" reqs posted as seats open, concentrated in the fall.", "notes": "", "examples": []},
+    {"org": "Sierra Space", "pattern": "now", "window": "\"... Engineer I\" reqs posted as seats open.", "notes": "", "examples": []},
+    {"org": "L3Harris (incl. Aerojet Rocketdyne)", "pattern": "now", "window": "\"Associate, ...\" reqs (L3Harris's entry level) posted as seats open, with a fall surge.", "notes": "", "examples": []},
+    {"org": "Westinghouse", "pattern": "now", "window": "\"... Engineer I / 1\" reqs posted as seats open, plus an Early Career Leadership Development Program req.", "notes": "", "examples": []},
+    {"org": "HII (Newport News, Ingalls)", "pattern": "now", "window": "\"ENGINEER ... 1\" reqs all year; some are labeled for a graduation term (\"FALL NEW GRAD\").", "notes": "", "examples": []}
+  ]
+}

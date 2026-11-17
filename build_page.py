@@ -57,6 +57,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px; }
 .hero .meta { opacity: .92; }
 .hero .meta .sep { opacity: .55; margin: 0 .35em; }
 .hero .who { margin-top: 6px; font-size: 14px; opacity: .85; }
+.hero .nav { margin-top: 18px; font-size: 14px; } .hero .nav a { color: var(--on-hero); opacity: .85; text-decoration: none; border-bottom: 1px solid var(--hero-muted); padding-bottom: 1px; } .hero .nav a:hover { opacity: 1; }
 
 /* stat strip */
 .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; margin: 22px 0 8px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -168,6 +169,7 @@ footer a { color: var(--ink); }
   <h1>Job radar.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
+  <nav class="nav"><a href="calendar.html">When entry-level roles open →</a></nav>
 </section>
 
 <section class="stats" id="stats" aria-label="Summary"></section>

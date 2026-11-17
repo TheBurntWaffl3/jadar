@@ -62,7 +62,7 @@ jobs:
           ARGS=(); for o in "${ONLY[@]}"; do o="$(echo "$o" | xargs)"; [ -n "$o" ] && ARGS+=("$o"); done
           timeout 2100 python3 -I scan.py "${ARGS[@]}"
 
-      - name: Build dashboard page
+      - name: Build dashboard and calendar pages
         if: steps.scan.outcome == 'success'
         env:
           RADAR_DATA: data
@@ -70,7 +70,8 @@ jobs:
         run: |
           python3 -I build_dash.py
           python3 -I build_page.py
-          cp site/index.html data/index.html
+          python3 -I build_calendar.py
+          cp site/index.html site/calendar.html data/
 
       - name: Send alert
         if: steps.scan.outcome == 'success' && inputs.only == ''
@@ -104,6 +105,7 @@ jobs:
           path: |
             data/radar_out.json
             site/index.html
+            site/calendar.html
           retention-days: 14
 
       - name: Upload page for GitHub Pages

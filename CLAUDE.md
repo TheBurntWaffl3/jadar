@@ -21,9 +21,19 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   4. Page: done and live. `build_page.py` -> `site/index.html`, deployed by the `publish` job (Pages source = GitHub
      Actions; the `github-pages` environment only accepts deployments from `main`). Also on the `data` branch and attached
      to each run.
-  5. Alerts: built for both channels (`alert.py`); **Kevin picks** by adding either `NTFY_TOPIC` or the `SMTP_*`/`ALERT_TO`
+  5. Hiring calendar (added 2026-11-17): `build_calendar.py` + `calendar.json` -> `site/calendar.html`, linked from the
+     dashboard hero ("When entry-level roles open"). Charts entry-level postings (Yes, or Maybe with an entry/class-year
+     title) by posting month per organization and hiring cycle (June–May, named for the class hired), with four
+     posting patterns (class-year pool, hire-now Level 1, start-season cohorts, government labs) and per-organization
+     cards: what the radar saw this cycle plus hand-checked prior-cycle examples with source links. Data: `history.json`
+     on the `data` branch (`scan.py` `update_history()`: every Yes/Maybe posting ever listed, firstSeen/lastSeen, never
+     pruned; starts accumulating 2026-11-17, so each year adds a comparable cycle) + `radar_out.json`. Only
+     `dateKind == "posted"` dates go on the grid; refreshed/bulk/first-seen postings appear in cards only. When adding a
+     curated example to `calendar.json`, cite the public page it was read from; `org` must match `sources.json`
+     (`tests/test_calendar.py` checks this).
+  6. Alerts: built for both channels (`alert.py`); **Kevin picks** by adding either `NTFY_TOPIC` or the `SMTP_*`/`ALERT_TO`
      secrets (README). Until then the alert is only printed in the run log.
-  6. Parity: **day 1 done (2026-11-12).** The Claude task's 00:39 UTC roles.json (asset of the "Kevin's Job Radar" artifact;
+  7. Parity: **day 1 done (2026-11-12).** The Claude task's 00:39 UTC roles.json (asset of the "Kevin's Job Radar" artifact;
      read it with the Artifact tool, `path` = the newest `_blob` id) vs the GitHub run 40 min later: 263/263 Yes and 584/585
      Maybe identical, 0 fit changes on shared postings; the rest were postings listed by only one run (timing) plus one
      explained improvement (HII "ENGINEER MODEL-BASED 4": Yes->No "senior title", the level digit is now seen because
@@ -31,7 +41,7 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
      `data` branch daily), then tell Kevin so he can disable the Claude task. Don't disable it yourself.
      Run log: first full read 4 min (4568 descriptions); incremental run 1.5 min (3056 reused, 1511 fetched, mostly
      Greenhouse boards whose descriptions come with the list). The 40-min timeout has plenty of margin.
-- Tests: `python3 -I -m unittest discover -s tests` (fit rules, cache, page). Keep them passing; add a case for every bug.
+- Tests: `python3 -I -m unittest discover -s tests` (fit rules, cache, history, page, calendar). Keep them passing; add a case for every bug.
 - Behavior differences from the original, on purpose: cached facts mean a posting's description is read once (and weekly),
   so a deadline that appears in the text later shows up by the next Sunday; `discipline()` no longer labels
   "...Infrastructure" titles as Structures; `OTHER_MAJOR` now also lists Kevin's own majors (no effect on Kevin, needed for

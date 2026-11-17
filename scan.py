@@ -743,6 +743,33 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
               detailErrors=sum(derr.values()), detailErr=(derr.most_common(1)[0][0] if derr else None), secs=round(time.time() - t0))
     return s, rows, st, entries
 
+
+HISTORY_KEYS = ("company", "sector", "title", "location", "fit", "discipline", "date", "dateKind", "minYears", "gradReq", "startWindow")
+
+def load_history():
+    """{'postings': {url: {company, title, location, fit, discipline, date, dateKind, firstSeen, lastSeen, ...}}}: every
+    Yes/Maybe posting the radar has ever listed. Unlike the cache it is never pruned, so the hiring calendar can show when
+    each organization opened entry-level roles in past cycles."""
+    try:
+        with open(os.path.join(DATA_DIR, "history.json")) as f: h = json.load(f)
+    except Exception: h = {}
+    h.setdefault("postings", {})
+    return h
+
+def update_history(history, roles, today):
+    """Upsert this run's Yes/Maybe roles. firstSeen is kept from the earlier record (or the role's own), lastSeen moves
+    to today, the listing facts are refreshed. Nothing is ever removed. Returns the number of postings added."""
+    added = 0
+    for r in roles:
+        if r.get("fit") == "No": continue
+        e = history["postings"].get(r["url"])
+        if e is None:
+            e = history["postings"][r["url"]] = dict(firstSeen=r.get("firstSeen") or today); added += 1
+        for k in HISTORY_KEYS:
+            if r.get(k) is not None: e[k] = r[k]
+        e["lastSeen"] = today
+    return added
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     only = set(a for a in argv if not a.startswith("--"))
@@ -805,10 +832,14 @@ def main(argv=None):
                        fullRead=full or None, roles=roles, new=new, status=status), f, indent=1)
     with open(CACHE_FILE, "w") as f:
         json.dump(cache, f, separators=(",", ":"))
+    history = load_history()
+    added = update_history(history, roles, now)
+    with open(os.path.join(DATA_DIR, "history.json"), "w") as f:
+        json.dump(history, f, separators=(",", ":"))
     ok = sum(s["ok"] for s in status)
     print(f"{len(roles)} in-field roles ({sum(r['fit']=='Yes' for r in roles)} Yes, {sum(r['fit']=='Maybe' for r in roles)} Maybe), "
           f"{len(new)} new, {ok}/{len(status)} sources OK, {sum(s['fetched'] for s in status)} descriptions fetched, "
-          f"{sum(s['cached'] for s in status)} reused from cache")
+          f"{sum(s['cached'] for s in status)} reused from cache; history {len(history['postings'])} postings (+{added})")
     for s in status:
         if not s["ok"]: print("FAIL", s["org"], s["error"])
         elif s["detailErrors"]: print("DETAIL", s["org"], f"{s['detailErrors']}/{s['fetched']} pages failed:", s["detailErr"])

@@ -8,6 +8,7 @@ dashboard with GitHub Pages. Python 3.11+, standard library only.
     python3 -I -m unittest discover -s tests        # fit-rule regression tests, cache tests, page test
     python3 -I scan.py [ORG ...] [--full]           # scan -> data/radar_out.json, data/cache.json
     python3 -I build_dash.py && python3 -I build_page.py   # -> data/roles.json, data/orgs.json, site/index.html
+    python3 -I build_calendar.py                     # -> site/calendar.html (when entry-level roles open)
     python3 -I alert.py                              # ntfy / email summary (prints only if no secrets are set)
     python3 -I tools/compare.py OLD.json NEW.json    # parity check between two scans
 
@@ -18,6 +19,11 @@ dashboard with GitHub Pages. Python 3.11+, standard library only.
   `RULES_VERSION` at the top: bump it when fact extraction changes so every description is re-read.
 - `sources.json`: the organizations and how each board is read. `profiles/<name>.json`: who the scan is for.
 - `build_dash.py` / `build_page.py`: turn `data/radar_out.json` into dashboard datasets and `site/index.html`.
+- `build_calendar.py` + `calendar.json`: the hiring-calendar page (`site/calendar.html`, linked from the dashboard hero).
+  It charts every entry-level posting the radar has ever listed by posting month and hiring cycle (June to May,
+  named for the class it hires), from `history.json` on the `data` branch (every Yes/Maybe posting, never pruned)
+  plus today's scan. `calendar.json` holds the hand-checked prior-cycle examples (each with the public page it was
+  read from) and the posting pattern each organization follows; its `org` names must match `sources.json`.
 - `alert.py`: the daily summary. `tools/compare.py`: Yes/Maybe diff between two scans.
 
 ## How a run works
@@ -25,11 +31,12 @@ dashboard with GitHub Pages. Python 3.11+, standard library only.
 1. Tests run first; a broken rule stops the scan.
 2. The `data` branch is checked out into `data/` (created on the first run). It holds `cache.json`
    (per-posting extracted facts keyed by URL, with first-seen dates; never full descriptions), the latest
-   `radar_out.json` and `index.html`, with full history.
+   `radar_out.json`, `history.json` (every Yes/Maybe posting ever listed, with first/last-seen dates, for the
+   hiring calendar) and both pages, with full git history.
 3. Every board's list is read. Descriptions are fetched only for URLs not in the cache; everything is then
    re-judged with the current rules, closed postings are dropped, dates refreshed. A full re-read happens
    on Sundays, when `RULES_VERSION` changes, or with the "full" input of a manual run.
-4. The page is built, the alert sent, the `data` branch committed, the page uploaded to Pages.
+4. The pages are built (`index.html`, `calendar.html`), the alert sent, the `data` branch committed, the site uploaded to Pages.
 
 Schedule: `30 11 * * *` UTC = 6:30 AM EST / 7:30 AM EDT. Scans take up to 35 minutes; the job times out at 40.
 
