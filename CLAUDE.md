@@ -92,6 +92,9 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   (`load_state()` now also returns `_doc`) and the digest gets a "Follow up" section. **Up next**: saved radar roles with
   `snap.applyBy`, soonest first, at the top of the tracker.
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
+  Coverage audit 2026-11-18 (per-board `status` has total/fetched/matches): "Los Alamos, New Mexico" matched NON_US
+  (`mexico`) with no US hint, so LANL's 134 in-field pages all dropped; spelled-out state names are now US hints. Shield AI
+  moved from Lever to Ashby (`shield`); JetZero's Greenhouse board is genuinely empty ("no current openings").
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 
 ## Fit rules (each exists because of a real bug; keep the regression cases)

@@ -377,6 +377,15 @@ class TestLLNLHeadings(unittest.TestCase):
         r = scan.requirements(t)
         self.assertEqual((r["degree"], r["minYears"]), ("BS", None)); self.assertNotIn("Desire", r["reqSnippet"] or "")
 
+class TestUSStates(unittest.TestCase):
+    def test_new_mexico_is_in_the_us(self):
+        # LANL (2026-11-18): every posting is "Los Alamos, New Mexico"; "mexico" matched NON_US and the spelled-out state
+        # had no US hint, so all 134 in-field LANL roles were dropped as non-US
+        for loc in ("Los Alamos, New Mexico", "Albuquerque, New Mexico", "Huntsville, Alabama", "Washington, District of Columbia"):
+            self.assertFalse(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
+        for loc in ("Mexico City, Mexico", "Guadalajara, Mexico"):
+            self.assertTrue(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
+
 class TestGNC(unittest.TestCase):
     def test_gnc_is_a_field(self):
         # Kevin 2026-11-17: entry-level GNC roles are wanted too
