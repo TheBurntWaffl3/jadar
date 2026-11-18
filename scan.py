@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-16.3"
+RULES_VERSION = "2026-11-18.1"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -135,8 +135,8 @@ TITLE_ENTRY = re.compile(r"(?i)(new ?grad|graduate engineer|early[- ]career|entr
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
 
 RQ_HEAD = re.compile(r"(?im)^\W*(basic|minimum|required|requirements|qualifications|what you.ll need|what you.ll bring|what qualifications|you have|must have|what we.re looking for|education/experience|(job )?level (minimum )?qualifications|level minimum)\b")
-PREF_WORD = re.compile(r"(?i)\b(preferred|desired|nice[- ]to[- ]have|bonus|plusses|pluses|would be (a )?(plus|great|nice)|good to have)\b")
-PREF_START = re.compile(r"(?i)^\W*(preferred|desired|nice|bonus|plus|these|what|the following|it would|it'?s a plus|good to have)")
+PREF_WORD = re.compile(r"(?i)\b(preferred|desired|we desire|nice[- ]to[- ]have|bonus|plusses|pluses|would be (a )?(plus|great|nice)|good to have)\b")
+PREF_START = re.compile(r"(?i)^\W*(preferred|desired|nice|bonus|plus|these|what|the following|it would|it'?s a plus|good to have|qualifications we desire|we desire)")
 def preferred_heading(t, start, had_required):
     """Offset of the first 'Preferred / Nice to have' heading line after `start`, or None. A heading is a short line
     (<= 70 chars) naming preferred/desired/nice-to-have that starts with such a word, is ALL CAPS, or ends with ':'.
@@ -203,6 +203,13 @@ def requirements(text):
         if re.search(rx, req, re.I): deg = k; break
     if re.search(r"(?i)\b(ms|m\.s\.|master'?s)( degree)? (degree )?in [^.\n]{0,80}(and|with) \d", req) and not re.search(r"(?i)bachelor|\bb\.?s\.?\b|\bbsc?\b|\bbse\b|undergraduate", req):
         deg = "MS"
+    if deg is None and not re.search(r"(?i)bachelor|\bb\.?s\.?\b|\bbsc?\b|\bbse\b|undergraduate|4-year degree|four[- ]year degree", req):
+        # a graduate degree named as the degree, with no bachelor's path anywhere in the requirements: Aerospace Corp
+        # "PhD degree from an accredited college/university program ... (pursuing or conferred within last 12 months)" (2026-11-18)
+        has_ms = re.search(r"(?i)\b(ms|m\.s\.?|master'?s|graduate)( degree)?( degree)? (in|from|or)\b|\bms/phd\b|\bms or phd\b", req)
+        has_phd = re.search(r"(?i)\b(ph\.?d\.?|doctora(l|te))( degree)? (in|from|degree|program|candidate|student)\b|\bph\.?d\.? (degree )?(pursuing|conferred|is required|required)", req)
+        if has_ms: deg = "MS"
+        elif has_phd: deg = "PhD"
 
     grad = None
     gm = re.search(rf"(?is)(graduat\w*|degree (conferred|completed|by)|complet\w* (your|their|a) degree)[^.\n]{{0,90}}?(({MONTHS})[a-z]*\.?\s*(20\d\d)|(20\d\d))[^.\n]{{0,60}}", t)

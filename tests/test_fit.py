@@ -338,6 +338,31 @@ class TestTitleLevels(unittest.TestCase):
         self.assertNotEqual(scan.fit(scan.PROFILE, r, "Thermal Engineer - Assistant Staff")[0], "No")
         self.assertEqual(scan.fit(scan.PROFILE, r, "2027 Graduate - Missile GNC Engineer")[0], "Yes")
 
+class TestGraduateDegrees(unittest.TestCase):
+    def test_phd_named_as_the_degree(self):
+        # Aerospace Corp "2027 Particle Induced Radiation Effects Scientist" (2026-11-18): Yes with "2027 grads named"
+        t = ("Minimum Requirements:\n* PhD degree from an accredited college/university program in electrical engineering, physics, or related "
+             "discipline (pursuing or conferred within last 12 months)\n* 0-1 year of industry work experience\n* Transcripts")
+        r = scan.requirements(t); self.assertEqual(r["degree"], "PhD")
+        self.assertEqual(scan.fit(scan.PROFILE, r, "2027 Particle Induced Radiation Effects Scientist"), ("No", "PhD required"))
+        r = scan.requirements("Requirements\n* Master's degree in aerospace engineering from an accredited program\n* Strong fundamentals")
+        self.assertEqual(r["degree"], "MS")
+        r = scan.requirements("Requirements\n* MS or PhD in mechanical engineering\n* 0 years")
+        self.assertEqual(r["degree"], "MS")
+        # a bachelor's path anywhere keeps it BS
+        r = scan.requirements("Requirements\n* Bachelor's, Master's or PhD in aerospace engineering\n* 0-2 years")
+        self.assertEqual(r["degree"], "BS")
+        r = scan.requirements("Requirements\n* BS in mechanical engineering; MS preferred\n* Graduate coursework in heat transfer a plus")
+        self.assertEqual(r["degree"], "BS")
+
+class TestLLNLHeadings(unittest.TestCase):
+    def test_qualifications_we_desire_is_preferred(self):
+        # LLNL (2026-11-18): "Qualifications We Desire" was read as part of the requirements, so a desired Master's counted
+        t = ("Qualifications We Require\n* Bachelor's degree in mechanical engineering or related field\n* Experience with test equipment\n"
+             "Qualifications We Desire\n* Master's degree in Engineering or related field.\n* Active DOE Q clearance\n* 5 years of experience")
+        r = scan.requirements(t)
+        self.assertEqual((r["degree"], r["minYears"]), ("BS", None)); self.assertNotIn("Desire", r["reqSnippet"] or "")
+
 class TestGNC(unittest.TestCase):
     def test_gnc_is_a_field(self):
         # Kevin 2026-11-17: entry-level GNC roles are wanted too
