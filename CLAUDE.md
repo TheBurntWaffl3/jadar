@@ -67,6 +67,7 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   "Salary:" line so the same regex reads it. First live read: salary on 552 of 847 fits.
 - **Page** (`build_page.py`): Ember-style single file; visible columns Fit/Company/Role/Field/Salary/Date/Why, everything
   else in the expandable row; sort by fit, newest, apply-by soonest, salary, company, min yrs (select + clickable headers).
+  Filters never persist across loads (Kevin, 2026-11-18): `jadar.filters.v1` keeps only sort/dir and the More-filters toggle.
 - **Per-role state** (page only): saved / applied / hidden, stored in the browser (`localStorage` `jadar.state.v1`,
   snapshot of company/title/url so Applied survives the posting closing) and optionally synced to a private repo's
   `state.json` through the GitHub Contents API with a fine-grained token kept in the browser (`jadar.sync.v1`).

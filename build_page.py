@@ -463,9 +463,11 @@ __SHARED_JS__
   const FILTER_DEFAULTS = {sector: '', disc: '', days: '', loc: '', q: '', mode: '', pay: '', payonly: false, exp: '', clr: '', cit: '', company: '', closing: '', timing: '', terps: false, newonly: false};
   const state = Object.assign({tab: 'inbox', fit: 'fits', sort: 'fit2027', dir: 'asc', more: false, open: null, draft: null}, FILTER_DEFAULTS);
   const FKEY = 'jadar.filters.v1';
-  function saveFilters() { const o = {v: 1, fit: state.fit, sort: state.sort, dir: state.dir, more: state.more}; Object.keys(FILTER_DEFAULTS).forEach(k => o[k] = state[k]); lsSet(FKEY, JSON.stringify(o)); }
-  function loadFilters() { try { const o = JSON.parse(lsGet(FKEY) || 'null'); if (!o || o.v !== 1) return; Object.keys(FILTER_DEFAULTS).forEach(k => { if (k in o && typeof o[k] === typeof FILTER_DEFAULTS[k]) state[k] = o[k]; });
-    if (['fits', 'Yes', 'all'].includes(o.fit)) state.fit = o.fit; if (typeof o.sort === 'string' && KEYS[o.sort]) state.sort = o.sort; if (o.dir === 'asc' || o.dir === 'desc') state.dir = o.dir; state.more = !!o.more; } catch (e) {} }
+  // Only the sort and the More-filters disclosure survive a reload; every filter (search, fit, location, timing, ...) starts
+  // clear so a filter left on yesterday never hides roles today (Kevin, 2026-11-18).
+  function saveFilters() { lsSet(FKEY, JSON.stringify({v: 2, sort: state.sort, dir: state.dir, more: state.more})); }
+  function loadFilters() { try { const o = JSON.parse(lsGet(FKEY) || 'null'); if (!o || !(o.v === 1 || o.v === 2)) return;
+    if (typeof o.sort === 'string' && KEYS[o.sort]) state.sort = o.sort; if (o.dir === 'asc' || o.dir === 'desc') state.dir = o.dir; state.more = !!o.more; } catch (e) {} }
   const fill = (sel, vals) => { vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); }); };
   fill($('#sector'), [...new Set(roles.map(r => r.sector).filter(Boolean))].sort());
   fill($('#disc'), [...new Set(roles.map(r => r.discipline).filter(Boolean))].sort());

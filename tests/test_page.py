@@ -136,6 +136,18 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class FilterPersistenceTests(unittest.TestCase):
+    def test_filters_do_not_persist(self):
+        # 2026-11-18: a reload starts with every filter clear; only sort/dir and the More-filters toggle are remembered
+        with open(FIXTURE) as f: out = json.load(f)
+        with open(os.path.join(ROOT, "sources.json")) as f: src = json.load(f)
+        html = build_page.build(out, src, "Kevin Kyle")
+        save = html[html.index("function saveFilters()"):html.index("\n", html.index("function saveFilters()"))]
+        self.assertIn("{v: 2, sort: state.sort, dir: state.dir, more: state.more}", save)
+        for k in ("fit:", "q:", "loc:", "timing:"): self.assertNotIn(k, save)
+        load = html[html.index("function loadFilters()"):html.index("\n", html.index("state.more = !!o.more"))]
+        self.assertNotIn("FILTER_DEFAULTS", load)
+
 class TrackerTests(unittest.TestCase):
     """tracker.html: second page, same state file, no roles or personal data embedded."""
 
