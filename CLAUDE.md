@@ -129,7 +129,7 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 
 ## Organizations not covered yet (and why)
 
-Kratos (submit4jobs robots.txt disallows), Spirit and PNNL (iCIMS robots.txt disallows), Textron (script-rendered pages), General Atomics (BrassRing, no feed), SAIC/Framatome/Argonne (block automated reads), INL (Taleo), ORNL/Kord (cert errors), X-Bow (ApplicantPro), York (Paycor), TAE (UKG), Natura (Gusto), Spectral, AEDC/NAS, Intuitive Machines, NuScale, Type One, Nano Nuclear, Austal USA, Fincantieri, SwRI. USAJOBS was dropped (no API key); the adapter can come back if Kevin gets one.
+Kratos (submit4jobs robots.txt disallows), Sandia (sandia.jobs is a Nuxt app over the jobsyn search API, which only answers requests from the site itself; the sitemap pages carry no job text), Spirit and PNNL (iCIMS robots.txt disallows), Textron (script-rendered pages), General Atomics (BrassRing, no feed), SAIC/Framatome/Argonne (block automated reads), INL (Taleo), ORNL/Kord (cert errors), X-Bow (ApplicantPro), York (Paycor), TAE (UKG), Natura (Gusto), Spectral, AEDC/NAS, Intuitive Machines, NuScale, Type One, Nano Nuclear, Austal USA, Fincantieri, SwRI. USAJOBS was dropped (no API key); the adapter can come back if Kevin gets one.
 
 ## Later: friends' versions (on hold)
 

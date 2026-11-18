@@ -11,6 +11,7 @@ PLAT = {"greenhouse": "Greenhouse", "lever": "Lever", "ashby": "Ashby", "workday
         "rmk": "SuccessFactors", "paylocity": "Paylocity", "htmllist": "Career site (job list pages)", "icims": "iCIMS"}
 GAPS = [  # organization, sector, platform, why not covered yet
  ("Kratos", "Hypersonics & defense tech", "Workday", "robots.txt disallows"),
+ ("Sandia", "Labs & FFRDCs", "jobsyn (DirectEmployers)", "script-rendered; the data API only answers the site itself"),
  ("General Atomics (GA-ASI / GA-EMS)", "Primes", "BrassRing", "no public feed"),
  ("SAIC", "Primes", "unknown", "blocks automated reads"),
  ("Textron", "Primes", "custom", "script-rendered pages"),
