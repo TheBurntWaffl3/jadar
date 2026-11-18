@@ -337,6 +337,9 @@ class TestTitleLevels(unittest.TestCase):
         self.assertEqual(scan.fit(scan.PROFILE, r, "Staff GNC Analysis Engineer")[0], "No")
         self.assertNotEqual(scan.fit(scan.PROFILE, r, "Thermal Engineer - Assistant Staff")[0], "No")
         self.assertEqual(scan.fit(scan.PROFILE, r, "2027 Graduate - Missile GNC Engineer")[0], "Yes")
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Membrane Science and Engineering Post-master Student"), ("No", "MS title"))
+        self.assertEqual(scan.fit(scan.PROFILE, r, "Computational Materials Scientist - Postdoctoral Researcher")[0], "No")
+        self.assertNotEqual(scan.fit(scan.PROFILE, r, "AOT-IC Post-Bachelor's Engineering")[0], "No")
 
 class TestGraduateDegrees(unittest.TestCase):
     def test_phd_named_as_the_degree(self):

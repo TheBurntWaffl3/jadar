@@ -418,7 +418,8 @@ def _fit(profile, r, title):
     gy = profile["_gradYear"]; prev = str(gy - 1)
     y = r["minYears"]; entry = bool(TITLE_ENTRY.search(title)) or bool(re.search(rf"\b{gy}\b", title))
     senior = bool(re.search(r"(?i)\b(senior|sr\.?|lead|iii|iv|v|level [3-9])\b|\b[3-9]\s*$", title)) and not re.search(rf"\b{gy}\b", title)
-    if re.search(r"(?i)\bph\.?d\b|\bdoctoral\b", title): return "No", "PhD title"  # JHU APL "2027 PhD Graduate - Trajectory Optimization Engineer"
+    if re.search(r"(?i)\bph\.?d\b|\bdoctoral\b|\bpost-?doc", title): return "No", "PhD title"
+    if re.search(r"(?i)\bpost-?master", title): return "No", "MS title"  # LANL "Membrane Science and Engineering Post-master Student"  # JHU APL "2027 PhD Graduate - Trajectory Optimization Engineer"
     if re.search(r"(?i)^\s*staff\b", title): senior = True  # Ursa Major "Staff GNC Analysis Engineer"; "Assistant Staff" (MIT LL) is not senior
     if r["degree"] in ("MS", "PhD") and r["degree"] != profile.get("degree"): return "No", f"{r['degree']} required"
     mj = r.get("majorReq") or ""
