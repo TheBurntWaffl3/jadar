@@ -1569,7 +1569,7 @@ def build_sources(out, src, profile_name=None, profile=None):
         x = st.get(s["org"])
         if not x: continue
         okish = x["ok"] or x.get("stale")
-        note = ((f"{x['detailErrors']} of {x['fetched']} pages failed: {x['detailErr']}" if x.get("detailErrors") else "") if x["ok"] else (x.get("error") or ""))[:110]
+        note = ((f"{x['detailErrors']} page read{'s' if x['detailErrors'] != 1 else ''} failed: {x['detailErr']}" if x.get("detailErrors") else "") if x["ok"] else (x.get("error") or ""))[:110]
         if x["ok"] and not x["matches"] and x["total"]: note = note or f"{x['total']} postings, none in field"
         if x["ok"] and not x["total"]: note = note or "board returned no postings"
         rows.append(dict(org=s["org"], sector=s["sector"], platform=build_dash.PLAT.get(s["type"], s["type"]), url=board_url(s), status="OK" if x["ok"] else "Failing",
