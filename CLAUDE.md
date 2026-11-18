@@ -113,7 +113,9 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 - Major: if the bachelor's sentence names only other majors -> No (BWXT Radiation Shielding: nuclear engineering or radiation health physics only); "X or related" without his major -> Yes becomes Maybe; "any engineering"/"STEM"/"technical discipline" -> fine.
 - MS/PhD required -> No. A graduate degree named as *the* degree with no bachelor's path anywhere in the requirements also
   counts (Aerospace Corp "PhD degree from an accredited ... (pursuing or conferred within last 12 months)", 2026-11-18; MS when both
-  MS and PhD are listed). LLNL's "Qualifications We Desire" is a preferred heading. Active clearance required -> No: catches "requires an active Secret clearance", "Current in-scope Secret clearance required, Top Secret preferred", "Active and existing security clearance required", "requires the candidate to hold a TS/SCI ..."; but "Preferred: Active DoD SECRET", "ability to obtain" are not active-required.
+  MS and PhD are listed; only when a requirements heading was found, since unstructured text is too risky). LLNL's
+  "Qualifications We Desire" is a preferred heading; JHU APL's "You meet our minimum qualifications..." is required and
+  "You'll go above and beyond..." is preferred. `BACHELOR` matches "B.S." followed by a space (the old `\bb\.?s\.?\b` did not). Active clearance required -> No: catches "requires an active Secret clearance", "Current in-scope Secret clearance required, Top Secret preferred", "Active and existing security clearance required", "requires the candidate to hold a TS/SCI ..."; but "Preferred: Active DoD SECRET", "ability to obtain" are not active-required.
 - Grad/start windows ending before 2027 -> No. "2026" new-grad titles -> Maybe.
 - Start windows ("available to begin within 30-60 days of applying", Relativity) -> Maybe with "apply after <date>" (June 1, 2027 minus the window).
 - GPA minimums and application deadlines ("Application Deadline: Nov 30, 2026", Workday endDate, Oracle end date, JSON-LD validThrough; skip "until filled"/"ongoing") are extracted and appended to `why`; deadlines show in the Apply-by column.

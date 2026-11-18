@@ -8,7 +8,7 @@ import json, re, sys, os, time, html, collections, urllib.request, urllib.parse,
 from concurrent.futures import ThreadPoolExecutor
 
 # Bump when requirements() extraction changes: forces every description to be re-read instead of reusing cached facts.
-RULES_VERSION = "2026-11-18.1"
+RULES_VERSION = "2026-11-18.2"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "sources.json")) as _f: SRC = json.load(_f)
 TODAY = dt.date.today()
@@ -134,9 +134,10 @@ ZERO_EXP = re.compile(r"(no (prior |professional )?experience (is )?required|\b0
 TITLE_ENTRY = re.compile(r"(?i)(new ?grad|graduate engineer|early[- ]career|entry[- ]level|university grad|college grad|recent grad|\bassociate\b[\w ,&/-]{0,50}?(engineer|scientist|analyst)|(engineer|scientist|analyst|physicist)[\w ,&/()-]{0,50}?\bassociate\b|engineer (i|1)\b|\blevel (i|1)\b|\b(i|1)\s*$|rotational|development program|\bLDP\b|\bEDP\b)")
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
 
-RQ_HEAD = re.compile(r"(?im)^\W*(basic|minimum|required|requirements|qualifications|what you.ll need|what you.ll bring|what qualifications|you have|must have|what we.re looking for|education/experience|(job )?level (minimum )?qualifications|level minimum)\b")
-PREF_WORD = re.compile(r"(?i)\b(preferred|desired|we desire|nice[- ]to[- ]have|bonus|plusses|pluses|would be (a )?(plus|great|nice)|good to have)\b")
-PREF_START = re.compile(r"(?i)^\W*(preferred|desired|nice|bonus|plus|these|what|the following|it would|it'?s a plus|good to have|qualifications we desire|we desire)")
+BACHELOR = re.compile(r"(?i)bachelor|\bb\.?s\.?(?![a-z])|\bbsc\b|\bbse\b|\bb\.?eng\b|undergraduate|4-year degree|four[- ]year degree")
+RQ_HEAD = re.compile(r"(?im)^\W*(basic|minimum|required|requirements|qualifications|you meet our minimum|what you.ll need|what you.ll bring|what qualifications|you have|must have|what we.re looking for|education/experience|(job )?level (minimum )?qualifications|level minimum)\b")
+PREF_WORD = re.compile(r"(?i)\b(preferred|desired|we desire|above and beyond|nice[- ]to[- ]have|bonus|plusses|pluses|would be (a )?(plus|great|nice)|good to have)\b")
+PREF_START = re.compile(r"(?i)^\W*(preferred|desired|nice|bonus|plus|these|what|the following|it would|it'?s a plus|good to have|qualifications we desire|we desire|you.ll go above and beyond)")
 def preferred_heading(t, start, had_required):
     """Offset of the first 'Preferred / Nice to have' heading line after `start`, or None. A heading is a short line
     (<= 70 chars) naming preferred/desired/nice-to-have that starts with such a word, is ALL CAPS, or ends with ':'.
@@ -201,9 +202,9 @@ def requirements(text):
     for k, rx in [("PhD", r"\bph\.?d\b[^.\n]{0,40}required|requires? a ph\.?d"), ("MS", r"master'?s (degree )?(is )?required|requires? a master"),
                   ("BS", r"bachelor|b\.s\.|\bbs\b|\bbsc\b|\bbse\b|\bb\.?eng\b|undergraduate degree|4-year degree|four[- ]year degree")]:
         if re.search(rx, req, re.I): deg = k; break
-    if re.search(r"(?i)\b(ms|m\.s\.|master'?s)( degree)? (degree )?in [^.\n]{0,80}(and|with) \d", req) and not re.search(r"(?i)bachelor|\bb\.?s\.?\b|\bbsc?\b|\bbse\b|undergraduate", req):
+    if re.search(r"(?i)\b(ms|m\.s\.|master'?s)( degree)? (degree )?in [^.\n]{0,80}(and|with) \d", req) and not BACHELOR.search(req):
         deg = "MS"
-    if deg is None and not re.search(r"(?i)bachelor|\bb\.?s\.?\b|\bbsc?\b|\bbse\b|undergraduate|4-year degree|four[- ]year degree", req):
+    if deg is None and rq and not BACHELOR.search(req):  # only with a real requirements heading: unstructured text is too risky
         # a graduate degree named as the degree, with no bachelor's path anywhere in the requirements: Aerospace Corp
         # "PhD degree from an accredited college/university program ... (pursuing or conferred within last 12 months)" (2026-11-18)
         has_ms = re.search(r"(?i)\b(ms|m\.s\.?|master'?s|graduate)( degree)?( degree)? (in|from|or)\b|\bms/phd\b|\bms or phd\b", req)

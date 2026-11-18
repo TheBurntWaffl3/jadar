@@ -354,6 +354,20 @@ class TestGraduateDegrees(unittest.TestCase):
         self.assertEqual(r["degree"], "BS")
         r = scan.requirements("Requirements\n* BS in mechanical engineering; MS preferred\n* Graduate coursework in heat transfer a plus")
         self.assertEqual(r["degree"], "BS")
+        # "B.S." followed by a space never matched the old bachelor regex (no word boundary after the period)
+        r = scan.requirements("Requirements\n* B.S. in mechanical engineering\n* M.S. in aerospace engineering with 2 years of research")
+        self.assertEqual(r["degree"], "BS")
+        # no requirements heading at all -> the graduate-degree rule stays out of it
+        r = scan.requirements("We are looking for someone with a Master's degree in aerospace engineering who loves rockets.")
+        self.assertIsNone(r["degree"])
+
+    def test_jhu_apl_headings(self):
+        # JHU APL 2027 Graduate postings (2026-11-18): no recognized headings, so the "above and beyond" M.S. counted as required
+        t = ("You meet our minimum qualifications for the job if you...\n* Are pursuing a B.S. in Aerospace or Mechanical Engineering, graduating by May 2027\n"
+             "* Have a GPA of 3.0 or higher\nYou'll go above and beyond our minimum requirements if you...\n* Have an M.S. in Aerospace Engineering\n* Have 2 years of research experience")
+        r = scan.requirements(t)
+        self.assertEqual((r["degree"], r["minYears"]), ("BS", None))
+        self.assertEqual(scan.fit(scan.PROFILE, r, "2027 Graduate - Aerospace & Thermal Engineering")[0], "Yes")
 
 class TestLLNLHeadings(unittest.TestCase):
     def test_qualifications_we_desire_is_preferred(self):
