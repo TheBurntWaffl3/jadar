@@ -319,6 +319,7 @@ class TestScopeWords(unittest.TestCase):
         self.assertEqual(scan.discipline("Manufacturing Engineer, Propellant"), "Propulsion")
         self.assertFalse(scan.in_scope("Manufacturing Engineer - General"))
         self.assertFalse(scan.in_scope("Composites Engineering Tech - 1st Shift"))  # GE Aerospace 2026-11-17: a technician role
+        self.assertFalse(scan.in_scope("Mid Level Radio Frequency Engineer", True))  # Amentum 2026-11-18
         # generic boards (Leidos, Electric Boat, Aerospace Corp, Westinghouse) let these through as Yes/Maybe on 2026-11-17
         for t in ("Data Analyst", "Middleware Engineer", "Platform Engineer", "Enterprise Architect", "GIS Production Engineer",
                   "Scientist I - Inhalation Toxicologist Research Scientist", "BIM Engineer", "Computer Systems Analyst",

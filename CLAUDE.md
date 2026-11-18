@@ -1,6 +1,6 @@
 # Job Radar (jadar)
 
-Daily scan of ~115 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request). US citizen; no active clearance (can obtain one).
+Daily scan of ~135 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request). US citizen; no active clearance (can obtain one).
 
 ## Current state (as of 2026-11-12)
 
@@ -131,6 +131,13 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
 `tests/test_fit.py` holds these as regression tests. Keep it passing (84 tests across `tests/` as of 2026-11-16).
 
 ## Organizations not covered yet (and why)
+
+Added 2026-11-18 after a research pass (20 boards that answered): Archer, Zipline, Gravitics, Loft Orbital + Loft Federal, Spire,
+BlackSky, Long Wall (ex-ABL), Turion, Vantor (ex-Maxar), Woodward, Teledyne, Duke Energy, Amentum, Southern Company, Virgin Galactic,
+Leonardo DRS, Triumph, Dominion, Entergy. Tried and dropped (in `build_dash.GAPS`): NREL (Workday site 404), Gulfstream and Parker
+(403), Astroscale US (empty SmartRecruiters feed), Wisk (Workday search empty), Bechtel/KBR/Rolls-Royce (no job links/pages).
+Unsupported ATS seen in that pass: iCIMS (Kaman, Howmet, Serco), Workable (Umbra, Radia), Jobvite (Supernal), Taleo TBE (Aurora),
+ADP (Scaled Composites, Mercury), classic SuccessFactors portal (Embraer), Phenom (Battelle). Capella is now inside IonQ's board.
 
 Kratos (submit4jobs robots.txt disallows), Sandia (sandia.jobs is a Nuxt app over the jobsyn search API, which only answers requests from the site itself; the sitemap pages carry no job text), Spirit and PNNL (iCIMS robots.txt disallows), Textron (script-rendered pages), General Atomics (BrassRing, no feed), SAIC/Framatome/Argonne (block automated reads), INL (Taleo), ORNL/Kord (cert errors), X-Bow (ApplicantPro), York (Paycor), TAE (UKG), Natura (Gusto), Spectral, AEDC/NAS, Intuitive Machines, NuScale, Type One, Nano Nuclear, Austal USA, Fincantieri, SwRI. USAJOBS was dropped (no API key); the adapter can come back if Kevin gets one.
 

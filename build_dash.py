@@ -30,6 +30,14 @@ GAPS = [  # organization, sector, platform, why not covered yet
  ("INL", "Labs & FFRDCs", "Taleo", "no public feed"), ("ORNL", "Labs & FFRDCs", "SuccessFactors", "certificate error"),
  ("Argonne", "Labs & FFRDCs", "Workday", "blocks automated reads"), ("PNNL", "Labs & FFRDCs", "iCIMS", "robots.txt disallows"),
  ("SwRI", "Labs & FFRDCs", "custom", "adapter not built"),
+ ("NREL", "Labs & FFRDCs", "Workday", "Workday site name unknown (nrel.wd5 /NREL returns 404)"),
+ ("Gulfstream", "Primes", "SuccessFactors", "blocks automated reads (403)"),
+ ("Parker Aerospace", "Primes", "TTC portals", "blocks automated reads (403)"),
+ ("Astroscale US", "Space", "SmartRecruiters", "public postings API returns nothing"),
+ ("Wisk Aero", "Hypersonics & defense tech", "Workday", "Workday search returns no postings"),
+ ("Bechtel", "Primes", "SuccessFactors", "search pages carry no job links"),
+ ("KBR", "Primes", "Phenom", "sitemap lists no job pages"),
+ ("Rolls-Royce North America", "Primes", "custom (Workday behind)", "sitemap lists no job pages"),
 ]
 KEEP = ["id", "fit", "why", "company", "sector", "title", "location", "discipline", "minYears", "degree", "majorReq", "gpaReq", "startWindow", "applyBy", "gradReq", "startReq",
         "clearance", "citizenship", "timing", "timingNote", "salary", "salaryMin", "salaryMax", "workMode", "employment", "travel", "relocation", "reqSnippet", "date", "dateKind", "firstSeen", "url", "schoolExpOk", "desc_ok"]
