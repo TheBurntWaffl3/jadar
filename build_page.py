@@ -3,7 +3,7 @@
 
 Env: RADAR_DATA (dir holding radar_out.json; default <repo>/data), SITE_DIR (output dir; default <repo>/site),
      PAGE_REPO (repo URL for the footer link)."""
-import json, os, sys, datetime as dt
+import collections, json, os, re, sys, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_dash
 
@@ -240,7 +240,7 @@ footer a { color: var(--ink); }
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a></nav>
   <h1>Job radar.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -1034,7 +1034,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a></nav>
   <h1>Tracker.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -1414,6 +1414,175 @@ def build_tracker(profile_name=None, profile=None, today=None):
     return (TRACKER_TEMPLATE.replace("__CSS_SHARED__", CSS_SHARED).replace("__SHARED_JS__", SHARED_JS).replace("__DATA__", blob)
             .replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short))
 
+SOURCES_TEMPLATE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Sources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+__CSS_SHARED__
+/* sources table */
+.stats.six { grid-template-columns: repeat(6, 1fr); }
+.twrap { overflow-x: auto; border-top: 1px solid var(--line); -webkit-overflow-scrolling: touch; }
+table.tr { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 13.5px; }
+.tr th, .tr td { text-align: left; vertical-align: top; padding: 9px 8px; border-bottom: 1px solid var(--line); background: var(--page); }
+.tr th { color: var(--muted); font-weight: 500; white-space: nowrap; user-select: none; }
+.tr th.sortable { cursor: pointer; } .tr th.sortable:hover { color: var(--ink); }
+.tr th .arrow { display: inline-block; width: 1em; opacity: 0; } .tr th[aria-sort] .arrow { opacity: 1; color: var(--ink); }
+.tr th[aria-sort="ascending"] .arrow::after { content: "↑"; } .tr th[aria-sort="descending"] .arrow::after { content: "↓"; }
+.tr td.co { font-weight: 600; } .tr td.co a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); } .tr td.co a:hover { border-color: var(--ink); }
+.tr td.num, .tr th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.tr td.note { color: var(--muted); max-width: 360px; }
+.st { display: inline-block; font: 11px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 4px 8px; border: 1px solid var(--line); }
+.st.ok { color: var(--good); border-color: var(--good); } .st.empty { color: var(--muted); } .st.fail { color: var(--crit); border-color: var(--crit); } .st.gap { color: var(--muted); border-style: dashed; }
+.tr tr.gap td { color: var(--muted); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.controls input[type=search], .controls select { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); }
+.controls input[type=search] { min-width: 220px; }
+.sched { color: var(--muted); font-size: 13px; margin: 6px 0 18px; }
+@media (max-width: 900px) { .stats.six { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats.six { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3), .stat:nth-child(5) { border-left: 0; } .stat:nth-child(-n+4) { border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" aria-current="page">Sources</a></nav>
+  <h1>Sources.</h1>
+  <div class="meta mono" id="meta"></div>
+  <div class="who" id="who"></div>
+</section>
+
+<section class="stats six" id="stats" aria-label="Summary"></section>
+
+<h2>Boards we scan.</h2>
+<p class="lede">Every organization's own job board, read directly (no aggregators). Listed is everything the board returned; in field is what passed the title and location scope; Yes is what fit the profile.</p>
+<p class="sched" id="sched"></p>
+<div class="controls">
+  <input type="search" id="q" placeholder="Search companies" aria-label="Search companies">
+  <select id="sector" aria-label="Sector"><option value="">All sectors</option></select>
+  <select id="status" aria-label="Status"><option value="">All statuses</option><option value="OK">Returning roles</option><option value="Empty">Nothing in field</option><option value="Failing">Failing</option><option value="Not covered yet">Not covered yet</option></select>
+  <span class="count mono" id="count"></span>
+</div>
+<div class="twrap">
+  <table class="tr" id="src">
+    <thead><tr>
+      <th class="sortable" data-sort="org">Company<span class="arrow"></span></th>
+      <th class="sortable" data-sort="sector">Sector<span class="arrow"></span></th>
+      <th class="sortable" data-sort="platform">Platform<span class="arrow"></span></th>
+      <th class="sortable" data-sort="status">Status<span class="arrow"></span></th>
+      <th class="num sortable" data-sort="total">Listed<span class="arrow"></span></th>
+      <th class="num sortable" data-sort="matches">In field<span class="arrow"></span></th>
+      <th class="num sortable" data-sort="yes">Yes<span class="arrow"></span></th>
+      <th class="sortable" data-sort="scanned">Last scanned<span class="arrow"></span></th>
+      <th>Note</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<footer>Read-only: the scan never applies, signs in or submits anything. Source: <a href="__REPO__">__REPO_SHORT__</a>.</footer>
+</main>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const $ = (s, el) => (el || document).querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+  const when = iso => { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString(undefined, {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'}); };
+  const ago = iso => { if (!iso) return ''; const h = (Date.now() - new Date(iso)) / 36e5; if (isNaN(h)) return ''; return h < 1 ? 'just now' : h < 36 ? Math.round(h) + ' h ago' : Math.round(h / 24) + ' days ago'; };
+  if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
+  const S = D.sources; const kind = r => r.status === 'OK' ? (r.matches ? 'OK' : 'Empty') : r.status;
+  const ok = S.filter(r => r.status === 'OK'), fail = S.filter(r => r.status === 'Failing'), gap = S.filter(r => r.status === 'Not covered yet');
+  const listed = S.reduce((n, r) => n + (r.total || 0), 0), inf = S.reduce((n, r) => n + (r.matches || 0), 0), yes = S.reduce((n, r) => n + (r.yes || 0), 0);
+  $('#meta').innerHTML = [ok.length + fail.length + ' boards', 'scanned ' + when(D.scanned) + (ago(D.scanned) ? ' (' + ago(D.scanned) + ')' : ''), 'rules ' + (D.rulesVersion || ''), D.fullRead ? 'full read' : 'incremental'].map(esc).join('<span class="sep">·</span>');
+  const tiles = [['Boards', ok.length + fail.length, 'read this run', ''], ['Returning roles', ok.filter(r => r.matches).length, 'in-field roles today', 'good'], ['Nothing in field', ok.filter(r => !r.matches).length, 'board answered, no fit', ''],
+                 ['Failing', fail.length, fail.length ? 'showing last read' : 'all boards answered', fail.length ? 'ember' : ''], ['Listed', listed, 'postings on all boards', ''], ['In field', inf, yes + ' Yes', '']];
+  $('#stats').innerHTML = tiles.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+  $('#sched').textContent = 'Scheduled runs: ' + D.schedule + '. ' + gap.length + ' organizations are not covered yet (listed at the bottom with the reason).';
+  const sectors = [...new Set(S.map(r => r.sector))].sort(); sectors.forEach(x => { const o = document.createElement('option'); o.value = x; o.textContent = x; $('#sector').appendChild(o); });
+  const state = {sort: 'org', dir: 'asc', q: '', sector: '', status: ''};
+  const cmpStr = (a, b) => String(a || '').localeCompare(String(b || '')), cmpNum = (a, b) => (a == null ? -1 : a) - (b == null ? -1 : b);
+  const RANK = {OK: 0, Empty: 1, Failing: 2, 'Not covered yet': 3};
+  const SORTS = {org: (a, b) => cmpStr(a.org, b.org), sector: (a, b) => cmpStr(a.sector, b.sector) || cmpStr(a.org, b.org), platform: (a, b) => cmpStr(a.platform, b.platform) || cmpStr(a.org, b.org),
+                 status: (a, b) => RANK[kind(a)] - RANK[kind(b)] || cmpStr(a.org, b.org), total: (a, b) => cmpNum(a.total, b.total), matches: (a, b) => cmpNum(a.matches, b.matches), yes: (a, b) => cmpNum(a.yes, b.yes),
+                 scanned: (a, b) => cmpStr(a.scanned, b.scanned) || cmpStr(a.org, b.org)};
+  const DEF = {org: 'asc', sector: 'asc', platform: 'asc', status: 'asc', total: 'desc', matches: 'desc', yes: 'desc', scanned: 'desc'};
+  function render() {
+    let rows = S.filter(r => (!state.q || r.org.toLowerCase().includes(state.q)) && (!state.sector || r.sector === state.sector) && (!state.status || kind(r) === state.status));
+    const sign = state.dir === 'desc' ? -1 : 1; rows.sort((a, b) => sign * SORTS[state.sort](a, b));
+    document.querySelectorAll('#src th.sortable').forEach(th => th.dataset.sort === state.sort ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
+    $('#count').textContent = rows.length + ' of ' + S.length;
+    $('#rows').innerHTML = rows.map(r => {
+      const k = kind(r); const cls = k === 'OK' ? 'ok' : k === 'Empty' ? 'empty' : k === 'Failing' ? 'fail' : 'gap';
+      const label = k === 'OK' ? 'OK' : k === 'Empty' ? 'no fits' : k === 'Failing' ? 'failing' : 'not covered';
+      const name = r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.org)}</a>` : esc(r.org);
+      const last = r.status === 'OK' ? when(r.scanned) : r.stale ? 'failed this run; showing the last read (' + r.stale + ' roles)' : r.status === 'Failing' ? 'failed this run' : '';
+      return `<tr class="${k === 'Not covered yet' ? 'gap' : ''}"><td class="co">${name}</td><td>${esc(r.sector)}</td><td>${esc(r.platform)}</td><td><span class="st ${cls}">${label}</span></td><td class="num">${r.total == null ? '' : esc(r.total)}</td><td class="num">${r.matches == null ? '' : esc(r.matches)}</td><td class="num">${r.yes == null ? '' : esc(r.yes)}</td><td>${esc(last)}</td><td class="note">${esc(r.note || '')}</td></tr>`;
+    }).join('') || '<tr><td colspan="9" class="empty">No boards match.</td></tr>';
+  }
+  document.querySelectorAll('#src th.sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.sort; state.dir = state.sort === k ? (state.dir === 'asc' ? 'desc' : 'asc') : DEF[k]; state.sort = k; render(); }));
+  $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
+  $('#sector').addEventListener('change', e => { state.sector = e.target.value; render(); });
+  $('#status').addEventListener('change', e => { state.status = e.target.value; render(); });
+  render();
+})();
+</script>
+</body>
+</html>
+"""
+
+SCHEDULE = "11:17, 12:17, 13:17 and 21:43 UTC daily (GitHub often starts them a few hours late); the first morning run emails the digest"
+
+def board_url(s):
+    """The public job board for a sources.json entry (what a person would open), or None."""
+    t = s.get("type")
+    try:
+        if t == "greenhouse": return f"https://job-boards.greenhouse.io/{s['id']}"
+        if t == "lever": return f"https://jobs.lever.co/{s['id']}"
+        if t == "ashby": return f"https://jobs.ashbyhq.com/{s['id']}"
+        if t == "workday": return f"https://{s['tenant']}.wd{s['wd']}.myworkdayjobs.com/{s['site']}"
+        if t == "eightfold": return f"https://{s['tenant']}.eightfold.ai/careers"
+        if t == "sitemap": return re.match(r"https?://[^/]+", s["sitemaps"][0]).group(0)
+        if t == "rmk": return s["base"]
+        if t == "oracle": return f"https://{s['host']}/hcmUI/CandidateExperience/en/sites/{s['site']}"
+        if t == "smartrecruiters": return f"https://careers.smartrecruiters.com/{s['id']}"
+        if t == "rippling": return f"https://ats.rippling.com/{s['id']}/jobs"
+        if t == "pinpoint": return f"https://{s['id']}.pinpointhq.com"
+        if t == "bamboo": return f"https://{s['id']}.bamboohr.com/careers"
+        if t == "apl": return "https://careers.jhuapl.edu"
+        if t in ("paylocity", "htmllist"): return re.sub(r"\?.*$", "", s["list"].replace("{i}", "1"))
+    except (KeyError, AttributeError): return None
+    return None
+
+def build_sources(out, src, profile_name=None, profile=None):
+    """Return the HTML string for sources.html: one row per board with what the last run saw, plus the not-covered list."""
+    st = {x["org"]: x for x in out.get("status", [])}
+    yes = collections.Counter(r["company"] for r in out.get("roles", []) if r["fit"] == "Yes")
+    scanned = out.get("scanned"); rows = []
+    for s in src:
+        x = st.get(s["org"])
+        if not x: continue
+        okish = x["ok"] or x.get("stale")
+        note = ((f"{x['detailErrors']} of {x['fetched']} pages failed: {x['detailErr']}" if x.get("detailErrors") else "") if x["ok"] else (x.get("error") or ""))[:110]
+        if x["ok"] and not x["matches"] and x["total"]: note = note or f"{x['total']} postings, none in field"
+        if x["ok"] and not x["total"]: note = note or "board returned no postings"
+        rows.append(dict(org=s["org"], sector=s["sector"], platform=build_dash.PLAT.get(s["type"], s["type"]), url=board_url(s), status="OK" if x["ok"] else "Failing",
+                         total=x["total"] if x["ok"] else None, matches=x["matches"] if okish else None, yes=yes.get(s["org"], 0) if okish else None,
+                         stale=x.get("stale") or 0, secs=x.get("secs"), scanned=scanned if x["ok"] else None, note=note))
+    for o, sec, plat, why in build_dash.GAPS:
+        rows.append(dict(org=o, sector=sec, platform=plat, url=None, status="Not covered yet", total=None, matches=None, yes=None, stale=0, secs=None, scanned=None, note=why))
+    data = dict(sources=rows, scanned=scanned, rulesVersion=out.get("rulesVersion"), fullRead=out.get("fullRead"), schedule=SCHEDULE,
+                profileName=profile_name or (profile or {}).get("name"))
+    blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+    short = REPO_URL.replace("https://github.com/", "")
+    return SOURCES_TEMPLATE.replace("__CSS_SHARED__", CSS_SHARED).replace("__DATA__", blob).replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short)
+
 def build(out, src, profile_name=None, profile=None):
     """Return the HTML string for a radar_out.json dict and sources.json list."""
     roles, orgs = build_dash.datasets(out, src)
@@ -1448,7 +1617,9 @@ def main():
     with open(os.path.join(site, "index.html"), "w") as f: f.write(html)
     tracker = build_tracker(name, profile, (out.get("scanned") or dt.date.today().isoformat())[:10])
     with open(os.path.join(site, "tracker.html"), "w") as f: f.write(tracker)
-    print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles; site/tracker.html: {len(tracker) // 1024} KB")
+    sources = build_sources(out, src, name, profile)
+    with open(os.path.join(site, "sources.html"), "w") as f: f.write(sources)
+    print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles; site/tracker.html: {len(tracker) // 1024} KB; site/sources.html: {len(sources) // 1024} KB")
 
 if __name__ == "__main__":
     main()

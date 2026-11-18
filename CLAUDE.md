@@ -91,6 +91,9 @@ Daily scan of ~115 organizations' own job boards for entry-level roles that fit 
   (sets `app.followedUp`, appends to Contacted). `alert.tracker_summary()` applies the same rule to the state file
   (`load_state()` now also returns `_doc`) and the digest gets a "Follow up" section. **Up next**: saved radar roles with
   `snap.applyBy`, soonest first, at the top of the tracker.
+- **Sources page** (`build_sources()` -> `site/sources.html`, third nav tab, 2026-11-18): one row per board from the run's
+  `status` (listed / in field / Yes / last scanned / note) with the public board link from `board_url()`, plus `build_dash.GAPS`
+  as "not covered". Embeds no personal data.
 - **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
   Coverage audit 2026-11-18 (per-board `status` has total/fetched/matches): "Los Alamos, New Mexico" matched NON_US
   (`mexico`) with no US hint, so LANL's 134 in-field pages all dropped; spelled-out state names are now US hints. Shield AI

@@ -148,6 +148,28 @@ class FilterPersistenceTests(unittest.TestCase):
         load = html[html.index("function loadFilters()"):html.index("\n", html.index("state.more = !!o.more"))]
         self.assertNotIn("FILTER_DEFAULTS", load)
 
+class SourcesTests(unittest.TestCase):
+    """sources.html: every board, its public link, what the last run saw, and the not-covered list."""
+    def setUp(self):
+        with open(FIXTURE) as f: self.out = json.load(f)
+        with open(os.path.join(ROOT, "sources.json")) as f: self.src = json.load(f)
+        self.html = build_page.build_sources(self.out, self.src, "Kevin Kyle")
+
+    def test_rows_and_links(self):
+        data = embedded(self.html); rows = {r["org"]: r for r in data["sources"]}
+        for x in self.out["status"]: self.assertIn(x["org"], rows)
+        for o, *_ in build_page.build_dash.GAPS: self.assertEqual(rows[o]["status"], "Not covered yet")
+        ok = [r for r in data["sources"] if r["status"] == "OK"]
+        self.assertTrue(ok); self.assertTrue(all(r["scanned"] == self.out.get("scanned") for r in ok))
+        self.assertTrue(all(r["url"] for r in ok), [r["org"] for r in ok if not r["url"]])
+        for needle in ('aria-current="page">Sources</a>', "Last scanned", "Boards we scan.", "sources.html"): self.assertIn(needle, self.html, needle)
+
+    def test_board_urls(self):
+        self.assertEqual(build_page.board_url({"type": "greenhouse", "id": "spacex"}), "https://job-boards.greenhouse.io/spacex")
+        self.assertEqual(build_page.board_url({"type": "workday", "tenant": "blueorigin", "wd": 5, "site": "BlueOrigin"}), "https://blueorigin.wd5.myworkdayjobs.com/BlueOrigin")
+        self.assertEqual(build_page.board_url({"type": "sitemap", "sitemaps": ["https://careers.l3harris.com/sitemap.xml"]}), "https://careers.l3harris.com")
+        self.assertIsNone(build_page.board_url({"type": "greenhouse"}))
+
 class TrackerTests(unittest.TestCase):
     """tracker.html: second page, same state file, no roles or personal data embedded."""
 
@@ -165,6 +187,7 @@ class TrackerTests(unittest.TestCase):
             env = dict(os.environ, RADAR_DATA=data, SITE_DIR=site)
             subprocess.run([sys.executable, "-I", build_page.__file__], check=True, env=env, cwd=ROOT, capture_output=True)
             self.assertTrue(os.path.exists(os.path.join(site, "index.html")))
+            self.assertTrue(os.path.exists(os.path.join(site, "sources.html")))
             with open(os.path.join(site, "tracker.html")) as f: tracker = f.read()
             with open(os.path.join(site, "index.html")) as f: index = f.read()
         self.assertIn("<title>Tracker</title>", tracker)
