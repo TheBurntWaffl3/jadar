@@ -49,6 +49,10 @@ class AlertTests(unittest.TestCase):
         self.assertTrue(alert.should_send(0, {}, TODAY)); self.assertTrue(alert.should_send(2, {"_sent": "2026-11-12"}, TODAY))
         self.assertFalse(alert.should_send(0, {"_sent": "2026-11-12"}, TODAY)); self.assertFalse(alert.should_send(0, {}, TODAY, quiet=True))
         self.assertTrue(alert.should_send(0, {"_sent": "2026-11-11"}, TODAY), "first run of a new day sends the status digest")
+        self.assertFalse(alert.should_send(5, {}, TODAY, mode="off"), "off never sends")
+        self.assertTrue(alert.should_send(0, {}, TODAY, mode="weekly")); self.assertTrue(alert.should_send(3, {"_sent": "2026-11-05"}, TODAY, mode="weekly"))
+        self.assertFalse(alert.should_send(3, {"_sent": "2026-11-06"}, TODAY, mode="weekly"), "6 days ago: not due")
+        self.assertFalse(alert.should_send(0, {"_sent": "2026-11-01"}, TODAY, quiet=True, mode="weekly"), "weekly + quiet needs something new")
 
     def test_repost_hidden_by_fingerprint(self):
         # SpaceX "Thermal Engineer" was hidden under an old URL; the same title re-posted under https://x/1 stays out

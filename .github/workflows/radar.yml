@@ -20,8 +20,17 @@ on:
       finder_max:
         description: Max Terps-finder searches this run (blank = default 15)
         default: ""
+      alert:
+        description: Also send the email/ntfy digest from this manual run (scheduled runs follow ALERTS below)
+        type: boolean
+        default: false
   push:
     paths: ["**.py", "sources.json", "profiles/**", ".github/workflows/radar.yml"]
+
+# Email/ntfy digests: "off" sends nothing, "weekly" sends at most one digest a week, "daily" sends the morning digest and an
+# evening one when something new appeared. Kevin asked for no more updates on 2026-11-24. The page still updates every run.
+env:
+  ALERTS: "off"
 
 permissions:
   contents: write   # commit the cache + outputs to the data branch
@@ -82,9 +91,10 @@ jobs:
           cp site/sources.html data/sources.html
 
       - name: Send alert
-        if: steps.scan.outcome == 'success' && inputs.only == ''
+        if: steps.scan.outcome == 'success' && inputs.only == '' && (github.event_name == 'schedule' || inputs.alert == true)
         env:
           RADAR_DATA: data
+          ALERTS: ${{ inputs.alert == true && 'daily' || env.ALERTS }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           NTFY_SERVER: ${{ secrets.NTFY_SERVER }}
           NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}

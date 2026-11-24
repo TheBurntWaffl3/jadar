@@ -24,8 +24,15 @@ def load_alerted():
         with open(LEDGER) as f: return json.load(f)
     except Exception: return {}
 
-def should_send(new_count, ledger, today, quiet=False):
-    """Send when there are new fits, or when nothing has been sent yet today (the daily status mail), unless quiet."""
+def should_send(new_count, ledger, today, quiet=False, mode="daily"):
+    """mode 'daily': send when there are new fits, or when nothing has been sent yet today (the daily status mail), unless
+    quiet. mode 'weekly': one mail a week at most (7+ days since the last one), and only with new fits when quiet.
+    mode 'off': never (Kevin, 2026-11-24: the daily mails flooded his inbox)."""
+    if mode == "off": return False
+    if mode == "weekly":
+        try: since = (today - dt.date.fromisoformat(ledger["_sent"])).days
+        except (KeyError, ValueError): since = 999
+        return since >= 7 and (new_count > 0 or not quiet)
     if quiet: return new_count > 0
     return new_count > 0 or ledger.get("_sent") != today.isoformat()
 
@@ -226,8 +233,9 @@ def main():
     today = dt.date.today(); ledger = load_alerted()
     title, body, prio, parts = compose(out, today, state=load_state(), alerted=ledger, people=load_people())
     print(title); print(body)
-    if not should_send(len(parts["new"]), ledger, today, os.environ.get("QUIET_IF_EMPTY") == "1"):
-        print("nothing new since the last alert and today's digest already went out; nothing sent"); return
+    mode = (os.environ.get("ALERTS") or "daily").strip().lower()
+    if not should_send(len(parts["new"]), ledger, today, os.environ.get("QUIET_IF_EMPTY") == "1", mode):
+        print(f"ALERTS={mode}: " + ("alerts are switched off; nothing sent" if mode == "off" else "not due yet; nothing sent")); return
     sent = []
     if os.environ.get("NTFY_TOPIC"):
         send_ntfy(title, body, prio); sent.append("ntfy")

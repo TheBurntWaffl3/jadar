@@ -27,7 +27,9 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   4. Page: done and live. `build_page.py` -> `site/index.html`, deployed by the `publish` job (Pages source = GitHub
      Actions; the `github-pages` environment only accepts deployments from `main`). Also on the `data` branch and attached
      to each run.
-  5. Alerts: email (Kevin's choice, Gmail SMTP secrets added 2026-11-12). HTML digest, `alerted.json` ledger on the data
+  5. Alerts: **switched off since 2026-11-24** (`ALERTS: "off"` at the top of `radar.yml`; Kevin: "the daily updates are
+     flooding my inbox"). Set it to `weekly` (one digest a week at most) or `daily` to turn them back on; manual runs never
+     mail unless the `alert` input is ticked. Email (Kevin's choice, Gmail SMTP secrets added 2026-11-12). HTML digest, `alerted.json` ledger on the data
      branch so no posting is mailed twice, evening run mails only when something new appeared. ntfy still supported.
   6. Parity: **day 1 done (2026-11-12).** The Claude task's 00:39 UTC roles.json (asset of the "Kevin's Job Radar" artifact;
      read it with the Artifact tool, `path` = the newest `_blob` id) vs the GitHub run 40 min later: 263/263 Yes and 584/585
