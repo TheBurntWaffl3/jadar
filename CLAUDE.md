@@ -179,6 +179,15 @@ ADP (Scaled Composites, Mercury), classic SuccessFactors portal (Embraer), Pheno
 
 Kratos (submit4jobs robots.txt disallows), Sandia (sandia.jobs is a Nuxt app over the jobsyn search API, which only answers requests from the site itself; the sitemap pages carry no job text), Spirit and PNNL (iCIMS robots.txt disallows), Textron (script-rendered pages), General Atomics (BrassRing, no feed), SAIC/Framatome/Argonne (block automated reads), INL (Taleo), ORNL/Kord (cert errors), X-Bow (ApplicantPro), York (Paycor), TAE (UKG), Natura (Gusto), Spectral, AEDC/NAS, Intuitive Machines, NuScale, Type One, Nano Nuclear, Austal USA, Fincantieri, SwRI. USAJOBS was dropped (no API key); the adapter can come back if Kevin gets one.
 
+## Cloud resume export (tested 2026-11-26, not built yet)
+
+LibreOffice (`soffice --headless --convert-to pdf`) is in the cloud container with Carlito (Calibri-metric) fonts; map the
+Aptos theme fonts to Carlito via fontconfig. Kevin's real Lockheed .docx renders as 2 pages because its right-aligned dates
+are pushed with default-stop tabs plus runs of spaces (Word-only layout). `tools/normalize_tabs.py` rewrites each such line
+to one right tab stop at the text width (minus the paragraph's right indent), after which the file renders as one page with
+every date on its line. Never commit Kevin's resume files to this repo; the private jadar-state repo (not yet reachable from
+cloud sessions: the Claude GitHub App must be granted on it) is where they belong.
+
 ## Later: friends' versions (on hold)
 
 One scan, many profiles: each friend gets `profiles/<name>.json`, their own page and alerts. Open questions for Kevin: how many friends and their majors/fields (may need new companies), GitHub Pro/Student status, email vs. phone-app alerts.
