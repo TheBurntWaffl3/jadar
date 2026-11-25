@@ -751,7 +751,7 @@ def judge_entry(s, e, profile=PROFILE):
     """Cache entry (listed posting with extracted facts) -> output row for this profile, or None when out of scope."""
     if not in_scope(e["title"], s.get("generic")): return None
     if NON_US.search(e["location"]) and not US_HINT.search(e["location"]): return None
-    if s.get("generic") and not FIELD.search(e["title"]) and not e.get("fieldInDesc"): return None
+    if not FIELD.search(e["title"]) and not e.get("fieldInDesc"): return None  # every board: the description must mention a field
     disc = discipline(e["title"])
     if profile.get("fields") and disc != "Other" and disc not in profile["fields"]: return None
     rq = dict(e["facts"])
@@ -773,13 +773,16 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
     """Read one organization's board. Returns (source, rows, status, entries) where entries are the cache entries
     (keyed by URL) for every in-scope posting listed this run."""
     cache = cache if cache is not None else {}
-    t0 = time.time(); rows = []; err = None; total = 0; detailed = 0; reused = 0; entries = {}
+    t0 = time.time(); rows = []; err = None; total = 0; detailed = 0; reused = 0; entries = {}; dropped = []
     derr = collections.Counter()  # detail-page failures by message (a board that blocks page reads shows up here)
     try:
         for row in ADAPT[s["type"]](s):
             total += 1
             title_for_scope = row.get("title") or row.get("slug") or ""
-            if not in_scope(title_for_scope, s.get("generic")): continue
+            if not in_scope(title_for_scope, True):  # Kevin 2026-11-25: a weird title must not hide a role whose text fits
+                if ROLEWORD.search(title_for_scope) and len(dropped) < 300:
+                    dropped.append(dict(title=(row.get("title") or title_for_scope)[:120], url=row.get("url"), reason="management title" if MGMT.search(title_for_scope) else "out-of-field word in title"))
+                continue
             u = row["url"]
             c = cache.get(u)
             if c and not full and c.get("facts") and needs_fetch(row) and c.get("company") == s["org"]:
@@ -804,10 +807,15 @@ def run_source(s, cache=None, full=False, profile=PROFILE):
             entries[u] = e
             row_out = judge_entry(s, e, profile)
             if row_out: rows.append(row_out)
+            elif len(dropped) < 300:
+                why = ("non-US location" if NON_US.search(e["location"]) and not US_HINT.search(e["location"]) else
+                       "no field word in title or description" if not FIELD.search(e["title"]) and not e.get("fieldInDesc") else
+                       "field not in profile" if profile.get("fields") and discipline(e["title"]) not in profile["fields"] + ["Other"] else "title out of scope")
+                dropped.append(dict(title=e["title"][:120], url=u, reason=why, descOk=bool(e.get("desc_ok"))))
     except Exception as ex:
         err = f"{type(ex).__name__}: {ex}"[:200]
     st = dict(org=s["org"], type=s["type"], ok=err is None, total=total, matches=len(rows), fetched=detailed, cached=reused, error=err,
-              detailErrors=sum(derr.values()), detailErr=(derr.most_common(1)[0][0] if derr else None), secs=round(time.time() - t0))
+              detailErrors=sum(derr.values()), detailErr=(derr.most_common(1)[0][0] if derr else None), secs=round(time.time() - t0), dropped=dropped)
     return s, rows, st, entries
 
 def main(argv=None):
@@ -872,8 +880,11 @@ def main(argv=None):
         cache["rulesVersion"] = RULES_VERSION
         if full: cache["lastFullRead"] = now
     os.makedirs(DATA_DIR, exist_ok=True)
+    scanned = dt.datetime.now(dt.timezone.utc).isoformat()
+    audit = dict(scanned=scanned, boards={st["org"]: dict(total=st["total"], matches=st["matches"], dropped=st.pop("dropped", [])) for st in status})
+    with open(os.path.join(DATA_DIR, "audit.json"), "w") as f: json.dump(audit, f, separators=(",", ":"))
     with open(os.path.join(DATA_DIR, "radar_out.json"), "w") as f:
-        json.dump(dict(scanned=dt.datetime.now(dt.timezone.utc).isoformat(), profile=PROFILE["slug"], rulesVersion=RULES_VERSION,
+        json.dump(dict(scanned=scanned, profile=PROFILE["slug"], rulesVersion=RULES_VERSION,
                        fullRead=full or None, roles=roles, new=new, status=status), f, indent=1)
     with open(CACHE_FILE, "w") as f:
         json.dump(cache, f, separators=(",", ":"))

@@ -113,7 +113,13 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
 - **Sources page** (`build_sources()` -> `site/sources.html`, third nav tab, 2026-11-18): one row per board from the run's
   `status` (listed / in field / Yes / last scanned / note) with the public board link from `board_url()`, plus `build_dash.GAPS`
   as "not covered". Embeds no personal data.
-- **Scope:** `in_scope()` needs a role word, no NOT_FIELD hit, no management title, and (unless generic) a FIELD hit. US locations only (NON_US / US_HINT).
+- **Scope (since 2026-11-25, Kevin: "if the title is weird but we match its requirements then it should still be listed"):**
+  the title gate is the same on every board: a role word, no NOT_FIELD hit, no management title (`in_scope(title, True)`);
+  the description must then mention a field (`DESC_FIELD`, `fieldInDesc`) unless the title already has a FIELD word. `generic`
+  in sources.json no longer changes behavior. Every run writes `audit.json` (per board: total, matches, dropped titles with
+  reasons: out-of-field word / management / no field in title or description / non-US / field not in profile) to the data
+  branch; a daily scheduled task ("Jadar daily coverage audit", 15:11 UTC, fires into the migration session) reviews it and
+  asks Kevin when a dropped title looks like a real fit. US locations only (NON_US / US_HINT).
   Coverage audit 2026-11-18 (per-board `status` has total/fetched/matches): "Los Alamos, New Mexico" matched NON_US
   (`mexico`) with no US hint, so LANL's 134 in-field pages all dropped; spelled-out state names are now US hints. Shield AI
   moved from Lever to Ashby (`shield`); JetZero's Greenhouse board is genuinely empty ("no current openings").

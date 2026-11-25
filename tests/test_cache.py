@@ -37,6 +37,31 @@ class UrlSeniorTests(unittest.TestCase):
             r = scan.judge_entry(s, dict(base, title="Thermal Engineer - Assistant Staff", url=url))
             self.assertNotEqual(r["why"], "senior per posting URL", url)
 
+class WeirdTitleTests(unittest.TestCase):
+    """Kevin 2026-11-25: "if the title is weird but we match its requirements then it should still be listed". The title
+    only needs a role word (and no out-of-field / management word); the description decides the field, on every board."""
+    def test_title_without_field_word_is_judged_by_its_description(self):
+        s = dict(org="Lockheed Martin", sector="Primes", type="eightfold")
+        base = dict(title="Engineer Asc - Early Career", location="Orlando, FL", date="2026-11-16", dateKind="posted", desc_ok=True, firstSeen="2026-11-25",
+                    url="https://lockheedmartin.eightfold.ai/careers/job/1", facts=scan.requirements("Basic Qualifications: Bachelors degree in a related discipline. 0-5 years of relevant experience."))
+        r = scan.judge_entry(s, dict(base, fieldInDesc=True)); self.assertEqual(r["fit"], "Yes")
+        self.assertIsNone(scan.judge_entry(s, dict(base, fieldInDesc=False)), "no field anywhere -> not listed")
+        self.assertTrue(scan.in_scope("Engineer Asc - Early Career", True)); self.assertFalse(scan.in_scope("Software Engineer Asc", True))
+
+    def test_run_source_records_dropped_titles(self):
+        import contextlib, io
+        s = dict(org="Fake Co", sector="Space", type="greenhouse", id="fake")
+        rows = [dict(title="Software Engineer", url="https://x/sw", location="Austin, TX", date="2026-11-20", dateKind="posted", desc="Python"),
+                dict(title="Director of Engineering", url="https://x/dir", location="Austin, TX", date="2026-11-20", dateKind="posted", desc="lead"),
+                dict(title="Engineer I", url="https://x/eng", location="Austin, TX", date="2026-11-20", dateKind="posted", desc="We make sandwiches. Bachelor's degree. 0 years."),
+                dict(title="Thermal Engineer I", url="https://x/th", location="Austin, TX", date="2026-11-20", dateKind="posted", desc="Thermal analysis. Bachelor's degree. 0 years.")]
+        old = scan.ADAPT["greenhouse"]; scan.ADAPT["greenhouse"] = lambda src: iter(rows)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()): _, out_rows, st, entries = scan.run_source(s, {}, True)
+        finally: scan.ADAPT["greenhouse"] = old
+        self.assertEqual([r["title"] for r in out_rows], ["Thermal Engineer I"])
+        self.assertEqual({d["title"]: d["reason"] for d in st["dropped"]}, {"Software Engineer": "out-of-field word in title", "Director of Engineering": "management title", "Engineer I": "no field word in title or description"})
+
 class CacheTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); d = self.tmp.name
