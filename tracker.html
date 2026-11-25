@@ -812,7 +812,9 @@ window.JADAR = (function () {
     persist(); render(); PREVIEW = null; $('#tsv').value = ''; $('#tsv-import').disabled = true; $('#tsv-note').textContent = `Imported ${n} row${n === 1 ? '' : 's'}.`;
   });
   J.bindSyncPanel($, sync, () => render());
+  const hm = location.hash.match(/^#open=(.+)$/); if (hm) { board.open = decodeURIComponent(hm[1]); view = 'board'; applyView(); }  // radar to-do: tracker.html#open=radar:<url>
   render();
+  if (hm) { const el = $('.card.open'); if (el) el.scrollIntoView({block: 'center'}); }
   if (J.syncCfg()) sync.syncNow();
 })();
 </script>
