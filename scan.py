@@ -749,7 +749,7 @@ def full_read_due(cache, force=False):
 
 def judge_entry(s, e, profile=PROFILE):
     """Cache entry (listed posting with extracted facts) -> output row for this profile, or None when out of scope."""
-    if not in_scope(e["title"], s.get("generic")): return None
+    if not in_scope(e["title"], True): return None  # title gate only; the field check is below
     if NON_US.search(e["location"]) and not US_HINT.search(e["location"]): return None
     if not FIELD.search(e["title"]) and not e.get("fieldInDesc"): return None  # every board: the description must mention a field
     disc = discipline(e["title"])
