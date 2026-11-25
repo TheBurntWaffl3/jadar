@@ -13,11 +13,14 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
 - What the GitHub version does (see README.md for how a run works):
   1. Profile file: done. `profiles/kevin.json`; `requirements()` extracts profile-independent facts (incl. the bachelor's
      sentence), `fit(profile, facts, title)` judges them, `major_req(profile, sentence)` applies the major rule.
-  2. Workflow: done. `.github/workflows/radar.yml`, crons 11:17 / 12:17 / 13:17 UTC (morning window; the first to fire
-     sends the digest, later ones mail only if new) and 21:43 UTC (evening), `workflow_dispatch` with `full`, `only`,
-     `finder_max` inputs, tests first, 40-min timeout. A push only runs the tests. GitHub starts scheduled runs 4-8 h late
-     on this repo (off-hour minutes did not help: 23:43 fired at 03:35), hence the extra morning slots and the sent ledger
-     (`alerted.json` `_sent` date; `alert.should_send()`). Scans are cheap (2 min), so extra runs cost nothing.
+  2. Workflow: done. `.github/workflows/radar.yml`, `workflow_dispatch` with `full`, `only`, `finder_max`, `alert`,
+     `scheduled` inputs, tests first, 40-min timeout. A push only runs the tests. **Clock (since 2026-11-25, Kevin: "why are
+     these runs unpredictable? resolve this"):** GitHub ran the crons 4-8 h late (scheduled workflows are low priority on a
+     free public repo; 23:43 once fired at 03:35), so the scan is now started by the scheduled task **"Jadar scan dispatch"**
+     (fires into this session at 6:50 / 12:50 / 18:50 ET, calls `actions_run_trigger` with `scheduled=true`, which the
+     workflow treats like a cron run: digest per ALERTS, finder on; also reports a failed previous run to Kevin). Two crons
+     (11:17 / 21:43 UTC) stay as a fallback only. The sent ledger (`alerted.json` `_sent`; `alert.should_send()`) makes a
+     duplicate run harmless. Scans are cheap (2 min).
      Boards that fail a run (Workday's Friday-night maintenance returns 521 on all 17 tenants) keep their roles from a read
      within `STALE_DAYS` (3): `judge_entry()` re-judges the cached entries, status gets `stale=N`, the orgs table says
      "showing last read".
@@ -111,11 +114,11 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   used" column: pick a file from the private repo's `resumes/` (listed through the sync token) or "Upload a PDF…", which
   PUTs the file as `resumes/<slug>-applied-<date>.pdf` and attaches it (`app.resume {name, path, at}`); the link opens it
   from a blob. Shared helpers `slugOf / listResumes / openRepoFile / uploadResume` live in `SHARED_JS`.
-  **Automatic hand-off** (2026-11-26, Kevin: "the pipeline should be automatic"): `tailor_queue.py` (morning run) writes the
-  same queue with a ready brief per role to `tailor_queue.json` in the private repo (skipping roles that already have a PDF);
-  a scheduled task ("Jadar resumes for the PC session", daily) fires into the Resume Tailoring session on Kevin's PC, which
-  pulls the private repo, makes up to 3 PDFs from the queue and pushes them to `resumes/`. The module is not named queue.py
-  because the scanner's thread pool needs the stdlib `queue`. Cloud drafting with the Claude API was built on 2026-11-25 (`tailor.py`, commit 68bc04a) and
+  **Automatic hand-off** (2026-11-26, Kevin: "the pipeline should be automatic"): `tailor_queue.py` (every run) writes the
+  same queue with a ready brief per role to `tailor_queue.json` in the private repo (skipping roles that already have a PDF),
+  ordered saved -> fresh (`firstSeen` within `FRESH_DAYS` = 3) -> 2027 -> newest, with `fresh`/`saved` counts in the doc. The
+  cloud build (next section) consumes it. The PC-session route ("Jadar resumes for the PC session") is disabled, not deleted.
+  The module is not named queue.py because the scanner's thread pool needs the stdlib `queue`. Cloud drafting with the Claude API was built on 2026-11-25 (`tailor.py`, commit 68bc04a) and
   removed the next day at Kevin's request; do not bring it back unless he asks.
 - **Sources page** (`build_sources()` -> `site/sources.html`, third nav tab, 2026-11-18): one row per board from the run's
   `status` (listed / in field / Yes / last scanned / note) with the public board link from `board_url()`, plus `build_dash.GAPS`
@@ -125,7 +128,7 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   the description must then mention a field (`DESC_FIELD`, `fieldInDesc`) unless the title already has a FIELD word. `generic`
   in sources.json no longer changes behavior. Every run writes `audit.json` (per board: total, matches, dropped titles with
   reasons: out-of-field word / management / no field in title or description / non-US / field not in profile) to the data
-  branch; a daily scheduled task ("Jadar daily coverage audit", 15:11 UTC, fires into the migration session) reviews it and
+  branch; a daily scheduled task ("Jadar daily coverage audit", 7:40 ET after the morning scan, fires into the migration session) reviews it and
   asks Kevin when a dropped title looks like a real fit. US locations only (NON_US / US_HINT).
   Coverage audit 2026-11-18 (per-board `status` has total/fetched/matches): "Los Alamos, New Mexico" matched NON_US
   (`mexico`) with no US hint, so LANL's 134 in-field pages all dropped; spelled-out state names are now US hints. Shield AI
@@ -191,8 +194,11 @@ Kevin's choice after testing: resumes are built in the cloud, no PC involved. Pi
   gets a real right tab stop), `pdf` (normalize + `soffice --headless`, prints page count). Fonts: Carlito for Calibri, Aptos
   mapped to Carlito in ~/.config/fontconfig/fonts.conf. The real master renders as 1 page this way (2 pages without the
   tab-stop rewrite: Word pushes dates with default tabs + spaces).
-- Scheduled task "Jadar cloud resume build" (3:07 PM ET daily, fires into this session): first 3 queue items without a PDF ->
-  plan -> apply -> pdf -> commit PDF + docx + plan to `resumes/` -> one report to Kevin. The two PC-session tasks are
+- Scheduled task "Jadar cloud resume build (after each scan batch)" (fires into this session 40 min after each dispatched
+  scan: 7:30 / 13:30 / 19:30 ET; Kevin 2026-11-25: "shouldnt it run after every new batch?"): compares the queue's
+  `generatedAt` with `resumes/.last_build`, stops silently if unchanged, else builds up to 5 queue items that are saved or
+  fresh and have no PDF -> plan -> apply -> pdf -> commit PDF + docx + plan to `resumes/` -> one report to Kevin only when
+  something was built or skipped. The two PC-session tasks are
   disabled, not deleted. Never commit resume files to this (public) repo.
 
 ## Later: friends' versions (on hold)

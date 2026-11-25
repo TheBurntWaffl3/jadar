@@ -497,7 +497,8 @@ __SHARED_JS__
   function reflectFilters() {  // push state into the controls
     ['sector', 'disc', 'days', 'loc', 'mode', 'pay', 'exp', 'clr', 'cit', 'company', 'closing', 'timing', 'sort'].forEach(k => { const el = $('#' + k); if (el) el.value = state[k]; });
     $('#only2027').setAttribute('aria-pressed', state.timing === '2027');
-    $('#q').value = state.q; $('#payonly').checked = state.payonly; $('#terps').checked = state.terps; $('#newonly').checked = state.newonly;
+    if (document.activeElement !== $('#q')) $('#q').value = state.q;  // never rewrite the box while typing (it ate the space after each word)
+    $('#payonly').checked = state.payonly; $('#terps').checked = state.terps; $('#newonly').checked = state.newonly;
     document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x.dataset.fit === state.fit));
     $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more);
   }
@@ -513,7 +514,7 @@ __SHARED_JS__
   $('#only2027').addEventListener('click', () => { state.timing = state.timing === '2027' ? '' : '2027'; saveFilters(); render(); });
   $('#imm-note').addEventListener('click', e => { if (e.target.id === 'imm-show') { e.preventDefault(); state.timing = 'immediate'; saveFilters(); render(); } });
   [['payonly', 'payonly'], ['terps', 'terps'], ['newonly', 'newonly']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { state[k] = e.target.checked; saveFilters(); render(); }));
-  $('#q').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); saveFilters(); render(); });
+  $('#q').addEventListener('input', e => { state.q = e.target.value.toLowerCase(); saveFilters(); render(); });
   $('#more-toggle').addEventListener('click', () => { state.more = !state.more; $('#more').classList.toggle('open', state.more); $('#more-toggle').setAttribute('aria-expanded', state.more); saveFilters(); });
   $('#clear-filters').addEventListener('click', () => { Object.assign(state, FILTER_DEFAULTS); fillTab = null; reflectFilters(); saveFilters(); render(); });
   const DEFAULT_DIR = {fit2027: 'asc', fit: 'asc', date: 'desc', applyBy: 'asc', salary: 'desc', company: 'asc', minYears: 'asc', discipline: 'asc'};

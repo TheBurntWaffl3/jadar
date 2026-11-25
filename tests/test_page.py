@@ -257,3 +257,14 @@ class TrackerTests(unittest.TestCase):
         # merge carries manual rows and the tracker lists
         self.assertIn("out.manual[k] = newer(a.manual[k], b.manual[k])", build_page.SHARED_JS)
         self.assertIn("out.tracker = newer(a.tracker, b.tracker)", build_page.SHARED_JS)
+
+
+class SearchBoxTests(unittest.TestCase):
+    def test_typing_a_space_is_kept(self):
+        # Kevin 2026-11-25: "why cant I put a space in the search bar": render() -> reflectFilters() wrote the trimmed query back
+        # into the box after every keystroke, so the space after a word vanished.
+        src = open(os.path.join(ROOT, "build_page.py"), encoding="utf-8").read()
+        self.assertIn("if (document.activeElement !== $('#q')) $('#q').value = state.q;", src)
+        self.assertIn("state.q = e.target.value.toLowerCase(); saveFilters(); render();", src)
+        self.assertNotIn("state.q = e.target.value.trim().toLowerCase(); saveFilters();", src)
+

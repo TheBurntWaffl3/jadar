@@ -1,12 +1,12 @@
-# Job radar. GitHub starts scheduled runs hours late on a busy day, so several morning slots are listed (UTC): whichever
-# fires first sends the day's digest; later runs email only if new fits appeared (alert.py keeps a sent ledger, so nothing
-# is mailed twice). 11:17 / 12:17 / 13:17 UTC = 6:17-8:17 AM EST; 21:43 UTC = 4:43 PM EST evening check.
+# Job radar. GitHub runs cron schedules on this repo hours late (scheduled workflows are low priority; 23:43 once fired at
+# 03:35), so the real clock lives outside GitHub: the scheduled task "Jadar scan dispatch" (claude.ai, 6:50 / 12:50 / 18:50
+# ET) starts this workflow with workflow_dispatch and scheduled=true, which behaves exactly like a cron run. The two crons
+# below are only a fallback in case the dispatcher ever stops; a duplicate run is cheap and the alert ledger prevents double
+# mail.
 name: Job radar
 on:
   schedule:
     - cron: "17 11 * * *"
-    - cron: "17 12 * * *"
-    - cron: "17 13 * * *"
     - cron: "43 21 * * *"
   workflow_dispatch:
     inputs:
@@ -22,6 +22,10 @@ on:
         default: ""
       alert:
         description: Also send the email/ntfy digest from this manual run (scheduled runs follow ALERTS below)
+        type: boolean
+        default: false
+      scheduled:
+        description: Set by the "Jadar scan dispatch" task; treat this run like a cron run (digest per ALERTS, finder on)
         type: boolean
         default: false
   push:
@@ -92,7 +96,7 @@ jobs:
           cp site/resumes.html data/resumes.html
 
       - name: Send alert
-        if: steps.scan.outcome == 'success' && inputs.only == '' && (github.event_name == 'schedule' || inputs.alert == true)
+        if: steps.scan.outcome == 'success' && inputs.only == '' && (github.event_name == 'schedule' || inputs.scheduled == true || inputs.alert == true)
         env:
           RADAR_DATA: data
           ALERTS: ${{ inputs.alert == true && 'daily' || env.ALERTS }}
