@@ -569,3 +569,19 @@ class TestExtras(unittest.TestCase):
         for k in ("salary", "salaryMin", "salaryMax", "workMode", "employment", "travel", "relocation", "reqSnippet"):
             self.assertIsNone(r[k], k)
         self.assertEqual(scan.fit(scan.PROFILE, r, "Structural Analysis Engineer"), ("No", "3+ yrs required"))
+
+
+class LocationAndTitleSweepTests(unittest.TestCase):
+    def test_india_and_gulf_locations_are_not_us(self):
+        # Kevin 2026-11-25 pasted the radar: RTX "Associate Engineer-Mechanical Design (Hybrid)" in "IN-TS-HYDERABAD-012 ~ Plot No 12"
+        # and Parsons "Associate Highway Design Engineer (UAE National)" were listed as Yes
+        for loc in ("IN-TS-HYDERABAD-012 ~ Plot No 12 ~ SARVOTHAM BLDG", "Dubai, UAE", "Abu Dhabi, United Arab Emirates", "Riyadh, Saudi Arabia"):
+            self.assertTrue(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
+        self.assertFalse(scan.NON_US.search("Indianapolis, IN") and not scan.US_HINT.search("Indianapolis, IN"))
+
+    def test_highway_welding_auditor_titles_are_out(self):
+        for t in ("Associate Highway Design Engineer (UAE National)", "ENGINEER WELDING 1- ET&D HIRING EVENT", "Nuclear Engineering Auditor"):
+            self.assertFalse(scan.in_scope(t, True), t)
+        for t in ("ENGINEER MECHANICAL 1- ET&D HIRING EVENT", "ENGINEER STRUCTURAL 1- ET&D HIRING EVENT", "Mechanical Engineer Associate - E1"):
+            self.assertTrue(scan.in_scope(t, True), t)
+

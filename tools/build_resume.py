@@ -123,7 +123,8 @@ def pdf(docx, outdir=None):
     pg = re.search(r'<w:pgSz w:w="(\d+)"', xml); mar = re.search(r'<w:pgMar [^>]*w:right="(\d+)"[^>]*w:left="(\d+)"', xml)
     textw = int(pg.group(1)) - int(mar.group(1)) - int(mar.group(2)) if pg and mar else 10800
     xml, n = normalize_tabs.normalize(xml, textw); write(z, xml, norm)
-    subprocess.run(["soffice", "--headless", "--convert-to", "pdf", "--outdir", outdir, norm], check=True, capture_output=True, timeout=180)
+    prof = os.environ.get("LO_PROFILE")  # a private LibreOffice profile per worker, so parallel builds do not share one lock
+    subprocess.run(["soffice"] + ([f"-env:UserInstallation=file://{prof}"] if prof else []) + ["--headless", "--convert-to", "pdf", "--outdir", outdir, norm], check=True, capture_output=True, timeout=180)
     produced = os.path.join(outdir, os.path.splitext(os.path.basename(norm))[0] + ".pdf")
     final = os.path.join(outdir, os.path.splitext(os.path.basename(docx))[0] + ".pdf"); os.replace(produced, final); os.remove(norm)
     info = subprocess.run(["pdfinfo", final], capture_output=True, text=True).stdout
