@@ -585,3 +585,13 @@ class LocationAndTitleSweepTests(unittest.TestCase):
         for t in ("ENGINEER MECHANICAL 1- ET&D HIRING EVENT", "ENGINEER STRUCTURAL 1- ET&D HIRING EVENT", "Mechanical Engineer Associate - E1"):
             self.assertTrue(scan.in_scope(t, True), t)
 
+    def test_civil_titles_are_out_and_clearance_is_required_phrasing(self):
+        # 2026-11-25 bulk build: 13 Parsons civil roles (roadway, drainage, environmental) were Yes fits, and the two Parsons
+        # systems roles said "Active Secret is required" / "TS/SCI is required" without tripping the active-clearance rule
+        for t in ("Associate Roadway Engineer", "Associate Drainage Engineer", "Associate Environmental Engineer", "Environmental Laboratory Scientist", "Drainage Engineer I"):
+            self.assertFalse(scan.in_scope(t, True), t)
+        self.assertTrue(scan.in_scope("Associate Structural Engineer", True))
+        for txt in ("Required: Active Secret is required. Bachelor's degree in engineering.", "TS/SCI is required for this position.", "Top Secret clearance is required."):
+            self.assertIn("active req", scan.requirements(txt)["clearance"] or "", txt)
+        self.assertNotIn("active req", scan.requirements("Ability to obtain a Secret clearance is required.")["clearance"] or "")
+
