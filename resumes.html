@@ -274,7 +274,31 @@ window.JADAR = (function () {
     window.addEventListener('online', () => { if (syncCfg()) sync.syncNow(); });
     reflect();
   }
-  return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
+  // ---- resume files in the private repo's resumes/ folder (next to state.json); the token never leaves this browser ----
+  const slugOf = (company, title) => (companyKey(company) + '__' + (title || '')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
+  const resumesDir = c => (c.path || 'state.json').replace(/[^/]*$/, '') + 'resumes';
+  async function listResumes(c) {
+    const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + resumesDir(c), {headers: ghHeaders(c), cache: 'no-store'});
+    if (r.status === 404) return []; if (!r.ok) throw new Error('list ' + r.status);
+    const j = await r.json(); return Array.isArray(j) ? j.filter(f => f.type === 'file').map(f => ({name: f.name, path: f.path, size: f.size, sha: f.sha})) : [];
+  }
+  async function openRepoFile(c, path, name) {  // fetch the bytes with the token and show them from a blob URL (PDF in a new tab)
+    const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + path, {headers: Object.assign(ghHeaders(c), {Accept: 'application/vnd.github.raw+json'}), cache: 'no-store'});
+    if (!r.ok) { alert('Could not fetch ' + name + ' (' + r.status + ')'); return; }
+    const type = /\.pdf$/i.test(name) ? 'application/pdf' : 'application/octet-stream';
+    const url = URL.createObjectURL(new Blob([await r.arrayBuffer()], {type}));
+    if (type === 'application/pdf') window.open(url, '_blank'); else { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  async function uploadResume(c, name, file) {  // PUT resumes/<name>; replaces an existing file of that name
+    const path = resumesDir(c) + '/' + name; const url = 'https://api.github.com/repos/' + c.repo + '/contents/' + path;
+    let sha = null; try { const g = await fetch(url, {headers: ghHeaders(c), cache: 'no-store'}); if (g.ok) sha = (await g.json()).sha; } catch (e) {}
+    const buf = new Uint8Array(await file.arrayBuffer()); let bin = ''; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+    const body = {message: 'Resume used: ' + name, content: btoa(bin)}; if (sha) body.sha = sha;
+    const r = await fetch(url, {method: 'PUT', headers: Object.assign(ghHeaders(c), {'Content-Type': 'application/json'}), body: JSON.stringify(body)});
+    if (!r.ok) throw new Error('upload ' + r.status); const j = await r.json(); return {name, path, size: file.size, sha: j.content && j.content.sha};
+  }
+  return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, slugOf, resumesDir, listResumes, openRepoFile, uploadResume, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
           b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, ghGet, ghPut, makeSync, bindSyncPanel};
 })();
 </script>

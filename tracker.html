@@ -153,6 +153,7 @@ tr.st-rejected td, tr.st-closed td, tr.st-withdrawn td { background: color-mix(i
 tr.st-screen td, tr.st-interview td { background: color-mix(in srgb, var(--page) 86%, #f0b400); }
 tr.st-offer td { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
 td.ed { cursor: text; min-width: 96px; } td.ed:hover { box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; }
+td.res { min-width: 180px; } td.res a { color: var(--ember); display: block; font-size: 13px; word-break: break-all; } td.res select.sel { margin-top: 4px; max-width: 180px; }
 td.ed.editing { cursor: default; }
 td.ed input, td.ed textarea { font: inherit; font-size: 13px; width: 100%; min-width: 110px; border: 1px solid var(--ember); border-radius: 6px; padding: 4px 6px; background: var(--page); color: var(--ink); }
 td.ed textarea { min-height: 54px; resize: vertical; }
@@ -253,6 +254,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
       <th>Position</th>
       <th>Benefits</th>
       <th class="sortable" data-sort="applied">Applied<span class="arrow"></span></th>
+      <th>Resume used</th>
       <th class="sortable" data-sort="posted">Posted<span class="arrow"></span></th>
       <th>Pay range</th>
       <th>Expected response</th>
@@ -388,7 +390,31 @@ window.JADAR = (function () {
     window.addEventListener('online', () => { if (syncCfg()) sync.syncNow(); });
     reflect();
   }
-  return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
+  // ---- resume files in the private repo's resumes/ folder (next to state.json); the token never leaves this browser ----
+  const slugOf = (company, title) => (companyKey(company) + '__' + (title || '')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
+  const resumesDir = c => (c.path || 'state.json').replace(/[^/]*$/, '') + 'resumes';
+  async function listResumes(c) {
+    const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + resumesDir(c), {headers: ghHeaders(c), cache: 'no-store'});
+    if (r.status === 404) return []; if (!r.ok) throw new Error('list ' + r.status);
+    const j = await r.json(); return Array.isArray(j) ? j.filter(f => f.type === 'file').map(f => ({name: f.name, path: f.path, size: f.size, sha: f.sha})) : [];
+  }
+  async function openRepoFile(c, path, name) {  // fetch the bytes with the token and show them from a blob URL (PDF in a new tab)
+    const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + path, {headers: Object.assign(ghHeaders(c), {Accept: 'application/vnd.github.raw+json'}), cache: 'no-store'});
+    if (!r.ok) { alert('Could not fetch ' + name + ' (' + r.status + ')'); return; }
+    const type = /\.pdf$/i.test(name) ? 'application/pdf' : 'application/octet-stream';
+    const url = URL.createObjectURL(new Blob([await r.arrayBuffer()], {type}));
+    if (type === 'application/pdf') window.open(url, '_blank'); else { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  async function uploadResume(c, name, file) {  // PUT resumes/<name>; replaces an existing file of that name
+    const path = resumesDir(c) + '/' + name; const url = 'https://api.github.com/repos/' + c.repo + '/contents/' + path;
+    let sha = null; try { const g = await fetch(url, {headers: ghHeaders(c), cache: 'no-store'}); if (g.ok) sha = (await g.json()).sha; } catch (e) {}
+    const buf = new Uint8Array(await file.arrayBuffer()); let bin = ''; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+    const body = {message: 'Resume used: ' + name, content: btoa(bin)}; if (sha) body.sha = sha;
+    const r = await fetch(url, {method: 'PUT', headers: Object.assign(ghHeaders(c), {'Content-Type': 'application/json'}), body: JSON.stringify(body)});
+    if (!r.ok) throw new Error('upload ' + r.status); const j = await r.json(); return {name, path, size: file.size, sha: j.content && j.content.sha};
+  }
+  return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, slugOf, resumesDir, listResumes, openRepoFile, uploadResume, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
           b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, ghGet, ghPut, makeSync, bindSyncPanel};
 })();
 </script>
@@ -419,9 +445,28 @@ window.JADAR = (function () {
     t.app.updatedAt = J.nowIso(); stamp(t); persist(); render();
   }
   const DATE_FIELDS = new Set(['appliedOn', 'posted', 'expected', 'firstResponse']);
-  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status')});
+  let FILES = null;  // resumes/ in the private repo, once sync is connected
+  async function loadFiles(c) { try { FILES = await J.listResumes(c); } catch (e) { FILES = FILES || []; } render(); }
+  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status'), after: c => loadFiles(c)});
   function persist() { J.saveState(S); sync.schedulePush(); }
   const stamp = (t) => { t.at = J.nowIso(); return t; };
+  // ---- which resume went with an application: pick a file from the private repo or upload one (evidence if a rejection comes) ----
+  function resumeCell(row) {
+    const res = row.app.resume || null; const c = J.syncCfg();
+    if (!c) return `<td class="res"><span class="src">${res ? esc(res.name) : 'connect sync to attach'}</span></td>`;
+    const opts = ['<option value="">' + (res ? '— none —' : 'none yet') + '</option>'].concat((FILES || []).map(f => `<option value="${esc(f.path)}"${res && res.path === f.path ? ' selected' : ''}>${esc(f.name)}</option>`), ['<option value="__upload">Upload a PDF…</option>']);
+    const link = res ? `<a href="#" data-openres="${esc(res.path)}" data-name="${esc(res.name)}">${esc(res.name)}</a><span class="hint">${res.at ? 'attached ' + esc(fmt(res.at.slice(0, 10))) : ''}</span>` : '';
+    return `<td class="res">${link}<select class="sel res" data-res="1" aria-label="Resume used">${opts.join('')}</select></td>`;
+  }
+  function setResume(row, f) { const t = target(row); if (!t) return; t.app = t.app || {}; if (f) t.app.resume = {name: f.name, path: f.path, at: J.nowIso()}; else delete t.app.resume; t.app.updatedAt = J.nowIso(); stamp(t); persist(); render(); }
+  const picker = document.createElement('input'); picker.type = 'file'; picker.accept = '.pdf,application/pdf,.docx'; picker.style.display = 'none'; document.body.appendChild(picker); let pickFor = null;
+  picker.addEventListener('change', async () => {
+    const file = picker.files[0]; const row = pickFor; picker.value = ''; pickFor = null; if (!file || !row) return; const c = J.syncCfg(); if (!c) return;
+    const ext = (file.name.match(/\.[a-z0-9]+$/i) || ['.pdf'])[0].toLowerCase(); const name = J.slugOf(row.company, row.position) + '-applied-' + (row.get('appliedOn') || D.today).slice(0, 10) + ext;
+    sync.setStatus('uploading ' + name + '…');
+    try { const f = await J.uploadResume(c, name, file); FILES = (FILES || []).filter(x => x.path !== f.path).concat([f]); setResume(row, f); sync.setStatus('uploaded ' + name); }
+    catch (e) { sync.setStatus(''); alert('Upload failed: ' + e.message + '. Check the token has Contents read and write on ' + c.repo + '.'); render(); }
+  });
 
   // ---- rows: applied radar roles + manual rows, read from the shared state (no roles data is embedded in this page) ----
   function target(row) { return row.kind === 'radar' ? S.roles[row.key] : S.manual[row.key]; }
@@ -455,7 +500,7 @@ window.JADAR = (function () {
   }
   function markApplied(url) {  // a saved radar role becomes an application (same shape the radar page writes)
     const e = S.roles[url]; if (!e) return; const sn = e.snap || {}; const now = J.nowIso();
-    e.status = 'applied'; e.at = now; e.app = Object.assign({}, e.app || {}, {status: 'applied', appliedOn: D.today, stageAt: D.today, history: [{status: 'applied', at: D.today}], updatedAt: now});
+    e.status = 'applied'; e.at = now; e.app = Object.assign({}, e.app || {}, {status: 'applied', appliedOn: D.today, appliedAt: now, stageAt: D.today, history: [{status: 'applied', at: D.today}], updatedAt: now});
     if (!e.app.pay && sn.salary) e.app.pay = sn.salary; if (!e.app.posted && sn.date) e.app.posted = sn.date;
     persist(); render();
   }
@@ -502,7 +547,7 @@ window.JADAR = (function () {
       return `<td class="ed editing" data-f="${f}" data-kind="${kind}">${input}</td>`;
     }
     let shown = kind === 'date' ? esc(fmt(v)) : esc(v); let extra = '';
-    if (f === 'appliedOn' && isIso(v)) { const d = -daysTo(v); extra = `<span class="hint">${d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago'}</span>`; }
+    if (f === 'appliedOn' && isIso(v)) { const d = -daysTo(v); const at = row.app.appliedAt ? new Date(row.app.appliedAt) : null; extra = `<span class="hint">${d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago'}${at && !isNaN(at) ? ' · clicked ' + at.toLocaleString(undefined, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) : ''}</span>`; }
     if (f === 'expected' && isIso(v) && daysTo(v) < 0 && !row.get('firstResponse')) shown = `<span class="late" title="Expected response date passed with no reply">${shown}</span>`;
     if (f === 'contacted' && needsFollowUp(row)) { const ap = row.get('appliedOn'); extra = `<button type="button" class="pbtn tiny" data-fu="1" title="Logs today's date here and resets the ${FU_DAYS}-day nudge">Followed up today</button>` + (isIso(ap) ? `<span class="hint">${-daysTo(ap)} days, no reply</span>` : ''); }
     return `<td class="ed" data-f="${f}" data-kind="${kind}" tabindex="0">${shown || '<span class="src">—</span>'}${extra}</td>`;
@@ -513,7 +558,7 @@ window.JADAR = (function () {
     const sign = state.dir === 'desc' ? -1 : 1; rows.sort((a, b) => sign * SORTS[state.sort](a, b));
     document.querySelectorAll('#apps th.sortable').forEach(th => th.dataset.sort === state.sort ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = rows.length + ' row' + (rows.length === 1 ? '' : 's');
-    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="13" class="empty">${state.fuOnly ? 'Nothing needs a follow-up right now.' : 'Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.'}</td></tr>`; renderSide(); renderNext(); return; }
+    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="14" class="empty">${state.fuOnly ? 'Nothing needs a follow-up right now.' : 'Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.'}</td></tr>`; renderSide(); renderNext(); return; }
     $('#rows').innerHTML = rows.map(r => {
       const st = r.app.status || 'applied';
       const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position);
@@ -521,7 +566,7 @@ window.JADAR = (function () {
       const coCell = manual ? cell(Object.assign({}, r, {get: f => r.company}), 'company', 'text').replace('class="ed"', 'class="ed co"').replace('class="ed editing"', 'class="ed editing co"') : `<td class="co">${esc(r.company)}</td>`;
       const posCell = manual ? cell(Object.assign({}, r, {get: f => r.position}), 'position', 'text').replace('class="ed"', 'class="ed pos"').replace('class="ed editing"', 'class="ed editing pos"') : `<td class="pos">${link}<span class="src">from the radar</span></td>`;
       const sel = `<select class="sel" data-f="status" aria-label="Status">${STATUSES.map(x => `<option value="${x}"${x === st ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
-      return `<tr class="st-${esc(st)}${needsFollowUp(r) ? ' fu' : ''}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
+      return `<tr class="st-${esc(st)}${needsFollowUp(r) ? ' fu' : ''}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${resumeCell(r)}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
     }).join('');
     if (state.editing) { const el = $('#rows td.editing input, #rows td.editing textarea'); if (el) { el.focus({preventScroll: true}); if (el.select && el.type !== 'date') el.select(); } }
     renderSide(); renderNext(); renderBoard();
@@ -557,6 +602,7 @@ window.JADAR = (function () {
     const ap = r.get('appliedOn'); const meta = [];
     if (isIso(ap)) meta.push(`applied ${esc(fmt(ap))}`); if (inStage != null && stt !== 'applied') meta.push(`${inStage} d in stage`);
     if (r.get('pay')) meta.push(esc(r.get('pay'))); if (r.get('dates')) meta.push('next: ' + esc(r.get('dates')));
+    if (r.app.resume) meta.push('resume: ' + esc(r.app.resume.name)); else if (!CLOSED.has(stt)) meta.push('<span class="src">no resume on file</span>');
     if (needsFollowUp(r)) meta.push('<span class="fu">follow up</span>'); if (CLOSED.has(stt)) meta.push(esc(LABEL[stt].toLowerCase()));
     const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position || '(no title)');
     const sel = `<select class="sel" data-move="1" aria-label="Move to stage">${STATUSES.map(x => `<option value="${x}"${x === stt ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
@@ -598,6 +644,7 @@ window.JADAR = (function () {
     if (row.kind === 'manual' && (f === 'company' || f === 'position')) setManualField(row, f, v); else setApp(row, f, v);
   }
   $('#rows').addEventListener('click', e => {
+    const op = e.target.closest('a[data-openres]'); if (op) { e.preventDefault(); const c = J.syncCfg(); if (c) J.openRepoFile(c, op.dataset.openres, op.dataset.name); return; }
     if (e.target.closest('a') || e.target.closest('select') || e.target.closest('input') || e.target.closest('textarea')) return;
     const rm = e.target.closest('button[data-rm]'); if (rm) { const row = rowFromEl(rm); if (row) removeManual(row); return; }
     const fu = e.target.closest('button[data-fu]'); if (fu) { const row = rowFromEl(fu); if (row) markFollowedUp(row); return; }
@@ -612,7 +659,11 @@ window.JADAR = (function () {
     else if (e.key === 'Enter' && e.target.matches('textarea') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); commit(e.target); }
   });
   $('#rows').addEventListener('focusout', e => { if (e.target.matches('td.editing input, td.editing textarea')) setTimeout(() => { if (state.editing && document.activeElement !== e.target) commit(e.target); }, 0); });
-  $('#rows').addEventListener('change', e => { if (e.target.matches('select[data-f="status"]')) { const row = rowFromEl(e.target); if (row) moveTo(row, e.target.value); } });
+  $('#rows').addEventListener('change', e => {
+    if (e.target.matches('select[data-f="status"]')) { const row = rowFromEl(e.target); if (row) moveTo(row, e.target.value); return; }
+    if (e.target.matches('select[data-res]')) { const row = rowFromEl(e.target); if (!row) return; const v = e.target.value;
+      if (v === '__upload') { pickFor = row; picker.click(); render(); } else setResume(row, v ? (FILES || []).find(f => f.path === v) : null); }
+  });
   document.querySelectorAll('#apps th.sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.sort; state.dir = state.sort === k ? (state.dir === 'asc' ? 'desc' : 'asc') : DEFAULT_DIR[k]; state.sort = k; render(); }));
 
   // ---- add row ----
