@@ -176,6 +176,11 @@ class TrackerTests(unittest.TestCase):
     def setUp(self):
         self.html = build_page.build_tracker("Kevin Kyle", today="2026-11-12")
 
+    def test_pipeline_board(self):
+        # 2026-11-25: Kevin "can't say I've been rejected or moved to first interview" -> a drag-and-drop stage board
+        for needle in ("Pipeline.", 'id="board"', 'id="funnel"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "Mark applied"):
+            self.assertIn(needle, self.html, needle)
+
     def test_follow_up_and_up_next(self):
         for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today", 'id="upnext"', "Up next.", "stats five"):
             self.assertIn(needle, self.html, needle)
