@@ -192,6 +192,31 @@ tr.row.dim td .role a, tr.row.dim td.co, tr.row.dim td.why { color: var(--muted)
 .dp-row input[type="text"], .dp-row input[type="password"] { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); min-width: 140px; }
 .dp-row input.wide { flex: 1 1 220px; }
 .stats.n7 { grid-template-columns: repeat(7, 1fr); }
+/* stats in the hero (Kevin 2026-11-25: "can we include the stats in the black section?") */
+.hero .kpis { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.16); }
+.hero .kpi .label { font: 11px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--hero-muted); }
+.hero .kpi .value { font-size: 28px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.hero .kpi .value.good { color: #4fd34f; } .hero .kpi .value.ember { color: #7a9bff; }
+.hero .kpi .sub { color: var(--hero-muted); font-size: 12px; }
+/* roles + a to-do column on the right (Kevin 2026-11-25) */
+main.wide { max-width: 1480px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 24px; align-items: start; }
+.main-col { min-width: 0; }
+.todo { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px 10px; margin: 34px 0 0; }
+.todo h2 { font-size: 18px; margin: 0 0 2px; }
+.todo .lede { font-size: 12.5px; margin: 0 0 8px; }
+.todo h3 { font: 11px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.todo h3 .n { color: var(--ink); } .todo h3 .n.hot { color: var(--ember); }
+.todo ul { list-style: none; margin: 0; padding: 0; }
+.todo li + li { border-top: 1px solid var(--line); }
+.todo button.item, .todo a.item { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 4px; font: inherit; color: inherit; cursor: pointer; border-radius: 8px; text-decoration: none; }
+.todo .item:hover { background: var(--page); }
+.todo .item b { display: block; font-size: 13px; font-weight: 600; } .todo .item span { display: block; font-size: 12.5px; color: var(--ink-2); line-height: 1.3; }
+.todo .item em { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 1px; } .todo .item em.hot { color: var(--ember); font-weight: 600; }
+.todo .more { display: block; font-size: 12px; color: var(--muted); padding: 6px 4px 0; } .todo .more a { color: var(--ember); }
+.todo .clear { color: var(--muted); font-size: 12.5px; padding: 4px; }
+@media (min-width: 1280px) { .layout { grid-template-columns: minmax(0, 1fr) 290px; } .todo { order: 2; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; } .main-col { order: 1; } }
+@media (max-width: 1279px) { .todo { margin-top: 18px; } .todo ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0 12px; } .todo li + li { border-top: 0; } }
 
 /* boards */
 .boards-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 10px 0; }
@@ -241,16 +266,18 @@ footer a { color: var(--ink); }
 </style>
 </head>
 <body>
-<main>
+<main class="wide">
 <section class="hero">
   <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a><span class="sep">·</span><a href="resumes.html" title="Tailored resume drafts">Resumes</a></nav>
   <h1>Job radar.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
+  <div class="kpis" id="stats" aria-label="Summary"></div>
 </section>
 
-<section class="stats" id="stats" aria-label="Summary"></section>
-
+<div class="layout">
+<aside class="todo" id="todo" aria-label="To do"></aside>
+<div class="main-col">
 <h2>Roles.</h2>
 <p class="lede">Entry-level fits across the boards. Click a row for the full requirements; star, check or hide roles as you go.</p>
 <div class="tabsrow">
@@ -334,6 +361,8 @@ footer a { color: var(--ink); }
     </tr></thead>
     <tbody id="rows"></tbody>
   </table>
+</div>
+</div>
 </div>
 
 <h2>Boards.</h2>
@@ -461,9 +490,50 @@ __SHARED_JS__
       ['Boards OK', okN + ' / ' + (okN + failN), failN ? failN + ' failing' : 'none failing', ''],
     ];
     if (applied) stats.push(['Applied', applied, 'tracked here', '']);
-    $('#stats').classList.toggle('n7', stats.length === 7);
-    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="kpi"><div class="label">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
   }
+
+  // ---- to-do column: applications nobody was contacted for, the best open fits, and what closes soon (Kevin 2026-11-25) ----
+  const TODO_N = 5;
+  function renderTodo() {
+    const inbox = roles.filter(inInbox);
+    // 1. applied, still open, nothing under "Contacted" in the tracker
+    const quiet = Object.entries(S.roles).filter(([u, e]) => e.status === 'applied' && !['rejected', 'closed', 'withdrawn', 'offer'].includes((e.app || {}).status || 'applied') && !((e.app || {}).contacted || '').trim())
+      .sort((a, b) => ((a[1].app || {}).appliedOn || a[1].at || '').localeCompare((b[1].app || {}).appliedOn || b[1].at || ''))
+      .map(([u, e]) => ({url: u, company: (e.snap || {}).company || '', title: (e.snap || {}).title || u, applied: (e.app || {}).appliedOn || (e.at || '').slice(0, 10)}));
+    // 2. closing within 14 days (Yes + Maybe, not applied / hidden), soonest first
+    const closing = inbox.filter(r => r.fit !== 'No' && r._dt != null && r._dt >= 0 && r._dt <= 14).sort((a, b) => a._dt - b._dt || (a.fit === 'Yes' ? -1 : 1));
+    // 3. best open fits: Yes, not saved yet; names 2027 first, then Terps there, then newest
+    const terps = r => { const e = peopleFor(r); return e ? e.people.length : 0; };
+    const best = inbox.filter(r => r.fit === 'Yes' && !statusOf(r.url)).sort((a, b) => ((b._timing === '2027') - (a._timing === '2027')) || (Math.min(terps(b), 1) - Math.min(terps(a), 1)) || String(b.date || '').localeCompare(String(a.date || '')));
+    const item = (r, note, hot) => `<li><button type="button" class="item" data-jump="${esc(r.url)}"><b>${esc(r.company)}</b><span>${esc(r.title)}</span>${note ? `<em class="${hot ? 'hot' : ''}">${esc(note)}</em>` : ''}</button></li>`;
+    const sec = (title, n, body, hot) => `<h3>${esc(title)}<span class="n${hot ? ' hot' : ''}">${n}</span></h3><ul>${body}</ul>`;
+    let html = '';
+    if (quiet.length) html += sec('No one contacted', quiet.length, quiet.slice(0, TODO_N).map(q => `<li><a class="item" href="tracker.html#open=${encodeURIComponent('radar:' + q.url)}"><b>${esc(q.company)}</b><span>${esc(q.title)}</span><em>applied ${esc(fmt(q.applied))} · open in the tracker</em></a></li>`).join('')
+      + (quiet.length > TODO_N ? `<li class="more"><a href="tracker.html">${quiet.length - TODO_N} more in the tracker</a></li>` : ''), true);
+    if (closing.length) html += sec('Closing soon', closing.length, closing.slice(0, TODO_N).map(r => item(r, (r._dt === 0 ? 'closes today' : r._dt === 1 ? 'closes tomorrow' : 'closes in ' + r._dt + ' days') + (statusOf(r.url) === 'saved' ? ' · saved' : '') + ' · ' + r.fit, r._dt <= 3)).join('')
+      + (closing.length > TODO_N ? `<li class="more"><a href="#" data-filter="closing">${closing.length - TODO_N} more · show all closing</a></li>` : ''), closing.some(r => r._dt <= 3));
+    if (best.length) html += sec('Best right now', best.length, best.slice(0, TODO_N).map(r => item(r, [r._timing === '2027' ? 'names 2027' : '', terps(r) ? terps(r) + ' Terps there' : '', r.date ? fmt(r.date) : ''].filter(Boolean).join(' · '), r._timing === '2027')).join('')
+      + (best.length > TODO_N ? `<li class="more"><a href="#" data-filter="yes">${best.length - TODO_N} more · show all Yes</a></li>` : ''), false);
+    $('#todo').innerHTML = `<h2>To do.</h2><p class="lede">What deserves a look today.</p>` + (html || '<div class="clear">Nothing pressing: no uncontacted applications, nothing closing within two weeks.</div>');
+  }
+  function jumpTo(url) {  // show one role in the table whatever the filters were, and open it
+    const r = byUrl.get(url); if (!r) return;
+    Object.assign(state, FILTER_DEFAULTS); state.tab = inInbox(r) ? 'inbox' : 'all'; state.fit = r.fit === 'No' ? 'all' : 'fits';
+    if (r._timing === 'immediate') state.timing = 'immediate';
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x.dataset.tab === state.tab));
+    document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x.dataset.fit === state.fit));
+    state.open = r.id; state.draft = null; saveFilters(); render();
+    const el = $(`tr.row[data-id="${CSS.escape(r.id)}"]`); if (el) { el.scrollIntoView({block: 'center', behavior: 'smooth'}); el.focus({preventScroll: true}); }
+  }
+  $('#todo').addEventListener('click', e => {
+    const b = e.target.closest('button[data-jump]'); if (b) { jumpTo(b.dataset.jump); return; }
+    const f = e.target.closest('a[data-filter]'); if (!f) return; e.preventDefault();
+    Object.assign(state, FILTER_DEFAULTS); state.tab = 'inbox'; document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x.dataset.tab === 'inbox'));
+    if (f.dataset.filter === 'closing') { state.fit = 'fits'; state.closing = '14'; state.more = true; state.sort = 'applyBy'; state.dir = 'asc'; } else { state.fit = 'Yes'; state.sort = 'fit2027'; state.dir = 'asc'; }
+    document.querySelectorAll('.seg:not(.tabs) button').forEach(x => x.setAttribute('aria-pressed', x.dataset.fit === state.fit));
+    saveFilters(); render(); $('#roles').scrollIntoView({block: 'start', behavior: 'smooth'});
+  });
 
   // controls
   const FILTER_DEFAULTS = {sector: '', disc: '', days: '', loc: '', q: '', mode: '', pay: '', payonly: false, exp: '', clr: '', cit: '', company: '', closing: '', timing: '', terps: false, newonly: false};
@@ -693,7 +763,7 @@ __SHARED_JS__
       .map(e => byUrl.get(e.snap && e.snap.url) || snapRole(e));
   }
   function render() {
-    FPM = null; renderStats();
+    FPM = null; renderStats(); renderTodo();
     const c = counts(); const inboxN = roles.filter(inInbox).length;
     const badges = {inbox: inboxN, saved: c.saved, applied: c.applied, hidden: c.hidden, all: roles.length};
     document.querySelectorAll('.tabs [data-badge]').forEach(b => b.textContent = badges[b.dataset.badge] ? ' ' + badges[b.dataset.badge] : '');
@@ -1598,7 +1668,9 @@ __SHARED_JS__
     persist(); render(); PREVIEW = null; $('#tsv').value = ''; $('#tsv-import').disabled = true; $('#tsv-note').textContent = `Imported ${n} row${n === 1 ? '' : 's'}.`;
   });
   J.bindSyncPanel($, sync, () => render());
+  const hm = location.hash.match(/^#open=(.+)$/); if (hm) { board.open = decodeURIComponent(hm[1]); view = 'board'; applyView(); }  // radar to-do: tracker.html#open=radar:<url>
   render();
+  if (hm) { const el = $('.card.open'); if (el) el.scrollIntoView({block: 'center'}); }
   if (J.syncCfg()) sync.syncNow();
 })();
 </script>

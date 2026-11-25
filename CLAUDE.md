@@ -73,6 +73,12 @@ Daily scan of ~200 organizations' own job boards for entry-level roles that fit 
 - **Page** (`build_page.py`): Ember-style single file; visible columns Fit/Company/Role/Field/Salary/Date/Why, everything
   else in the expandable row; sort by fit, newest, apply-by soonest, salary, company, min yrs (select + clickable headers).
   Filters never persist across loads (Kevin, 2026-11-18): `jadar.filters.v1` keeps only sort/dir and the More-filters toggle.
+- **Radar layout** (2026-11-25, Kevin: "clean this up, can we include the stats in the black section? have small to-do
+  column on the right"): the seven stats are `.kpi` tiles inside the hero (`#stats`); `.layout` puts `#todo` (sticky,
+  290px, at >= 1280px; above the table below that) next to `.main-col`. `renderTodo()`: "No one contacted" = applied roles
+  whose tracker `app.contacted` is empty (links `tracker.html#open=radar:<url>`, which the tracker reads from the hash and
+  opens that card); "Closing soon" = inbox Yes/Maybe with `_dt` 0..14; "Best right now" = unsaved Yes, 2027 first, then
+  Terps, then newest. 5 each; `jumpTo(url)` resets filters, opens the row and scrolls to it; "show all" links set filters.
 - **Per-role state** (page only): saved / applied / hidden, stored in the browser (`localStorage` `jadar.state.v1`,
   snapshot of company/title/url so Applied survives the posting closing) and optionally synced to a private repo's
   `state.json` through the GitHub Contents API with a fine-grained token kept in the browser (`jadar.sync.v1`).

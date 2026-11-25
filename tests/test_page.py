@@ -264,6 +264,17 @@ class TrackerTests(unittest.TestCase):
         self.assertIn("out.tracker = newer(a.tracker, b.tracker)", build_page.SHARED_JS)
 
 
+class RadarLayoutTests(unittest.TestCase):
+    def test_stats_in_hero_and_todo_column(self):
+        # Kevin 2026-11-25: "can we include the stats in the black section? have small to-do column on the right which highlights
+        # job applications I havent contacted anyone for and highlights the best jobs or those closing soon"
+        html = build_page.build(json.load(open(FIXTURE)), json.load(open(os.path.join(ROOT, "sources.json"))), "K")
+        for needle in ('<div class="kpis" id="stats"', 'class="main-col"', 'id="todo"', "function renderTodo(", "No one contacted", "Closing soon", "Best right now",
+                       "tracker.html#open=", "function jumpTo(", 'data-jump="', 'class="kpi"'):
+            self.assertIn(needle, html, needle)
+        self.assertNotIn('<section class="stats" id="stats"', html)
+        self.assertIn("location.hash.match(/^#open=(.+)$/)", build_page.build_tracker("K", today="2026-11-12"))
+
 class SearchBoxTests(unittest.TestCase):
     def test_typing_a_space_is_kept(self):
         # Kevin 2026-11-25: "why cant I put a space in the search bar": render() -> reflectFilters() wrote the trimmed query back
