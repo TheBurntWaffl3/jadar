@@ -396,6 +396,9 @@ __SHARED_JS__
   const entry = url => S.roles[url];
   const statusOf = url => (S.roles[url] || {}).status || null;
   // fingerprint = company + normalized title: a re-posted job (new URL, same job) stays hidden / applied
+  // search words: "aerospace corporation" must find "Aerospace Corp" (Kevin, 2026-11-25); long forms collapse to the short ones on both sides
+  const QALIAS = [[/\bcorporation\b/g, 'corp'], [/\bincorporated\b/g, 'inc'], [/\blaborator(y|ies)\b/g, 'lab'], [/\btechnolog(y|ies)\b/g, 'tech'], [/\bcompany\b/g, 'co'], [/[.,]/g, '']];
+  const qnorm = t => QALIAS.reduce((x, [re, to]) => x.replace(re, to), String(t || '').toLowerCase());
   const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
   const fpOf = r => companyKey(r.company) + '|' + norm(r.title);
   Object.values(S.roles).forEach(e => { if (!e.fp && e.snap && e.snap.title) e.fp = fpOf(e.snap); });  // migrate older entries
@@ -719,8 +722,8 @@ __SHARED_JS__
     $('#more-toggle').textContent = nMore ? 'More filters · ' + nMore : 'More filters';
     $('#clear-filters').hidden = !activeFilters().length;
     const tc = $('#terps-chk'); tc.classList.toggle('off', !PEOPLE); $('#terps').disabled = !PEOPLE; tc.title = PEOPLE ? '' : 'Connect sync in Data to use this';
-    if (state.q) { const words = state.q.split(/\s+/).filter(Boolean);  // every word must appear somewhere in the row
-      list = list.filter(r => { const h = r._q || [r.company, r.title, r.location].join(' ').toLowerCase(); return words.every(w => h.includes(w)); }); }
+    if (state.q) { const words = qnorm(state.q).split(/\s+/).filter(Boolean);  // every word must appear somewhere in the row
+      list = list.filter(r => { const h = r._q || (r._q = qnorm([r.company, r.title, r.location].join(' '))); return words.every(w => h.includes(w)); }); }
     if (!listTab) list = sorted(list);
     document.querySelectorAll('th.sortable').forEach(th => (!listTab && (th.dataset.sort === state.sort || (th.dataset.sort === 'fit' && state.sort === 'fit2027'))) ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = list.length + ' of ' + base.length + ' roles';

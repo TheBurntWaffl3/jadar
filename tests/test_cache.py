@@ -47,6 +47,9 @@ class WeirdTitleTests(unittest.TestCase):
         r = scan.judge_entry(s, dict(base, fieldInDesc=True)); self.assertEqual(r["fit"], "Yes")
         self.assertIsNone(scan.judge_entry(s, dict(base, fieldInDesc=False)), "no field anywhere -> not listed")
         self.assertTrue(scan.in_scope("Engineer Asc - Early Career", True)); self.assertFalse(scan.in_scope("Software Engineer Asc", True))
+        # 2026-11-25 coverage sweep false positives: AEVEX "Identity Intelligence Analyst Jr.", AST SpaceMobile "EDP - Industrial Engineering"
+        self.assertFalse(scan.in_scope("Identity Intelligence Analyst Jr.", True)); self.assertFalse(scan.in_scope("Engineering Development Program (EDP) – Industrial Engineering – Micron Operations", True))
+        self.assertTrue(scan.in_scope("Engineering Development Program (EDP) – Major Assembly- Integration- CSAT Structures", True))
 
     def test_run_source_records_dropped_titles(self):
         import contextlib, io

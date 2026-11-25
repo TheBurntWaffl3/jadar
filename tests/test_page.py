@@ -267,4 +267,5 @@ class SearchBoxTests(unittest.TestCase):
         self.assertIn("if (document.activeElement !== $('#q')) $('#q').value = state.q;", src)
         self.assertIn("state.q = e.target.value.toLowerCase(); saveFilters(); render();", src)
         self.assertNotIn("state.q = e.target.value.trim().toLowerCase(); saveFilters();", src)
+        self.assertIn("const words = qnorm(state.q)", src); self.assertIn("[/\\bcorporation\\b/g, 'corp']", src)  # "aerospace corporation" finds Aerospace Corp
 
