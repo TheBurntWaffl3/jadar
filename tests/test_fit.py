@@ -595,3 +595,15 @@ class LocationAndTitleSweepTests(unittest.TestCase):
             self.assertIn("active req", scan.requirements(txt)["clearance"] or "", txt)
         self.assertNotIn("active req", scan.requirements("Ability to obtain a Secret clearance is required.")["clearance"] or "")
 
+    def test_bulk_build_title_and_location_gaps(self):
+        # 2026-11-25 bulk resume build, batches 18-22: titles that passed the gate but are not engineering roles for Kevin
+        for t in ("Field Engineer", "Harness Engineer I", "EWIS Harness Design Engineer I (New Grad)", "Mission Security Engineer", "Avionics Engineer",
+                  "Compensation Analyst I", "Logistics Analyst I", "Configuration Analyst I", "Directed Energy Materials Planning Associate Analyst"):
+            self.assertFalse(scan.in_scope(t, True), t)
+        for t in ("Avionics Test Engineer I", "Avionics Manufacturing Engineer I", "Structural Analyst", "Electromechanical Engineer"):
+            self.assertTrue(scan.in_scope(t, True), t)
+        for loc in ("Wolverhampton, GBR", "Warsaw, Poland", "Auckland, New Zealand"):
+            self.assertTrue(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
+        self.assertIn("active req", scan.requirements("Must hold and maintain an active US Secret clearance.")["clearance"] or "")
+        self.assertNotIn("active req", scan.requirements("Must be able to obtain and maintain an active US Secret clearance.")["clearance"] or "")  # "obtain" = eligible
+

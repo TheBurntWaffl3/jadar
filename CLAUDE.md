@@ -245,6 +245,20 @@ Kevin's choice after testing: resumes are built in the cloud, no PC involved. Pi
   something was built or skipped. The two PC-session tasks are
   disabled, not deleted. Never commit resume files to this (public) repo.
 
+## Bulk resume build of 2026-11-25 (Kevin: "pump out resumes as quickly as possible and for every role possible")
+
+455 Yes roles without a PDF, 23 company-grouped batches, six worker agents at a time, brief in
+`docs/BULK_RESUME_BRIEF.md` (workers read master/CLAUDE.md + FACTS.md, write plan/docx/pdf per slug into jadar-state
+`resumes/`, no git; the session commits per batch and appends gap notes to `resumes/NOTES.md`). Result: 354 PDFs on the
+shelf (near-identical postings share one slug and file), ~45 postings skipped with reasons (non-US, civil, electrical,
+materials/chemical degrees only, active clearance, years required). Kevin's PC session changed the master and the facts
+mid-run (Aeroelasticity is a current course); every plan was re-applied against the new master afterwards. Rule gaps the
+build exposed are fixed with tests (civil titles, analyst titles, harness/avionics/security engineer, India/Gulf/UK/
+Poland/NZ locations, "X is required" and "hold and maintain an active" clearance wording). Still open for the audit
+(`tools/coverage/audit_todo.txt` is not in the repo; the list): NextEra "Experience: 2+ years" lost to a "Nuclear
+Experience: 0+ years" tier line; BWXT "BS + 10 yrs or MS + 5" read as 0 yrs; Astranis/Specter winter-spring 2027 starts
+before graduation. The scheduled build after each scan now builds everything new in the queue (no cap).
+
 ## Later: friends' versions (on hold)
 
 One scan, many profiles: each friend gets `profiles/<name>.json`, their own page and alerts. Open questions for Kevin: how many friends and their majors/fields (may need new companies), GitHub Pro/Student status, email vs. phone-app alerts.
