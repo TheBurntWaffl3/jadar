@@ -1,6 +1,6 @@
 """Tailoring queue for the resume session on Kevin's PC (2026-11-26: "the pipeline should be automatic").
 
-Morning run only. Builds the same queue the Resumes page shows (Yes roles + saved Maybe roles, minus hidden / applied /
+Every run. Builds the same queue the Resumes page shows (Yes roles + saved Maybe roles, minus hidden / applied /
 done / skipped and minus roles that already have a PDF in the private repo's resumes/ folder), writes it with a ready brief
 per role to `tailor_queue.json` in the private state repo. A scheduled task on Kevin's PC reads that file, makes the
 resumes and pushes the PDFs; the Resumes page then shows them. Nothing here touches the public page or this repo.
@@ -57,9 +57,16 @@ def brief(r):
              f"Save the PDF to the jadar-state repo as resumes/{slug(r['company'], r['title'])}.pdf (that exact name attaches it to the role on the Resumes page)."]
     return "\n".join(x for x in lines if x != "")
 
-def build_queue(out, state, files, max_n=25):
-    """Ordered queue: saved roles first, then roles naming 2027, then newest. Skips hidden/applied, done/skipped marks, and
-    roles whose PDF already exists (filename starts with the slug)."""
+FRESH_DAYS = 3  # a role first seen within this many days is "fresh": the build makes its resume in the next wake-up
+
+def _iso(s):
+    try: dt.date.fromisoformat(str(s)[:10]); return True
+    except ValueError: return False
+
+def build_queue(out, state, files, max_n=25, today=None):
+    """Ordered queue: saved roles first, then fresh ones (first seen within FRESH_DAYS), then roles naming 2027, then
+    newest. Skips hidden/applied, done/skipped marks, and roles whose PDF already exists (filename starts with the slug)."""
+    today = today or dt.date.today()
     doc = state.get("_doc") or {}; marks = doc.get("tailor") or {}
     names = [f.lower() for f in files]
     items = []
@@ -69,9 +76,11 @@ def build_queue(out, state, files, max_n=25):
         if not (r["fit"] == "Yes" or (saved and r["fit"] == "Maybe")): continue
         sl = slug(r["company"], r["title"])
         if any(n.startswith(sl) for n in names): continue
-        key = (0 if saved else 1, 0 if r.get("timing") == "2027" else 1, -(int((r.get("date") or "0000-00-00").replace("-", "") or 0)))
+        first = r.get("firstSeen") or r.get("date") or ""
+        fresh = bool(first) and (today - dt.date.fromisoformat(first[:10])).days <= FRESH_DAYS if _iso(first) else False
+        key = (0 if saved else 1, 0 if fresh else 1, 0 if r.get("timing") == "2027" else 1, -(int((r.get("date") or "0000-00-00").replace("-", "") or 0)))
         items.append((key, dict(url=r["url"], company=r["company"], title=r["title"], slug=sl, fit=r["fit"], why=r.get("why") or "", location=r.get("location") or "",
-                                date=r.get("date"), applyBy=r.get("applyBy"), salary=r.get("salary"), saved=saved, timing=r.get("timing"), reqSnippet=r.get("reqSnippet") or "")))
+                                date=r.get("date"), firstSeen=r.get("firstSeen"), fresh=fresh, applyBy=r.get("applyBy"), salary=r.get("salary"), saved=saved, timing=r.get("timing"), reqSnippet=r.get("reqSnippet") or "")))
     items.sort(key=lambda x: x[0])
     rows = [it for _, it in items[:max_n]]
     for it in rows: it["brief"] = brief(it)
@@ -84,9 +93,10 @@ def main():
     state = alert.load_state(); files = list_files(finder.http_json)
     rows = build_queue(out, state, files, int(os.environ.get("QUEUE_MAX") or 25))
     doc = dict(v=1, generatedAt=dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), scanned=out.get("scanned"), count=len(rows),
-               note="Written by the jadar morning run. Make the PDFs in order; name each resumes/<slug>.pdf; roles with a PDF already in resumes/ are not listed.", items=rows)
+               fresh=sum(1 for r in rows if r["fresh"]), saved=sum(1 for r in rows if r["saved"]),
+               note="Written by every jadar run. Order: saved, fresh (first seen within 3 days), 2027, newest. Name each PDF resumes/<slug>.pdf; roles with a PDF already in resumes/ are not listed.", items=rows)
     save_queue(doc, load_queue(finder.http_json), finder.http_json)
-    print(f"queue: {len(rows)} roles queued ({sum(1 for r in rows if r['saved'])} saved, {sum(1 for r in rows if r['timing'] == '2027')} naming 2027); {len(files)} PDFs already in resumes/")
+    print(f"queue: {len(rows)} roles queued ({doc['saved']} saved, {doc['fresh']} fresh, {sum(1 for r in rows if r['timing'] == '2027')} naming 2027); {len(files)} PDFs already in resumes/")
 
 if __name__ == "__main__":
     try: main()

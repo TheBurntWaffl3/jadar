@@ -19,10 +19,16 @@ class QueueTests(unittest.TestCase):
         self.assertEqual(Q.slug("L3Harris (incl. Aerojet Rocketdyne)", "Engineer I/II"), "l3harris-engineer-i-ii")
 
     def test_order_and_skips(self):
+        import datetime as dt
         state = {"https://x/c": "saved", "https://x/e": "applied", "_doc": {"tailor": {"https://x/f": {"status": "skip"}}}}
-        rows = Q.build_queue({"roles": ROLES}, state, files=["stoke-propulsion-engineer.pdf", "old.pdf"])
+        today = dt.date(2026, 11, 26)
+        rows = Q.build_queue({"roles": ROLES}, state, files=["stoke-propulsion-engineer.pdf", "old.pdf"], today=today)
         self.assertEqual([r["url"] for r in rows], ["https://x/c", "https://x/b", "https://x/a"])  # saved, then 2027, then newest; d is Maybe unsaved, e applied, f skipped, g has a PDF
-        self.assertEqual(len(Q.build_queue({"roles": ROLES}, state, [], max_n=2)), 2)
+        self.assertEqual(len(Q.build_queue({"roles": ROLES}, state, [], max_n=2, today=today)), 2)
+        # a role first seen within 3 days outranks older 2027 roles (the build wakes for new batches)
+        roles = [dict(ROLES[0], firstSeen="2026-11-25"), dict(ROLES[1], firstSeen="2026-11-10")]
+        rows = Q.build_queue({"roles": roles}, {}, [], today=today)
+        self.assertEqual([r["url"] for r in rows], ["https://x/a", "https://x/b"]); self.assertTrue(rows[0]["fresh"]); self.assertFalse(rows[1]["fresh"])
 
     def test_brief(self):
         rows = Q.build_queue({"roles": ROLES[:1]}, {}, [])

@@ -123,8 +123,8 @@ jobs:
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I finder.py
 
-      - name: Write the tailoring queue for the resume session (private tailor_queue.json)
-        if: steps.scan.outcome == 'success' && inputs.only == '' && github.event.schedule != '43 21 * * *'
+      - name: Write the tailoring queue for the resume build (private tailor_queue.json)
+        if: steps.scan.outcome == 'success' && inputs.only == ''
         continue-on-error: true
         timeout-minutes: 3
         env:
