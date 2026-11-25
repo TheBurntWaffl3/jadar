@@ -122,11 +122,21 @@ table.tr { border-collapse: collapse; width: 100%; min-width: 1120px; font-size:
 .tr td.pos { min-width: 180px; }
 .stats.five { grid-template-columns: repeat(5, 1fr); }
 /* pipeline board */
-.funnel { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; margin: 0 0 14px; }
-.funnel .step { flex: 1 1 120px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; min-width: 120px; }
-.funnel .step .n { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.funnel .step .l { color: var(--muted); font-size: 12px; } .funnel .step .r { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
-.funnel .step.closed { border-style: dashed; }
+.col h3 .pct { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted); font-size: 11.5px; margin-left: auto; margin-right: 6px; }
+/* an open card: the editor for that application (resume, contacts, dates, notes) inside the card; its column widens */
+.card .exp { float: right; margin: -2px -4px 0 6px; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 13px; padding: 2px 6px; border-radius: 999px; } .card .exp:hover { background: var(--pill); color: var(--ink); }
+.card.open { cursor: default; box-shadow: inset 3px 0 0 var(--stage, var(--line)), 0 6px 24px rgba(0,0,0,.08); }
+.card .edit { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.card .edit label { display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.card .edit label.wide { grid-column: 1 / -1; }
+.card .edit input, .card .edit textarea, .card .edit select.sel { font: inherit; font-size: 13px; letter-spacing: 0; text-transform: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; background: var(--page); color: var(--ink); width: 100%; box-sizing: border-box; }
+.card .edit select.sel { border-radius: 8px; padding-right: 22px; }
+.card .edit textarea { min-height: 58px; resize: vertical; }
+.card .edit input:focus, .card .edit textarea:focus { border-color: var(--ember); outline: none; }
+.card .edit .hint { text-transform: none; letter-spacing: 0; }
+.card .edit .res a { color: var(--ember); font-size: 13px; text-transform: none; letter-spacing: 0; word-break: break-all; }
+.card .edit .row { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.card .edit .row .src { margin-left: auto; }
 .viewrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
 .board { display: grid; grid-template-columns: repeat(6, minmax(190px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
 .col { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px; min-height: 160px; display: flex; flex-direction: column; gap: 8px; }
@@ -186,11 +196,8 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
   <div class="who" id="who"></div>
 </section>
 
-<section class="stats five" id="stats" aria-label="Summary"></section>
-
 <h2>Pipeline.</h2>
-<p class="lede">Drag a card to the stage it reached, or use the menu on the card. Saved roles become applications when you mark them applied.</p>
-<div class="funnel" id="funnel" aria-label="Funnel"></div>
+<p class="lede">Drag a card to the stage it reached, or use the menu on it. Click a card to open it: resume used, who you contacted, dates and notes live there. Saved roles become applications when you mark them applied.</p>
 <div class="viewrow">
   <div class="seg" id="view" role="group" aria-label="View"><button type="button" class="ctl small" data-view="board" aria-pressed="true">Board</button><button type="button" class="ctl small" data-view="table" aria-pressed="false">Table</button></div>
   <span class="dp-note">Stages: Applied → Phone screen → Interview → Offer. Rejected, closed and withdrawn go to the last column.</span>
@@ -517,16 +524,14 @@ window.JADAR = (function () {
     persist(); render(); return id;
   }
 
-  // ---- hero + stats ----
+  // ---- hero line (the only stats: Kevin 2026-11-25, "seems redundant with the applied row and then another applied row") ----
   function renderStats() {
     const rows = rowsAll(); const st = r => r.app.status || 'applied';
     const n = rows.length, waiting = rows.filter(r => st(r) === 'applied' && !r.get('firstResponse')).length;
     const inter = rows.filter(r => ['screen', 'interview'].includes(st(r))).length, rej = rows.filter(r => ['rejected', 'closed', 'withdrawn'].includes(st(r))).length;
     const offers = rows.filter(r => st(r) === 'offer').length, fu = rows.filter(needsFollowUp).length;
-    $('#meta').innerHTML = [n + ' application' + (n === 1 ? '' : 's'), waiting + ' awaiting response', fu + ' to follow up', inter + ' interview' + (inter === 1 ? '' : 's'), rej + ' rejected'].map(esc).join('<span class="sep">·</span>');
+    $('#meta').innerHTML = [n + ' application' + (n === 1 ? '' : 's'), waiting + ' awaiting response', fu + ' to follow up', inter + ' interview' + (inter === 1 ? '' : 's'), offers + ' offer' + (offers === 1 ? '' : 's'), rej + ' closed'].map(esc).join('<span class="sep">·</span>');
     $('#fu-toggle').textContent = 'Needs follow-up' + (fu ? ' · ' + fu : '');
-    const stats = [['Applications', n, 'tracked', ''], ['Awaiting', waiting, 'no response yet', waiting ? 'ember' : ''], ['Follow up', fu, fu ? FU_DAYS + '+ days, no reply' : 'nothing overdue', fu ? 'ember' : ''], ['Interviews', inter + offers, offers ? offers + ' offer' + (offers === 1 ? '' : 's') : 'screens + interviews', inter + offers ? 'good' : ''], ['Closed out', rej, 'rejected / closed', '']];
-    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
   }
 
   // ---- main table ----
@@ -576,11 +581,8 @@ window.JADAR = (function () {
     const rows = rowsAll(); const st = r => r.app.status || 'applied';
     const saved = Object.entries(S.roles).filter(([u, e]) => e.status === 'saved').map(([u, e]) => Object.assign({url: u}, e.snap || {}));
     const reached = i => rows.filter(r => furthest(r) <= i).length; const n = rows.length;
-    const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '';
-    const steps = [['Applied', n, n ? 'all applications' : 'nothing yet', 'applied'], ['Phone screen', reached(2), n ? pct(reached(2), n) + ' of applied' : '', 'screen'],
-                   ['Interview', reached(1), reached(2) ? pct(reached(1), reached(2)) + ' of screens' : '', 'interview'], ['Offer', reached(0), reached(1) ? pct(reached(0), reached(1)) + ' of interviews' : '', 'offer'],
-                   ['Closed', rows.filter(r => CLOSED.has(st(r))).length, 'rejected / closed / withdrawn', 'closed']];
-    $('#funnel').innerHTML = steps.map(([l, v, r, k]) => `<div class="step ${k === 'closed' ? 'closed' : ''} stage-${k}" style="box-shadow: inset 0 3px 0 var(--stage)"><div class="n">${v}</div><div class="l">${esc(l)}</div><div class="r">${esc(r)}</div></div>`).join('');
+    const pct = (a, b) => b ? Math.round(100 * a / b) + '% reached' : '';  // how many applications ever got this far (shown in the column header)
+    const REACH = {screen: reached(2) ? pct(reached(2), n) : '', interview: reached(1) ? pct(reached(1), n) : '', offer: reached(0) ? pct(reached(0), n) : ''};
     const cols = [['saved', 'Saved', 'Saved on the radar, not applied yet', saved.map(r => ({kind: 'saved', key: r.url, snap: r}))],
                   ['applied', 'Applied', 'Waiting to hear back', rows.filter(r => st(r) === 'applied')], ['screen', 'Phone screen', '', rows.filter(r => st(r) === 'screen')],
                   ['interview', 'Interview', '', rows.filter(r => st(r) === 'interview')], ['offer', 'Offer', '', rows.filter(r => st(r) === 'offer')],
@@ -588,8 +590,37 @@ window.JADAR = (function () {
     const byDate = (a, b) => cmpStr(b.app ? (b.app.stageAt || b.get('appliedOn')) : (b.snap.applyBy || ''), a.app ? (a.app.stageAt || a.get('appliedOn')) : (a.snap.applyBy || ''));
     $('#board').innerHTML = cols.map(([k, title, hint, items]) => {
       const cards = items.sort(k === 'saved' ? (a, b) => cmpStr(a.snap.applyBy || '9', b.snap.applyBy || '9') : byDate).map(it => card(k, it)).join('');
-      return `<section class="col stage-${k}" data-col="${k}" aria-label="${esc(title)}"><h3>${esc(title)}<span class="cnt">${items.length}</span></h3>${cards || (hint ? `<div class="hint">${esc(hint)}</div>` : '')}</section>`;
+      return `<section class="col stage-${k}" data-col="${k}" aria-label="${esc(title)}"><h3>${esc(title)}${REACH[k] ? `<span class="pct">${esc(REACH[k])}</span>` : ''}<span class="cnt">${items.length}</span></h3>${cards || (hint ? `<div class="hint">${esc(hint)}</div>` : '')}</section>`;
     }).join('');
+    const openCol = board.open ? cols.findIndex(([k, t, h, items]) => items.some(it => `${it.kind}:${it.key}` === board.open)) : -1;
+    $('#board').style.gridTemplateColumns = cols.map((c, i) => i === openCol ? 'minmax(400px, 2.2fr)' : 'minmax(170px, 1fr)').join(' ');
+    if (board.focus) { const el = $('#board .card.open [data-f="' + board.focus + '"]'); if (el) el.focus({preventScroll: true}); board.focus = null; }
+  }
+  const board = {open: null, focus: null};  // which card is open (kind:key) and which field to focus after a re-render
+  function editor(r) {  // the application's own fields, inside its card
+    const d = (f) => { const v = r.get(f); return esc(isIso(v) ? v.slice(0, 10) : ''); };
+    const ap = r.get('appliedOn'); const at = r.app.appliedAt ? new Date(r.app.appliedAt) : null;
+    const clicked = at && !isNaN(at) ? `<span class="hint">clicked ${esc(at.toLocaleString([], {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}))}</span>` : '';
+    const res = r.app.resume || null; const c = J.syncCfg();
+    const resSel = c ? `<select class="sel" data-res="1" aria-label="Resume used">${['<option value="">' + (res ? '— none —' : 'none yet') + '</option>'].concat((FILES || []).map(f => `<option value="${esc(f.path)}"${res && res.path === f.path ? ' selected' : ''}>${esc(f.name)}</option>`), ['<option value="__upload">Upload a PDF…</option>']).join('')}</select>`
+                     : `<span class="hint">${res ? esc(res.name) : 'connect sync (Table → Data) to attach a file'}</span>`;
+    const resLink = res ? `<a href="#" data-openres="${esc(res.path)}" data-name="${esc(res.name)}">${esc(res.name)}</a>` : '';
+    const exp = r.get('expected'); const late = isIso(exp) && daysTo(exp) < 0 && !r.get('firstResponse') ? '<span class="hint late">passed, no reply</span>' : '';
+    const fu = needsFollowUp(r) ? `<button type="button" class="pbtn tiny" data-fu="1" title="Logs today's date under Contacted and resets the ${FU_DAYS}-day nudge">Followed up today</button>` : (r.app.followedUp ? `<span class="hint">followed up ${esc(fmt(r.app.followedUp))}</span>` : '');
+    const manual = r.kind === 'manual';
+    return `<div class="edit">`
+      + (manual ? `<label>Company<input type="text" data-mf="company" value="${esc(r.company)}"></label><label>Position<input type="text" data-mf="position" value="${esc(r.position)}"></label><label class="wide">Link<input type="url" data-mf="link" value="${esc(r.link)}"></label>` : '')
+      + `<label>Applied on<input type="date" data-f="appliedOn" value="${d('appliedOn')}">${clicked}</label>`
+      + `<label class="res">Resume used${resLink}${resSel}</label>`
+      + `<label>Expected response<input type="date" data-f="expected" value="${d('expected')}">${late}</label>`
+      + `<label>First response<input type="date" data-f="firstResponse" value="${d('firstResponse')}"></label>`
+      + `<label>Next dates<input type="text" data-f="dates" value="${esc(r.get('dates'))}" placeholder="interview Dec 3, 2 pm"></label>`
+      + `<label>Pay<input type="text" data-f="pay" value="${esc(r.get('pay'))}"></label>`
+      + `<label class="wide">Contacted<textarea data-f="contacted" placeholder="who, when, what they said">${esc(r.get('contacted'))}</textarea></label>`
+      + `<label class="wide">Notes<textarea data-f="notes">${esc(r.get('notes'))}</textarea></label>`
+      + `<label class="wide">Benefits<input type="text" data-f="benefits" value="${esc(r.get('benefits'))}"></label>`
+      + `<div class="row">${fu}${manual ? '<button type="button" class="pbtn tiny" data-rm="1">Remove row</button>' : ''}<span class="src">${r.app.updatedAt ? 'saved ' + esc(fmt(String(r.app.updatedAt).slice(0, 10))) : ''}</span></div>`
+      + `</div>`;
   }
   function card(col, it) {
     if (it.kind === 'saved') {
@@ -600,21 +631,37 @@ window.JADAR = (function () {
     }
     const r = it; const stt = r.app.status || 'applied'; const since = r.app.stageAt || r.get('appliedOn'); const inStage = isIso(since) ? -daysTo(since) : null;
     const ap = r.get('appliedOn'); const meta = [];
-    if (isIso(ap)) meta.push(`applied ${esc(fmt(ap))}`); if (inStage != null && stt !== 'applied') meta.push(`${inStage} d in stage`);
-    if (r.get('pay')) meta.push(esc(r.get('pay'))); if (r.get('dates')) meta.push('next: ' + esc(r.get('dates')));
-    if (r.app.resume) meta.push('resume: ' + esc(r.app.resume.name)); else if (!CLOSED.has(stt)) meta.push('<span class="src">no resume on file</span>');
-    if (needsFollowUp(r)) meta.push('<span class="fu">follow up</span>'); if (CLOSED.has(stt)) meta.push(esc(LABEL[stt].toLowerCase()));
+    if (isIso(ap)) meta.push(`<span>applied ${esc(fmt(ap))}</span>`); if (inStage != null && stt !== 'applied') meta.push(`<span>${inStage} d in stage</span>`);
+    if (r.get('pay')) meta.push(`<span>${esc(r.get('pay'))}</span>`); if (r.get('dates')) meta.push(`<span>next: ${esc(r.get('dates'))}</span>`);
+    if (r.app.resume) meta.push(`<span>resume: ${esc(r.app.resume.name)}</span>`); else if (!CLOSED.has(stt)) meta.push('<span class="src">no resume on file</span>');
+    if (needsFollowUp(r)) meta.push('<span class="fu">follow up</span>'); if (CLOSED.has(stt)) meta.push(`<span>${esc(LABEL[stt].toLowerCase())}</span>`);
     const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position || '(no title)');
     const sel = `<select class="sel" data-move="1" aria-label="Move to stage">${STATUSES.map(x => `<option value="${x}"${x === stt ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
-    return `<article class="card stage-${CLOSED.has(stt) ? 'closed' : stt}" draggable="true" data-kind="${r.kind}" data-key="${esc(r.key)}"><div class="co">${esc(r.company)}</div><div class="pos">${link}</div><div class="m">${meta.join('')}</div><div class="acts">${sel}</div></article>`;
+    const open = board.open === `${r.kind}:${r.key}`;
+    return `<article class="card stage-${CLOSED.has(stt) ? 'closed' : stt}${open ? ' open' : ''}" draggable="${open ? 'false' : 'true'}" data-kind="${r.kind}" data-key="${esc(r.key)}"><button type="button" class="exp" data-exp="1" aria-expanded="${open}" title="${open ? 'Close' : 'Open: resume, contacts, dates, notes'}">${open ? '▴' : '▾'}</button><div class="co">${esc(r.company)}</div><div class="pos">${link}</div><div class="m">${meta.join('')}</div><div class="acts">${sel}</div>${open ? editor(r) : ''}</article>`;
   }
   function cardRow(el) { const c = el.closest('.card'); if (!c) return null; if (c.dataset.kind === 'saved') return {kind: 'saved', key: c.dataset.key}; return rowsAll().find(r => r.kind === c.dataset.kind && r.key === c.dataset.key) || null; }
   function dropTo(row, col) {
     if (!row) return; if (row.kind === 'saved') { if (col !== 'saved') markApplied(row.key); return; }
     if (col === 'saved') return; moveTo(row, col === 'closed' ? (CLOSED.has(row.app.status) ? row.app.status : 'rejected') : col);
   }
-  $('#board').addEventListener('change', e => { if (e.target.matches('select[data-move]')) { const row = cardRow(e.target); if (row && row.kind !== 'saved') moveTo(row, e.target.value); } });
-  $('#board').addEventListener('click', e => { const b = e.target.closest('button[data-apply]'); if (b) { const row = cardRow(b); if (row) markApplied(row.key); } });
+  $('#board').addEventListener('change', e => {
+    const t = e.target; const row = cardRow(t); if (!row || row.kind === 'saved') return;
+    if (t.matches('select[data-move]')) { moveTo(row, t.value); return; }
+    if (t.matches('select[data-res]')) { const v = t.value; if (v === '__upload') { pickFor = row; picker.click(); } else setResume(row, v ? (FILES || []).find(f => f.path === v) : null); return; }
+    if (t.matches('[data-f]')) { board.focus = null; setApp(row, t.dataset.f, t.value); return; }   // saves on change / blur, re-renders the card
+    if (t.matches('[data-mf]')) { setManualField(row, t.dataset.mf, t.value); }
+  });
+  $('#board').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.card .edit input')) { e.preventDefault(); e.target.blur(); } if (e.key === 'Escape' && e.target.closest('.card.open')) { board.open = null; render(); } });
+  $('#board').addEventListener('click', e => {
+    const b = e.target.closest('button[data-apply]'); if (b) { const row = cardRow(b); if (row) markApplied(row.key); return; }
+    const op = e.target.closest('a[data-openres]'); if (op) { e.preventDefault(); const c = J.syncCfg(); if (c) J.openRepoFile(c, op.dataset.openres, op.dataset.name); return; }
+    const fu = e.target.closest('button[data-fu]'); if (fu) { const row = cardRow(fu); if (row) markFollowedUp(row); return; }
+    const rm = e.target.closest('button[data-rm]'); if (rm) { const row = cardRow(rm); if (row) removeManual(row); return; }
+    if (e.target.closest('a, select, input, textarea, label, .edit')) return;
+    const c = e.target.closest('.card'); if (!c || c.dataset.kind === 'saved') return;
+    const key = c.dataset.kind + ':' + c.dataset.key; board.open = board.open === key ? null : key; render();
+  });
   $('#board').addEventListener('dragstart', e => { const c = e.target.closest('.card'); if (!c) return; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', c.dataset.kind + '|' + c.dataset.key); });
   $('#board').addEventListener('dragend', e => { const c = e.target.closest('.card'); if (c) c.classList.remove('dragging'); document.querySelectorAll('.col.over').forEach(x => x.classList.remove('over')); });
   $('#board').addEventListener('dragover', e => { const col = e.target.closest('.col'); if (!col) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; document.querySelectorAll('.col.over').forEach(x => x !== col && x.classList.remove('over')); col.classList.add('over'); });
