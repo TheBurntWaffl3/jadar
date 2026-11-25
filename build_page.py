@@ -240,7 +240,7 @@ footer a { color: var(--ink); }
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" aria-current="page">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a><span class="sep">·</span><a href="resumes.html" title="Tailored resume drafts">Resumes</a></nav>
   <h1>Job radar.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -896,12 +896,13 @@ window.JADAR = (function () {
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
   const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
-  const emptyState = () => ({v: 1, roles: {}, manual: {}, tracker: {connections: [], places: [], at: ''}});
+  const emptyState = () => ({v: 1, roles: {}, manual: {}, resume: {master: '', at: ''}, drafts: {}, tracker: {connections: [], places: [], at: ''}});
   function normState(s) {  // older files have only `roles`; give them the tracker parts
     if (!s || s.v !== 1 || !s.roles || typeof s.roles !== 'object') return null;
     if (!s.manual || typeof s.manual !== 'object') s.manual = {};
     if (!s.tracker || typeof s.tracker !== 'object') s.tracker = {connections: [], places: [], at: ''};
     if (!Array.isArray(s.tracker.connections)) s.tracker.connections = []; if (!Array.isArray(s.tracker.places)) s.tracker.places = [];
+    if (!s.resume || typeof s.resume !== 'object') s.resume = {master: '', at: ''}; if (!s.drafts || typeof s.drafts !== 'object') s.drafts = {};
     return s;
   }
   function loadState() { try { const s = normState(JSON.parse(lsGet(KEY) || 'null')); if (s) return s; } catch (e) {} return emptyState(); }
@@ -912,7 +913,8 @@ window.JADAR = (function () {
     const newer = (x, y) => !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x);
     new Set([...Object.keys(a.roles), ...Object.keys(b.roles)]).forEach(u => { out.roles[u] = newer(a.roles[u], b.roles[u]); });
     new Set([...Object.keys(a.manual), ...Object.keys(b.manual)]).forEach(k => { out.manual[k] = newer(a.manual[k], b.manual[k]); });
-    out.tracker = newer(a.tracker, b.tracker);
+    out.tracker = newer(a.tracker, b.tracker); out.resume = newer(a.resume, b.resume);
+    new Set([...Object.keys(a.drafts), ...Object.keys(b.drafts)]).forEach(u => { out.drafts[u] = newer(a.drafts[u], b.drafts[u]); });
     return out;
   }
   // ---- GitHub Contents API (token stays in this browser; only api.github.com is contacted) ----
@@ -922,6 +924,7 @@ window.JADAR = (function () {
   const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
   const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
   const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
+  const draftsUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'drafts.json');
   async function ghGet(c) {
     const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
     if (r.status === 404) return {state: null, sha: null};
@@ -972,7 +975,7 @@ window.JADAR = (function () {
     reflect();
   }
   return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
-          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, ghGet, ghPut, makeSync, bindSyncPanel};
+          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, draftsUrl, ghGet, ghPut, makeSync, bindSyncPanel};
 })();
 </script>"""
 
@@ -1059,7 +1062,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a><span class="sep">·</span><a href="resumes.html" title="Tailored resume drafts">Resumes</a></nav>
   <h1>Tracker.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -1561,7 +1564,7 @@ table.tr { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" aria-current="page">Sources</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" aria-current="page">Sources</a><span class="sep">·</span><a href="resumes.html" title="Tailored resume drafts">Resumes</a></nav>
   <h1>Sources.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -1669,6 +1672,190 @@ def board_url(s):
     except (KeyError, AttributeError): return None
     return None
 
+RESUMES_TEMPLATE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Resumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+__CSS_SHARED__
+/* resumes */
+.stats.four { grid-template-columns: repeat(4, 1fr); }
+.two { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.dcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; cursor: pointer; }
+.dcard:hover, .dcard.on { outline: 2px solid var(--ember); outline-offset: -2px; }
+.dcard .co { font-weight: 600; font-size: 13.5px; } .dcard .t { font-size: 13px; } .dcard .m { color: var(--muted); font-size: 11.5px; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+.st { display: inline-block; font: 11px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; border: 1px solid var(--line); }
+.st.approved { color: var(--good); border-color: var(--good); } .st.rejected { color: var(--muted); } .st.redo { color: #b07a00; border-color: #b07a00; } .st.draft { color: var(--ember); border-color: var(--ember); }
+.detail { background: var(--page); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.detail h3 { margin: 14px 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.detail h3:first-child { margin-top: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; } .chip { font-size: 12px; border-radius: 999px; padding: 3px 9px; border: 1px solid var(--line); background: var(--pill); }
+.chip.ok { border-color: var(--good); } .chip.miss { border-color: var(--crit); color: var(--crit); }
+table.diff { border-collapse: collapse; width: 100%; font-size: 13px; } .diff th, .diff td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+.diff th { color: var(--muted); font-weight: 500; } .diff td.sec { white-space: nowrap; color: var(--muted); font-size: 12px; } .diff td.rev { font-weight: 500; } .diff td.why { color: var(--muted); font-size: 12px; }
+.diff tr.changed td.rev { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.lede small { color: var(--muted); }
+textarea.master { width: 100%; min-height: 260px; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--page); color: var(--ink); }
+.gaps li { margin: 3px 0; }
+.empty { color: var(--muted); padding: 24px 0; }
+.hidden { display: none !important; }
+@media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats.four { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a><span class="sep">·</span><a href="resumes.html" aria-current="page">Resumes</a></nav>
+  <h1>Resumes.</h1>
+  <div class="meta mono" id="meta"></div>
+  <div class="who" id="who"></div>
+</section>
+
+<section class="stats four" id="stats" aria-label="Summary"></section>
+
+<h2>Drafts.</h2>
+<p class="lede">Each morning the radar drafts a tailored revision of your master resume for the strongest new fits: saved roles first, then roles naming 2027. Review, approve or send back. <small>Drafts live in your private state repo; nothing here is on the public page.</small></p>
+<div class="tabsrow">
+  <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
+  <button type="button" class="ctl small" id="master-toggle" aria-expanded="false" aria-controls="masterpanel">Master resume</button>
+  <span class="sync-status mono" id="sync-status"></span>
+  <span class="count mono" id="count"></span>
+</div>
+<div id="datapanel" class="hidden">
+  <div class="dp-head mono">Sync with GitHub</div>
+  <div class="dp-row">
+    <input type="text" id="sync-repo" placeholder="owner/name" value="TheBurntWaffl3/jadar-state" aria-label="Repository">
+    <input type="text" id="sync-path" placeholder="state.json" value="state.json" aria-label="File path">
+    <input type="password" id="sync-token" class="wide" placeholder="fine-grained token" aria-label="Token" autocomplete="off">
+    <button type="button" class="pbtn" id="sync-connect">Connect</button>
+    <button type="button" class="pbtn" id="sync-disconnect">Disconnect</button>
+    <button type="button" class="pbtn" id="sync-now">Sync now</button>
+  </div>
+  <div class="dp-note">Same token as the radar and tracker. Drafts are read from drafts.json next to state.json; your approvals are written into state.json.</div>
+</div>
+<div id="masterpanel" class="hidden">
+  <div class="dp-head mono">Master resume (the only source of facts for every draft)</div>
+  <div class="dp-note">Paste the full text of your current resume: headings, then one bullet per line. It is stored in your state file (private repo), never on the public page. Update it whenever the real resume changes.</div>
+  <textarea class="master" id="master" aria-label="Master resume text" placeholder="Kevin Kyle&#10;EDUCATION&#10;University of Maryland, College Park — B.S. Aerospace Engineering, expected May 2027&#10;TECHNICAL EXPERIENCE&#10;Rocket Lab — R&D Engineering Intern&#10;- Built LabVIEW DAQ ..."></textarea>
+  <div class="dp-row"><button type="button" class="pbtn on" id="master-save">Save master</button><span class="dp-note" id="master-note"></span></div>
+</div>
+
+<div class="two">
+  <div class="list" id="list"></div>
+  <div class="detail" id="detail"><div class="empty">Pick a draft on the left.</div></div>
+</div>
+
+<footer>Drafts only rephrase, reorder and select from your master resume; they never add experience. Source: <a href="__REPO__">__REPO_SHORT__</a>.</footer>
+</main>
+<script id="data" type="application/json">__DATA__</script>
+__SHARED_JS__
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const J = window.JADAR; const $ = (s, el) => (el || document).querySelector(s); const esc = J.esc;
+  const today = new Date(D.today + 'T00:00:00'); const fmt = iso => J.fmt(iso, today), isIso = J.isIso;
+  let S = J.loadState(); let DRAFTS = null; let cur = null;
+  if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
+  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status'), after: c => loadDrafts(c)});
+  function persist() { J.saveState(S); sync.schedulePush(); }
+  J.bindSyncPanel($, sync, () => { DRAFTS = null; render(); });
+  async function loadDrafts(c) {
+    try {
+      const r = await fetch(J.draftsUrl(c), {headers: J.ghHeaders(c), cache: 'no-store'});
+      if (!r.ok) { DRAFTS = r.status === 404 ? {v: 1, drafts: {}} : DRAFTS; render(); return; }
+      const j = await r.json(); const d = JSON.parse(J.b64dec(j.content || ''));
+      if (d && d.drafts && typeof d.drafts === 'object') { DRAFTS = d; render(); }
+    } catch (e) { render(); }
+  }
+  const mark = u => (S.drafts[u] || {}).status || 'draft';
+  function setMark(u, status) { S.drafts[u] = {status, at: J.nowIso()}; persist(); render(); }
+  function items() { return Object.values((DRAFTS || {}).drafts || {}).sort((a, b) => (b.generatedAt || '').localeCompare(a.generatedAt || '')); }
+  function revisedText(d) {
+    const p = d.plan || {}; const lines = [];
+    if (p.summary) lines.push(p.summary, '');
+    let sec = null;
+    (p.bullets || []).forEach(b => { if (b.section !== sec) { sec = b.section; lines.push(sec.toUpperCase()); } lines.push('- ' + b.revised); });
+    if (p.skills_line) lines.push('', 'SKILLS', p.skills_line);
+    return lines.join('\n');
+  }
+  function renderStats() {
+    const it = items(); const n = it.length, ap = it.filter(d => mark(d.url) === 'approved').length, rj = it.filter(d => mark(d.url) === 'rejected').length, open = n - ap - rj;
+    const hasMaster = ((S.resume || {}).master || '').length >= 200;
+    $('#meta').innerHTML = [n + ' draft' + (n === 1 ? '' : 's'), open + ' to review', ap + ' approved', hasMaster ? 'master resume saved' : 'no master resume yet'].map(esc).join('<span class="sep">·</span>');
+    const stats = [['Drafts', n, 'on file (45 days)', ''], ['To review', open, open ? 'waiting for you' : 'all reviewed', open ? 'ember' : ''], ['Approved', ap, 'ready to build', ap ? 'good' : ''], ['Master', hasMaster ? 'OK' : '—', hasMaster ? 'saved ' + fmt((S.resume.at || '').slice(0, 10)) : 'paste it under Master resume', '']];
+    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+  }
+  function render() {
+    renderStats();
+    const it = items(); const c = J.syncCfg();
+    $('#count').textContent = it.length ? it.length + ' draft' + (it.length === 1 ? '' : 's') : '';
+    if (!c) { $('#list').innerHTML = '<div class="empty">Connect sync under Data to load your drafts (they live in your private repo).</div>'; }
+    else if (!DRAFTS) { $('#list').innerHTML = '<div class="empty">Loading drafts…</div>'; }
+    else if (!it.length) { $('#list').innerHTML = `<div class="empty">${((S.resume || {}).master || '').length >= 200 ? 'No drafts yet. The next morning run drafts up to 3 for your strongest fits.' : 'Paste your master resume first (button above); the next morning run drafts from it.'}</div>`; }
+    else $('#list').innerHTML = it.map(d => `<div class="dcard${cur === d.url ? ' on' : ''}" data-url="${esc(d.url)}" tabindex="0"><div class="co">${esc(d.company)}</div><div class="t">${esc(d.title)}</div><div class="m"><span class="st ${esc(mark(d.url))}">${esc(mark(d.url))}</span><span>${esc(d.fit)}</span><span>${esc(fmt(d.generatedAt))}</span>${d.applyBy ? `<span>apply by ${esc(fmt(d.applyBy))}</span>` : ''}</div></div>`).join('');
+    if (cur && !it.some(d => d.url === cur)) cur = null;
+    renderDetail(it.find(d => d.url === cur));
+    const m = $('#master'); if (document.activeElement !== m) m.value = (S.resume || {}).master || '';
+    $('#master-note').textContent = (S.resume || {}).at ? 'Saved ' + fmt((S.resume.at || '').slice(0, 10)) + ' · ' + ((S.resume.master || '').split('\n').length) + ' lines' : 'Not saved yet';
+  }
+  function renderDetail(d) {
+    if (!d) { $('#detail').innerHTML = '<div class="empty">Pick a draft on the left.</div>'; return; }
+    const p = d.plan || {}; const st = mark(d.url);
+    const cov = (p.coverage || []).map(x => `<span class="chip ${x.present ? 'ok' : 'miss'}" title="${esc(x.where || '')}">${esc(x.keyword)}</span>`).join('') || (p.keywords || []).map(k => `<span class="chip">${esc(k)}</span>`).join('');
+    const rows = (p.bullets || []).map(b => `<tr class="${b.revised !== b.original ? 'changed' : ''}"><td class="sec">${esc(b.section)}</td><td>${esc(b.original)}</td><td class="rev">${esc(b.revised)}</td><td class="why">${esc(b.why)}</td></tr>`).join('');
+    $('#detail').innerHTML = `<h3>${esc(d.company)} · <span class="st ${esc(st)}">${esc(st)}</span></h3>
+      <div style="font-size:17px;font-weight:600;letter-spacing:-.01em"><a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(d.title)}</a></div>
+      <div class="dp-note">${esc(d.location || '')}${d.why ? ' · ' + esc(d.why) : ''} · drafted ${esc(fmt(d.generatedAt))} · ${esc(d.model || '')}</div>
+      ${p.summary ? `<h3>Summary line</h3><div>${esc(p.summary)}</div>` : ''}
+      <h3>Posting keywords (green = your master already shows it)</h3><div class="chips">${cov}</div>
+      <h3>Bullets (in the order they should appear)</h3>
+      <table class="diff"><thead><tr><th>Section</th><th>Master</th><th>Tailored</th><th>Why</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="empty">No bullets returned.</td></tr>'}</tbody></table>
+      ${p.skills_line ? `<h3>Skills line</h3><div>${esc(p.skills_line)}</div>` : ''}
+      ${(p.section_order || []).length ? `<h3>Section order</h3><div>${esc(p.section_order.join(' → '))}</div>` : ''}
+      ${(p.gaps || []).length ? `<h3>Gaps (requirements your master does not show)</h3><ul class="gaps">${p.gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul>` : ''}
+      ${p.note ? `<h3>Note</h3><div>${esc(p.note)}</div>` : ''}
+      <div class="acts">
+        <button type="button" class="pbtn${st === 'approved' ? ' on' : ''}" data-mark="approved">✓ Approve</button>
+        <button type="button" class="pbtn${st === 'rejected' ? ' on' : ''}" data-mark="rejected">Reject</button>
+        <button type="button" class="pbtn${st === 'redo' ? ' on' : ''}" data-mark="redo" title="The next morning run drafts this role again">Send back for a redo</button>
+        <button type="button" class="pbtn" id="copy-rev">Copy tailored text</button>
+        <button type="button" class="pbtn" id="dl-rev">Download .md</button>
+      </div>`;
+    $('#detail').querySelectorAll('button[data-mark]').forEach(b => b.addEventListener('click', () => setMark(d.url, st === b.dataset.mark ? 'draft' : b.dataset.mark)));
+    $('#copy-rev').addEventListener('click', async () => { try { await navigator.clipboard.writeText(revisedText(d)); $('#copy-rev').textContent = 'Copied'; setTimeout(() => $('#copy-rev').textContent = 'Copy tailored text', 1200); } catch (e) { alert('Copy failed; select the text instead.'); } });
+    $('#dl-rev').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([revisedText(d)], {type: 'text/markdown'})); a.download = (d.company + ' - ' + d.title).replace(/[^\w.-]+/g, '_') + '.md'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); });
+  }
+  $('#list').addEventListener('click', e => { const c = e.target.closest('.dcard'); if (c) { cur = c.dataset.url; render(); } });
+  $('#list').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.dcard')) { e.preventDefault(); cur = e.target.dataset.url; render(); } });
+  $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); });
+  $('#master-toggle').addEventListener('click', e => { const o = $('#masterpanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); if (!o) $('#master').focus(); });
+  $('#master-save').addEventListener('click', () => { S.resume = {master: $('#master').value.replace(/\r\n/g, '\n').trim(), at: J.nowIso()}; persist(); render(); });
+  render();
+  const c0 = J.syncCfg(); if (c0) { sync.syncNow(); }
+})();
+</script>
+</body>
+</html>
+"""
+
+def build_resumes(profile_name=None, profile=None, today=None):
+    """Return the HTML string for resumes.html. Embeds nothing personal: drafts come from the private repo through the
+    browser's sync token, the master resume lives in the state file."""
+    data = dict(today=today or dt.date.today().isoformat(), profileName=profile_name or (profile or {}).get("name"))
+    blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+    short = REPO_URL.replace("https://github.com/", "")
+    return (RESUMES_TEMPLATE.replace("__CSS_SHARED__", CSS_SHARED).replace("__SHARED_JS__", SHARED_JS).replace("__DATA__", blob)
+            .replace("__REPO__", REPO_URL).replace("__REPO_SHORT__", short))
+
 def build_sources(out, src, profile_name=None, profile=None):
     """Return the HTML string for sources.html: one row per board with what the last run saw, plus the not-covered list."""
     st = {x["org"]: x for x in out.get("status", [])}
@@ -1724,10 +1911,13 @@ def main():
     html = build(out, src, name, profile)
     os.makedirs(site, exist_ok=True)
     with open(os.path.join(site, "index.html"), "w") as f: f.write(html)
-    tracker = build_tracker(name, profile, (out.get("scanned") or dt.date.today().isoformat())[:10])
+    today = (out.get("scanned") or dt.date.today().isoformat())[:10]
+    tracker = build_tracker(name, profile, today)
     with open(os.path.join(site, "tracker.html"), "w") as f: f.write(tracker)
     sources = build_sources(out, src, name, profile)
     with open(os.path.join(site, "sources.html"), "w") as f: f.write(sources)
+    resumes = build_resumes(name, profile, today)
+    with open(os.path.join(site, "resumes.html"), "w") as f: f.write(resumes)
     print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles; site/tracker.html: {len(tracker) // 1024} KB; site/sources.html: {len(sources) // 1024} KB")
 
 if __name__ == "__main__":

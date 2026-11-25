@@ -170,6 +170,16 @@ class SourcesTests(unittest.TestCase):
         self.assertEqual(build_page.board_url({"type": "sitemap", "sitemaps": ["https://careers.l3harris.com/sitemap.xml"]}), "https://careers.l3harris.com")
         self.assertIsNone(build_page.board_url({"type": "greenhouse"}))
 
+class ResumesTests(unittest.TestCase):
+    """resumes.html: review page for tailored drafts; embeds nothing personal."""
+    def test_page(self):
+        html = build_page.build_resumes("Kevin Kyle", today="2026-11-25")
+        for needle in ('aria-current="page">Resumes</a>', "Master resume", "draftsUrl", "Approve", "Send back for a redo", "Copy tailored text", 'id="master"'):
+            self.assertIn(needle, html, needle)
+        data = embedded(html); self.assertEqual(sorted(data), ["profileName", "today"])
+        self.assertIn("resume: {master: '', at: ''}, drafts: {}", html); self.assertIn("out.resume = newer(a.resume, b.resume)", html)
+        self.assertIn('href="resumes.html"', build_page.build_tracker("K", today="2026-11-25"))
+
 class TrackerTests(unittest.TestCase):
     """tracker.html: second page, same state file, no roles or personal data embedded."""
 
@@ -193,6 +203,7 @@ class TrackerTests(unittest.TestCase):
             subprocess.run([sys.executable, "-I", build_page.__file__], check=True, env=env, cwd=ROOT, capture_output=True)
             self.assertTrue(os.path.exists(os.path.join(site, "index.html")))
             self.assertTrue(os.path.exists(os.path.join(site, "sources.html")))
+            self.assertTrue(os.path.exists(os.path.join(site, "resumes.html")))
             with open(os.path.join(site, "tracker.html")) as f: tracker = f.read()
             with open(os.path.join(site, "index.html")) as f: index = f.read()
         self.assertIn("<title>Tracker</title>", tracker)

@@ -24,6 +24,9 @@ on:
         description: Also send the email/ntfy digest from this manual run (scheduled runs follow ALERTS below)
         type: boolean
         default: false
+      tailor_max:
+        description: Max resume drafts this run (blank = default 3; 0 = none)
+        default: ""
   push:
     paths: ["**.py", "sources.json", "profiles/**", ".github/workflows/radar.yml"]
 
@@ -89,6 +92,7 @@ jobs:
           cp site/index.html data/index.html
           cp site/tracker.html data/tracker.html
           cp site/sources.html data/sources.html
+          cp site/resumes.html data/resumes.html
 
       - name: Send alert
         if: steps.scan.outcome == 'success' && inputs.only == '' && (github.event_name == 'schedule' || inputs.alert == true)
@@ -121,6 +125,21 @@ jobs:
           STATE_REPO: ${{ vars.STATE_REPO }}
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I finder.py
+
+      - name: Tailor resumes for the top fits (private drafts.json)
+        if: steps.scan.outcome == 'success' && inputs.only == '' && github.event.schedule != '43 21 * * *' && inputs.tailor_max != '0'
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          RADAR_DATA: data
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TAILOR_MAX: ${{ inputs.tailor_max }}
+          STATE_REPO: ${{ vars.STATE_REPO }}
+          STATE_PATH: ${{ vars.STATE_PATH }}
+          STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
+        run: |
+          pip install -q anthropic
+          python3 -I tailor.py
 
       - name: Commit cache and outputs to the data branch
         if: steps.scan.outcome == 'success'
