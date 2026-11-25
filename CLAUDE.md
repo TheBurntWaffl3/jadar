@@ -92,7 +92,11 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   and (expected date passed or applied 14+ days ago); tile + "Needs follow-up" filter + per-row "Followed up today" button
   (sets `app.followedUp`, appends to Contacted). `alert.tracker_summary()` applies the same rule to the state file
   (`load_state()` now also returns `_doc`) and the digest gets a "Follow up" section. **Up next**: saved radar roles with
-  `snap.applyBy`, soonest first, at the top of the tracker.
+  `snap.applyBy`, soonest first. **Pipeline board** (2026-11-25, Kevin: "can't say I've been rejected or moved to first
+  interview"): first thing on the tracker; funnel strip (reached counts via `furthest()` over `app.history`) + six columns
+  Saved / Applied / Phone screen / Interview / Offer / Closed, drag-and-drop or a per-card menu; `moveTo()` records
+  `app.stageAt` + `app.history`, `markApplied()` turns a saved radar role into an application; Board/Table toggle
+  (`jadar.trackerview.v1`). The table stays as the detail editor.
 - **Sources page** (`build_sources()` -> `site/sources.html`, third nav tab, 2026-11-18): one row per board from the run's
   `status` (listed / in field / Yes / last scanned / note) with the public board link from `board_url()`, plus `build_dash.GAPS`
   as "not covered". Embeds no personal data.
