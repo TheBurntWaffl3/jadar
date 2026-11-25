@@ -137,7 +137,7 @@ table.tr { border-collapse: collapse; width: 100%; min-width: 1120px; font-size:
 .card .edit .res a { color: var(--ember); font-size: 13px; text-transform: none; letter-spacing: 0; word-break: break-all; }
 .card .edit .row { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .card .edit .row .src { margin-left: auto; }
-.viewrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
+.viewrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; } .viewrow.top { margin-top: 22px; }
 .board { display: grid; grid-template-columns: repeat(6, minmax(190px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
 .col { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px; min-height: 160px; display: flex; flex-direction: column; gap: 8px; }
 .col.over { outline: 2px solid var(--ember); outline-offset: -2px; }
@@ -169,7 +169,9 @@ tr.fu td:first-child { box-shadow: inset 3px 0 0 #f0b400; }
 tr.st-rejected td, tr.st-closed td, tr.st-withdrawn td { background: color-mix(in srgb, var(--page) 90%, #d03b3b); }
 tr.st-screen td, tr.st-interview td { background: color-mix(in srgb, var(--page) 86%, #f0b400); }
 tr.st-offer td { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
-td.ed { cursor: text; min-width: 96px; } td.ed:hover { box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; }
+td.ed { cursor: text; min-width: 96px; }
+td.ed[data-kind="long"] { min-width: 200px; max-width: 320px; }
+td.ed .clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; line-height: 1.35; } td.ed:hover { box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; }
 td.res { min-width: 180px; } td.res a { color: var(--ember); display: block; font-size: 13px; word-break: break-all; } td.res select.sel { margin-top: 4px; max-width: 180px; }
 td.ed.editing { cursor: default; }
 td.ed input, td.ed textarea { font: inherit; font-size: 13px; width: 100%; min-width: 110px; border: 1px solid var(--ember); border-radius: 6px; padding: 4px 6px; background: var(--page); color: var(--ink); }
@@ -203,24 +205,13 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
   <div class="who" id="who"></div>
 </section>
 
-<h2>Pipeline.</h2>
-<p class="lede">Drag a card to the stage it reached, or use the menu on it. Click a card to open it: resume used, who you contacted, dates and notes live there. Saved roles become applications when you mark them applied.</p>
-<div class="viewrow">
-  <div class="seg" id="view" role="group" aria-label="View"><button type="button" class="ctl small" data-view="board" aria-pressed="true">Board</button><button type="button" class="ctl small" data-view="table" aria-pressed="false">Table</button></div>
-  <span class="dp-note">Stages: Applied → Phone screen → Interview → Offer. Rejected, closed and withdrawn go to the last column.</span>
+<div class="viewrow top">
+  <div class="seg" id="view" role="group" aria-label="View"><button type="button" class="ctl small" data-view="table" aria-pressed="true">Table</button><button type="button" class="ctl small" data-view="board" aria-pressed="false">Board</button></div>
+  <span class="dp-note" id="view-note"></span>
 </div>
 <div class="board" id="board"></div>
 
-<section id="upnext" hidden>
-<h2>Up next.</h2>
-<p class="lede">Roles you saved on the radar that have a deadline, soonest first.</p>
-<table class="sm-table" id="next"><thead><tr><th>Company</th><th>Role</th><th>Apply by</th><th>Fit</th></tr></thead><tbody id="next-rows"></tbody></table>
-<p class="dp-note" id="next-note"></p>
-</section>
-
 <div id="tableview">
-<h2>Applications.</h2>
-<p class="lede">Every role you marked applied on the radar, plus anything you add here. Click a cell to edit; it saves on Enter or when you click away.</p>
 <div class="tabsrow">
   <button type="button" class="ctl small" id="add-toggle" aria-expanded="false" aria-controls="addform">Add row</button>
   <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
@@ -444,7 +435,7 @@ window.JADAR = (function () {
   const LABEL = {applied: 'Applied', screen: 'Phone screen', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', closed: 'Closed', withdrawn: 'Withdrawn'};
   const RANK = {offer: 0, interview: 1, screen: 2, applied: 3, withdrawn: 4, closed: 5, rejected: 6};
   const CLOSED = new Set(['rejected', 'closed', 'withdrawn']); const STAGES = ['applied', 'screen', 'interview', 'offer'];
-  const VKEY = 'jadar.trackerview.v1'; let view = (J.lsGet(VKEY) === 'table') ? 'table' : 'board';
+  const VKEY = 'jadar.trackerview.v1'; let view = (J.lsGet(VKEY) === 'board') ? 'board' : 'table';  // table by default (Kevin 2026-11-25)
   const APP_FIELDS = ['benefits', 'appliedOn', 'posted', 'pay', 'expected', 'firstResponse', 'dates', 'contacted', 'notes'];
   const FU_DAYS = 14;  // no reply after this many days -> nudge; a follow-up resets the clock
   function needsFollowUp(r) {
@@ -542,7 +533,7 @@ window.JADAR = (function () {
   }
 
   // ---- main table ----
-  const state = {sort: 'applied', dir: 'desc', editing: null, fuOnly: false};
+  const state = {sort: 'applied', dir: 'asc', editing: null, fuOnly: false};  // oldest first (Kevin 2026-11-25)
   const cmpStr = (a, b) => String(a || '').localeCompare(String(b || ''));
   const SORTS = {
     applied: (a, b) => cmpStr(a.get('appliedOn'), b.get('appliedOn')),
@@ -550,7 +541,7 @@ window.JADAR = (function () {
     company: (a, b) => cmpStr(a.company, b.company) || cmpStr(b.get('appliedOn'), a.get('appliedOn')),
     status: (a, b) => (RANK[a.app.status || 'applied'] - RANK[b.app.status || 'applied']) || cmpStr(b.get('appliedOn'), a.get('appliedOn')),
   };
-  const DEFAULT_DIR = {applied: 'desc', posted: 'desc', company: 'asc', status: 'asc'};
+  const DEFAULT_DIR = {applied: 'asc', posted: 'desc', company: 'asc', status: 'asc'};
   function cell(row, f, kind) {  // kind: 'text' | 'date' | 'long'
     const v = row.get(f); const id = `${row.kind}:${row.key}:${f}`;
     if (state.editing === id) {
@@ -558,7 +549,7 @@ window.JADAR = (function () {
         kind === 'long' ? `<textarea data-f="${f}" aria-label="${f}">${esc(v)}</textarea>` : `<input type="text" value="${esc(v)}" data-f="${f}" aria-label="${f}">`;
       return `<td class="ed editing" data-f="${f}" data-kind="${kind}">${input}</td>`;
     }
-    let shown = kind === 'date' ? esc(fmt(v)) : esc(v); let extra = '';
+    let shown = kind === 'date' ? esc(fmt(v)) : kind === 'long' && v ? `<span class="clamp" title="Click to edit">${esc(v)}</span>` : esc(v); let extra = '';
     if (f === 'appliedOn' && isIso(v)) { const d = -daysTo(v); const at = row.app.appliedAt ? new Date(row.app.appliedAt) : null; extra = `<span class="hint">${d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago'}${at && !isNaN(at) ? ' · clicked ' + at.toLocaleString(undefined, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) : ''}</span>`; }
     if (f === 'expected' && isIso(v) && daysTo(v) < 0 && !row.get('firstResponse')) shown = `<span class="late" title="Expected response date passed with no reply">${shown}</span>`;
     if (f === 'contacted' && needsFollowUp(row)) { const ap = row.get('appliedOn'); extra = `<button type="button" class="pbtn tiny" data-fu="1" title="Logs today's date here and resets the ${FU_DAYS}-day nudge">Followed up today</button>` + (isIso(ap) ? `<span class="hint">${-daysTo(ap)} days, no reply</span>` : ''); }
@@ -570,7 +561,7 @@ window.JADAR = (function () {
     const sign = state.dir === 'desc' ? -1 : 1; rows.sort((a, b) => sign * SORTS[state.sort](a, b));
     document.querySelectorAll('#apps th.sortable').forEach(th => th.dataset.sort === state.sort ? th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending') : th.removeAttribute('aria-sort'));
     $('#count').textContent = rows.length + ' row' + (rows.length === 1 ? '' : 's');
-    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="14" class="empty">${state.fuOnly ? 'Nothing needs a follow-up right now.' : 'Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.'}</td></tr>`; renderSide(); renderNext(); return; }
+    if (!rows.length) { $('#rows').innerHTML = `<tr><td colspan="14" class="empty">${state.fuOnly ? 'Nothing needs a follow-up right now.' : 'Nothing yet. Mark a role applied on the radar, add a row, or paste your sheet under Data.'}</td></tr>`; renderSide(); renderBoard(); return; }
     $('#rows').innerHTML = rows.map(r => {
       const st = r.app.status || 'applied';
       const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position);
@@ -578,10 +569,10 @@ window.JADAR = (function () {
       const coCell = manual ? cell(Object.assign({}, r, {get: f => r.company}), 'company', 'text').replace('class="ed"', 'class="ed co"').replace('class="ed editing"', 'class="ed editing co"') : `<td class="co">${esc(r.company)}</td>`;
       const posCell = manual ? cell(Object.assign({}, r, {get: f => r.position}), 'position', 'text').replace('class="ed"', 'class="ed pos"').replace('class="ed editing"', 'class="ed editing pos"') : `<td class="pos">${link}<span class="src">from the radar</span></td>`;
       const sel = `<select class="sel" data-f="status" aria-label="Status">${STATUSES.map(x => `<option value="${x}"${x === st ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
-      return `<tr class="st-${esc(st)}${needsFollowUp(r) ? ' fu' : ''}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${resumeCell(r)}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
+      return `<tr class="st-${esc(st)}${needsFollowUp(r) ? ' fu' : ''}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${resumeCell(r)}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'long')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
     }).join('');
     if (state.editing) { const el = $('#rows td.editing input, #rows td.editing textarea'); if (el) { el.focus({preventScroll: true}); if (el.select && el.type !== 'date') el.select(); } }
-    renderSide(); renderNext(); renderBoard();
+    renderSide(); renderBoard();
   }
   // ---- pipeline board ----
   function renderBoard() {
@@ -678,20 +669,10 @@ window.JADAR = (function () {
   $('#board').addEventListener('dragleave', e => { const col = e.target.closest('.col'); if (col && !col.contains(e.relatedTarget)) col.classList.remove('over'); });
   $('#board').addEventListener('drop', e => { const col = e.target.closest('.col'); if (!col) return; e.preventDefault(); const [kind, key] = (e.dataTransfer.getData('text/plain') || '|').split('|');
     const row = kind === 'saved' ? {kind: 'saved', key} : rowsAll().find(r => r.kind === kind && r.key === key); dropTo(row, col.dataset.col); });
-  function applyView() { $('#board').classList.toggle('hidden', view !== 'board'); $('#tableview').classList.toggle('hidden', view !== 'table'); document.querySelectorAll('#view button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === view)); }
+  function applyView() { $('#board').classList.toggle('hidden', view !== 'board'); $('#tableview').classList.toggle('hidden', view !== 'table'); document.querySelectorAll('#view button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === view));
+    $('#view-note').textContent = view === 'table' ? 'Click a cell to edit; it saves on Enter or when you click away.' : 'Drag a card to the stage it reached, or click it to open: resume used, who you contacted, dates, notes.'; }
   $('#view').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (!b) return; view = b.dataset.view; J.lsSet(VKEY, view); applyView(); });
   applyView();
-  // ---- up next: saved radar roles with a deadline (from their snapshots; nothing embedded in the page) ----
-  function renderNext() {
-    const saved = Object.entries(S.roles).filter(([u, e]) => e.status === 'saved').map(([u, e]) => Object.assign({url: u}, e.snap || {}));
-    const dated = saved.filter(r => isIso(r.applyBy) && daysTo(r.applyBy) >= 0).sort((a, b) => cmpStr(a.applyBy, b.applyBy));
-    const sec = $('#upnext'); sec.hidden = !saved.length; if (!saved.length) return;
-    $('#next-rows').innerHTML = dated.length ? dated.map(r => { const d = daysTo(r.applyBy); const when = d === 0 ? 'today' : d === 1 ? 'tomorrow' : 'in ' + d + ' days';
-      return `<tr><td class="co">${esc(r.company || '')}</td><td><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title || r.url)}</a>${r.location ? `<span class="src"> · ${esc(r.location)}</span>` : ''}</td><td class="n"><span class="${d <= 7 ? 'due-soon' : ''}">${esc(fmt(r.applyBy))}</span><span class="hint">${when}</span></td><td>${esc(r.fit || '')}</td></tr>`; }).join('')
-      : `<tr><td colspan="4" class="empty">None of your saved roles lists a deadline.</td></tr>`;
-    const rest = saved.length - dated.length;
-    $('#next-note').innerHTML = (rest ? `${rest} more saved role${rest === 1 ? '' : 's'} without a deadline` : `${saved.length} saved role${saved.length === 1 ? '' : 's'}`) + ' · <a href="index.html">Saved on the radar</a>';
-  }
   $('#fu-toggle').addEventListener('click', e => { state.fuOnly = !state.fuOnly; e.currentTarget.setAttribute('aria-pressed', state.fuOnly); e.currentTarget.classList.toggle('on', state.fuOnly); render(); });
   function rowFromEl(el) { const tr = el.closest('tr[data-kind]'); if (!tr) return null; return rowsAll().find(r => r.kind === tr.dataset.kind && r.key === tr.dataset.key) || null; }
   function commit(el) {
