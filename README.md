@@ -97,5 +97,6 @@ hosts derived from `sources.json` plus the four ATS APIs. Per-host throttle with
 
 The Resumes page is the tailoring queue: the strongest open fits (saved roles first, then roles naming your graduation
 year) with each posting's minimum qualifications and a **Copy brief** button whose text you hand to whatever writes your
-resume. Save the finished PDF into a `resumes/` folder of your private state repo under the filename the brief gives, and
-it shows up on the page next to the role, opened through your own token. Nothing about your resume lives in this repo.
+resume. The morning run also writes the queue with the briefs to `tailor_queue.json` in your private state repo, so a resume
+session on your own computer can work through it unattended. Save each finished PDF into the repo's `resumes/` folder under
+the filename the brief gives, and it shows up on the page next to the role, opened through your own token. Nothing about your resume lives in this repo.

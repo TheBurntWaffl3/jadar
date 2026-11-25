@@ -123,6 +123,17 @@ jobs:
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I finder.py
 
+      - name: Write the tailoring queue for the resume session (private tailor_queue.json)
+        if: steps.scan.outcome == 'success' && inputs.only == '' && github.event.schedule != '43 21 * * *'
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          RADAR_DATA: data
+          STATE_REPO: ${{ vars.STATE_REPO }}
+          STATE_PATH: ${{ vars.STATE_PATH }}
+          STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
+        run: python3 -I tailor_queue.py
+
       - name: Commit cache and outputs to the data branch
         if: steps.scan.outcome == 'success'
         run: |

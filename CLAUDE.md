@@ -104,8 +104,13 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   2027 -> newest; each card has the requirement excerpt, **Copy brief** (a read-only instruction for the local session incl.
   the target filename), Mark done / Skip (state.json `tailor[url].status`). **Finished files**: the page lists the private
   repo's `resumes/` folder (next to state.json) through the browser's sync token and opens a file as a blob URL (PDF in a
-  new tab); a file named `<slug>.pdf` (slug = companyKey__title, lowercased, non-alphanumerics -> "-", 90 chars) attaches to
-  its role and counts as done. Cloud drafting with the Claude API was built on 2026-11-25 (`tailor.py`, commit 68bc04a) and
+  new tab); a file named `<slug>.pdf` (slug = companyKey + title, lowercased, every run of non-alphanumerics -> "-", 90 chars, e.g.
+  `lockheed-martin-systems-engineer-asc-early-career`) attaches to its role and counts as done.
+  **Automatic hand-off** (2026-11-26, Kevin: "the pipeline should be automatic"): `tailor_queue.py` (morning run) writes the
+  same queue with a ready brief per role to `tailor_queue.json` in the private repo (skipping roles that already have a PDF);
+  a scheduled task ("Jadar resumes for the PC session", daily) fires into the Resume Tailoring session on Kevin's PC, which
+  pulls the private repo, makes up to 3 PDFs from the queue and pushes them to `resumes/`. The module is not named queue.py
+  because the scanner's thread pool needs the stdlib `queue`. Cloud drafting with the Claude API was built on 2026-11-25 (`tailor.py`, commit 68bc04a) and
   removed the next day at Kevin's request; do not bring it back unless he asks.
 - **Sources page** (`build_sources()` -> `site/sources.html`, third nav tab, 2026-11-18): one row per board from the run's
   `status` (listed / in field / Yes / last scanned / note) with the public board link from `board_url()`, plus `build_dash.GAPS`
