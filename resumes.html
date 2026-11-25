@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Resumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --page: #ffffff; --ink: #0b0b0c; --ink-2: #3f3f44; --muted: #737379; --line: #ececee; --card: #f7f7f8; --pill: #f4f4f5;
+  --hero: #0b0b0c; --on-hero: #ffffff; --hero-muted: #9a9aa0;
+  --ember: #2f5bea; --tint: #eaf0ff; --tint-2: #cbd8ff; --on-ember: #ffffff;
+  --good: #0ca30c; --maybe: #2f5bea; --no: #8a8a90; --crit: #d03b3b;
+  --fail-wash: rgba(208,59,59,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0b0b0c; --ink: #ececee; --ink-2: #c6c6cb; --muted: #8a8a90; --line: #232326; --card: #141416; --pill: #1b1b1e;
+    --hero: #15151a; --on-hero: #ffffff; --hero-muted: #8a8a90; --ember: #5b82ff; --maybe: #5b82ff;
+    --tint: #121a33; --tint-2: #1c2a55; --on-ember: #ffffff; --good: #2bbf2b; --no: #737379; --fail-wash: rgba(208,59,59,0.14);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0b0b0c; --ink: #ececee; --ink-2: #c6c6cb; --muted: #8a8a90; --line: #232326; --card: #141416; --pill: #1b1b1e;
+  --hero: #15151a; --on-hero: #ffffff; --hero-muted: #8a8a90; --ember: #5b82ff; --maybe: #5b82ff;
+  --tint: #121a33; --tint-2: #1c2a55; --on-ember: #ffffff; --good: #2bbf2b; --no: #737379; --fail-wash: rgba(208,59,59,0.14);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.45 "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+body { overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+.mono { font-family: ui-monospace, Menlo, Consolas, "SF Mono", monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+/* hero */
+.hero { background: var(--hero); color: var(--on-hero); border: 1px solid var(--line); border-radius: 24px; padding: 36px 28px 28px; margin-top: 8px; }
+.hero h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1; letter-spacing: -0.035em; font-weight: 600; margin: 0 0 18px; }
+.hero .meta { opacity: .92; }
+.hero .meta .sep { opacity: .55; margin: 0 .35em; }
+.topnav { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 22px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-size: 13px; letter-spacing: .01em; }
+.topnav .sep { display: none; }
+.topnav a { color: var(--on-hero); text-decoration: none; opacity: .72; padding: 7px 16px; border-radius: 999px; font-weight: 600; transition: background .12s, opacity .12s; }
+.topnav a:hover { opacity: 1; background: rgba(255,255,255,.10); }
+.topnav a[aria-current] { opacity: 1; background: var(--ember); color: #fff; }
+.topnav a:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+.hero .who { margin-top: 6px; font-size: 14px; opacity: .85; }
+
+/* stat strip */
+.stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; margin: 22px 0 8px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stat { padding: 16px 12px 14px; border-left: 1px solid var(--line); }
+.stat:first-child { border-left: 0; }
+.stat .label { color: var(--muted); }
+.stat .value { font-size: 34px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.stat .value.ember { color: var(--ember); } .stat .value.good { color: var(--good); }
+.stat .sub { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+
+h2 { font-size: 28px; letter-spacing: -0.03em; font-weight: 600; margin: 34px 0 6px; }
+h2 + .lede { color: var(--muted); margin: 0 0 14px; }
+
+/* controls */
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.seg { display: inline-flex; background: var(--pill); border-radius: 999px; padding: 3px; }
+.seg button { background: transparent; color: var(--ink); border: 0; padding: 7px 14px; font: inherit; font-size: 13.5px; font-weight: 500; border-radius: 999px; cursor: pointer; min-height: 32px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+.ctl { font: inherit; font-size: 13.5px; font-weight: 500; padding: 8px 14px; border: 0; border-radius: 999px; background: var(--pill); color: var(--ink); min-height: 38px; }
+select.ctl { appearance: none; -webkit-appearance: none; padding-right: 30px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat; cursor: pointer; }
+input.ctl { flex: 1 1 180px; min-width: 150px; }
+#loc, #company { max-width: 280px; text-overflow: ellipsis; }
+.ctl.more-toggle[aria-expanded="true"] { background: var(--ink); color: var(--page); }
+.controls.more { display: none; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.controls.more.open { display: flex; }
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink); padding: 6px 4px; cursor: pointer; }
+.chk input { accent-color: var(--ink); width: 15px; height: 15px; margin: 0; }
+.chk.off { opacity: .45; cursor: not-allowed; }
+.linkbtn { background: none; border: 0; padding: 6px 4px; font: inherit; font-size: 13px; color: var(--ember); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+input.ctl::placeholder { color: var(--muted); }
+.count { color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+
+/* shared bits (nav, pills, data panel, footer) */
+.topnav { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 22px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-size: 13px; letter-spacing: .01em; }
+.topnav .sep { display: none; }
+.topnav a { color: var(--on-hero); text-decoration: none; opacity: .72; padding: 7px 16px; border-radius: 999px; font-weight: 600; transition: background .12s, opacity .12s; }
+.topnav a:hover { opacity: 1; background: rgba(255,255,255,.10); }
+.topnav a[aria-current] { opacity: 1; background: var(--ember); color: #fff; }
+.topnav a:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+.tabsrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
+.ctl.small { min-height: 32px; padding: 6px 12px; font-size: 13px; }
+.sync-status { color: var(--muted); }
+.pbtn { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--page); color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; min-height: 32px; }
+.pbtn.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.pbtn.sm { padding: 3px 10px; font-size: 12px; min-height: 0; }
+#datapanel { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; margin: 0 0 14px; }
+#datapanel.open { display: block; }
+.dp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0; }
+.dp-row + .dp-row { margin-top: 10px; }
+.dp-head { margin: 10px 0 4px; }
+.dp-note { color: var(--muted); font-size: 12.5px; }
+.dp-row input[type="text"], .dp-row input[type="password"], .dp-row input[type="date"], .dp-row input[type="url"] { font: inherit; font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); color: var(--ink); min-width: 140px; }
+.dp-row input.wide { flex: 1 1 220px; }
+.empty { padding: 24px 10px; color: var(--muted); }
+footer { color: var(--muted); font-size: 13px; margin: 36px 0 12px; }
+footer a { color: var(--ink); }
+
+/* resumes */
+.stats.four { grid-template-columns: repeat(4, 1fr); }
+.two { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.dcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; cursor: pointer; }
+.dcard:hover, .dcard.on { outline: 2px solid var(--ember); outline-offset: -2px; }
+.dcard .co { font-weight: 600; font-size: 13.5px; } .dcard .t { font-size: 13px; } .dcard .m { color: var(--muted); font-size: 11.5px; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+.st { display: inline-block; font: 11px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; border: 1px solid var(--line); }
+.st.approved { color: var(--good); border-color: var(--good); } .st.rejected { color: var(--muted); } .st.redo { color: #b07a00; border-color: #b07a00; } .st.draft { color: var(--ember); border-color: var(--ember); }
+.detail { background: var(--page); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.detail h3 { margin: 14px 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.detail h3:first-child { margin-top: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; } .chip { font-size: 12px; border-radius: 999px; padding: 3px 9px; border: 1px solid var(--line); background: var(--pill); }
+.chip.ok { border-color: var(--good); } .chip.miss { border-color: var(--crit); color: var(--crit); }
+table.diff { border-collapse: collapse; width: 100%; font-size: 13px; } .diff th, .diff td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+.diff th { color: var(--muted); font-weight: 500; } .diff td.sec { white-space: nowrap; color: var(--muted); font-size: 12px; } .diff td.rev { font-weight: 500; } .diff td.why { color: var(--muted); font-size: 12px; }
+.diff tr.changed td.rev { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.lede small { color: var(--muted); }
+textarea.master { width: 100%; min-height: 260px; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--page); color: var(--ink); }
+.gaps li { margin: 3px 0; }
+.empty { color: var(--muted); padding: 24px 0; }
+.hidden { display: none !important; }
+@media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats.four { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" title="Your applications">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a><span class="sep">·</span><a href="resumes.html" aria-current="page">Resumes</a></nav>
+  <h1>Resumes.</h1>
+  <div class="meta mono" id="meta"></div>
+  <div class="who" id="who"></div>
+</section>
+
+<section class="stats four" id="stats" aria-label="Summary"></section>
+
+<h2>Drafts.</h2>
+<p class="lede">Each morning the radar drafts a tailored revision of your master resume for the strongest new fits: saved roles first, then roles naming 2027. Review, approve or send back. <small>Drafts live in your private state repo; nothing here is on the public page.</small></p>
+<div class="tabsrow">
+  <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
+  <button type="button" class="ctl small" id="master-toggle" aria-expanded="false" aria-controls="masterpanel">Master resume</button>
+  <span class="sync-status mono" id="sync-status"></span>
+  <span class="count mono" id="count"></span>
+</div>
+<div id="datapanel" class="hidden">
+  <div class="dp-head mono">Sync with GitHub</div>
+  <div class="dp-row">
+    <input type="text" id="sync-repo" placeholder="owner/name" value="TheBurntWaffl3/jadar-state" aria-label="Repository">
+    <input type="text" id="sync-path" placeholder="state.json" value="state.json" aria-label="File path">
+    <input type="password" id="sync-token" class="wide" placeholder="fine-grained token" aria-label="Token" autocomplete="off">
+    <button type="button" class="pbtn" id="sync-connect">Connect</button>
+    <button type="button" class="pbtn" id="sync-disconnect">Disconnect</button>
+    <button type="button" class="pbtn" id="sync-now">Sync now</button>
+  </div>
+  <div class="dp-note">Same token as the radar and tracker. Drafts are read from drafts.json next to state.json; your approvals are written into state.json.</div>
+</div>
+<div id="masterpanel" class="hidden">
+  <div class="dp-head mono">Master resume (the only source of facts for every draft)</div>
+  <div class="dp-note">Paste the full text of your current resume: headings, then one bullet per line. It is stored in your state file (private repo), never on the public page. Update it whenever the real resume changes.</div>
+  <textarea class="master" id="master" aria-label="Master resume text" placeholder="Kevin Kyle&#10;EDUCATION&#10;University of Maryland, College Park — B.S. Aerospace Engineering, expected May 2027&#10;TECHNICAL EXPERIENCE&#10;Rocket Lab — R&D Engineering Intern&#10;- Built LabVIEW DAQ ..."></textarea>
+  <div class="dp-row"><button type="button" class="pbtn on" id="master-save">Save master</button><span class="dp-note" id="master-note"></span></div>
+</div>
+
+<div class="two">
+  <div class="list" id="list"></div>
+  <div class="detail" id="detail"><div class="empty">Pick a draft on the left.</div></div>
+</div>
+
+<footer>Drafts only rephrase, reorder and select from your master resume; they never add experience. Source: <a href="https://github.com/TheBurntWaffl3/jadar">TheBurntWaffl3/jadar</a>.</footer>
+</main>
+<script id="data" type="application/json">{"today":"2026-11-25","profileName":"Kevin Kyle"}</script>
+<script>
+window.JADAR = (function () {
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const isIso = s => /^\d{4}-\d{2}-\d{2}/.test(String(s || ''));
+  const fmt = (iso, today) => { if (!isIso(iso)) return iso || ''; const [y,m,d] = iso.split('-').map(Number); return MON[m-1] + ' ' + d + (today && y !== today.getFullYear() ? ', ' + y : ''); };
+  const fmtLong = iso => { if (!isIso(iso)) return iso || ''; const [y,m,d] = iso.split('-').map(Number); return MON[m-1] + ' ' + d + ', ' + y; };
+  const daysTo = (iso, today) => { if (!isIso(iso)) return null; const [y,m,d] = iso.split('-').map(Number); return Math.round((new Date(y, m-1, d) - today) / 86400000); };
+  const nowIso = () => new Date().toISOString();
+  function companyKey(c) { return (c || '').replace(/\s*\(.*?\)\s*/g, ' ').split(' / ')[0].replace(/\s+/g, ' ').trim(); }
+  // 9/8/26, 10/12/2026, 11/11 (this year), 2026-09-08, "Nov 11" -> ISO; anything else -> null
+  function parseDate(s, year) {
+    s = String(s || '').trim(); if (!s) return null;
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0');
+    m = s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+    if (m) { let y = m[3] ? Number(m[3]) : year; if (y < 100) y += 2000; const mo = Number(m[1]), d = Number(m[2]); if (mo < 1 || mo > 12 || d < 1 || d > 31) return null; return y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0'); }
+    m = s.match(/^([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?/);
+    if (m) { const mo = MON.findIndex(x => x.toLowerCase() === m[1].toLowerCase()); if (mo < 0) return null; return (m[3] ? Number(m[3]) : year) + '-' + String(mo + 1).padStart(2, '0') + '-' + m[2].padStart(2, '0'); }
+    return null;
+  }
+  // ---- state: one object shared by both pages, in this browser and (optionally) in the private sync repo ----
+  const KEY = 'jadar.state.v1', SKEY = 'jadar.sync.v1';
+  const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
+  const emptyState = () => ({v: 1, roles: {}, manual: {}, resume: {master: '', at: ''}, drafts: {}, tracker: {connections: [], places: [], at: ''}});
+  function normState(s) {  // older files have only `roles`; give them the tracker parts
+    if (!s || s.v !== 1 || !s.roles || typeof s.roles !== 'object') return null;
+    if (!s.manual || typeof s.manual !== 'object') s.manual = {};
+    if (!s.tracker || typeof s.tracker !== 'object') s.tracker = {connections: [], places: [], at: ''};
+    if (!Array.isArray(s.tracker.connections)) s.tracker.connections = []; if (!Array.isArray(s.tracker.places)) s.tracker.places = [];
+    if (!s.resume || typeof s.resume !== 'object') s.resume = {master: '', at: ''}; if (!s.drafts || typeof s.drafts !== 'object') s.drafts = {};
+    return s;
+  }
+  function loadState() { try { const s = normState(JSON.parse(lsGet(KEY) || 'null')); if (s) return s; } catch (e) {} return emptyState(); }
+  const saveState = s => lsSet(KEY, JSON.stringify(s));
+  function mergeStates(a, b) {  // roles per url and manual rows per id: newer `at` wins; tracker lists: newer `at` wins as a whole
+    a = normState(a) || emptyState(); b = normState(b) || emptyState();
+    const out = emptyState();
+    const newer = (x, y) => !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x);
+    new Set([...Object.keys(a.roles), ...Object.keys(b.roles)]).forEach(u => { out.roles[u] = newer(a.roles[u], b.roles[u]); });
+    new Set([...Object.keys(a.manual), ...Object.keys(b.manual)]).forEach(k => { out.manual[k] = newer(a.manual[k], b.manual[k]); });
+    out.tracker = newer(a.tracker, b.tracker); out.resume = newer(a.resume, b.resume);
+    new Set([...Object.keys(a.drafts), ...Object.keys(b.drafts)]).forEach(u => { out.drafts[u] = newer(a.drafts[u], b.drafts[u]); });
+    return out;
+  }
+  // ---- GitHub Contents API (token stays in this browser; only api.github.com is contacted) ----
+  const b64enc = s => { const u = new TextEncoder().encode(s); let bin = ''; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(bin); };
+  const b64dec = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, '')), ch => ch.charCodeAt(0)));
+  function syncCfg() { try { const c = JSON.parse(lsGet(SKEY) || 'null'); return c && c.repo && c.token ? c : null; } catch (e) { return null; } }
+  const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
+  const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
+  const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
+  const draftsUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'drafts.json');
+  async function ghGet(c) {
+    const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
+    if (r.status === 404) return {state: null, sha: null};
+    if (!r.ok) throw new Error(String(r.status));
+    const j = await r.json(); let st = null; try { st = normState(JSON.parse(b64dec(j.content || ''))); } catch (e) { st = null; }
+    return {state: st, sha: j.sha};
+  }
+  async function ghPut(c, st, sha) {
+    const body = {message: 'jadar state', content: b64enc(JSON.stringify(st, null, 1))}; if (sha) body.sha = sha;
+    const r = await fetch(ghUrl(c), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, ghHeaders(c)), body: JSON.stringify(body)});
+    if (!r.ok) throw new Error(String(r.status));
+  }
+  function makeSync(o) {  // o: {get: () => state, set: state => void, statusEl, after?: cfg => void}
+    let syncing = false, pending = false, timer = null;
+    const setStatus = m => { if (o.statusEl) o.statusEl.textContent = m || ''; };
+    async function syncNow() {
+      const c = syncCfg(); if (!c) return;
+      if (syncing) { pending = true; return; }
+      syncing = true;
+      try {
+        if (navigator.onLine === false) { setStatus('offline'); return; }
+        setStatus('syncing…');
+        const {state: remote, sha} = await ghGet(c);
+        const S = o.get(); const before = JSON.stringify(S);
+        const merged = remote ? mergeStates(S, remote) : S;
+        if (JSON.stringify(merged) !== before) { saveState(merged); o.set(merged); }
+        if (!remote || JSON.stringify(merged) !== JSON.stringify(remote)) await ghPut(c, merged, sha);
+        setStatus('synced ' + new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase());
+        if (o.after) o.after(c);
+      } catch (err) { setStatus('sync failed: ' + (err.message || 'error')); }
+      finally { syncing = false; if (pending) { pending = false; syncNow(); } }
+    }
+    function schedulePush() { if (!syncCfg()) return; clearTimeout(timer); timer = setTimeout(syncNow, 2000); }
+    return {syncNow, schedulePush, setStatus};
+  }
+  function bindSyncPanel($, sync, onChange) {  // the Data panel's Connect / Disconnect / Sync now controls (same markup on both pages)
+    function reflect() { const c = syncCfg(); $('#sync-connect').style.display = c ? 'none' : ''; $('#sync-disconnect').style.display = c ? '' : 'none'; $('#sync-now').style.display = c ? '' : 'none'; if (c) { $('#sync-repo').value = c.repo; $('#sync-path').value = c.path || 'state.json'; } }
+    $('#sync-connect').addEventListener('click', () => {
+      const repo = $('#sync-repo').value.trim(), path = $('#sync-path').value.trim() || 'state.json', token = $('#sync-token').value.trim();
+      if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { alert('Repository must look like owner/name'); return; }
+      if (!token) { alert('Paste a fine-grained token for that repo (Contents: read and write)'); return; }
+      if (!lsSet(SKEY, JSON.stringify({repo, path, token}))) { alert('This browser blocks storage; sync cannot be kept.'); return; }
+      $('#sync-token').value = ''; reflect(); sync.syncNow();
+    });
+    $('#sync-disconnect').addEventListener('click', () => { lsDel(SKEY); reflect(); sync.setStatus(''); if (onChange) onChange(); });
+    $('#sync-now').addEventListener('click', sync.syncNow);
+    window.addEventListener('online', () => { if (syncCfg()) sync.syncNow(); });
+    reflect();
+  }
+  return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
+          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, draftsUrl, ghGet, ghPut, makeSync, bindSyncPanel};
+})();
+</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const J = window.JADAR; const $ = (s, el) => (el || document).querySelector(s); const esc = J.esc;
+  const today = new Date(D.today + 'T00:00:00'); const fmt = iso => J.fmt(iso, today), isIso = J.isIso;
+  let S = J.loadState(); let DRAFTS = null; let cur = null;
+  if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
+  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status'), after: c => loadDrafts(c)});
+  function persist() { J.saveState(S); sync.schedulePush(); }
+  J.bindSyncPanel($, sync, () => { DRAFTS = null; render(); });
+  async function loadDrafts(c) {
+    try {
+      const r = await fetch(J.draftsUrl(c), {headers: J.ghHeaders(c), cache: 'no-store'});
+      if (!r.ok) { DRAFTS = r.status === 404 ? {v: 1, drafts: {}} : DRAFTS; render(); return; }
+      const j = await r.json(); const d = JSON.parse(J.b64dec(j.content || ''));
+      if (d && d.drafts && typeof d.drafts === 'object') { DRAFTS = d; render(); }
+    } catch (e) { render(); }
+  }
+  const mark = u => (S.drafts[u] || {}).status || 'draft';
+  function setMark(u, status) { S.drafts[u] = {status, at: J.nowIso()}; persist(); render(); }
+  function items() { return Object.values((DRAFTS || {}).drafts || {}).sort((a, b) => (b.generatedAt || '').localeCompare(a.generatedAt || '')); }
+  function revisedText(d) {
+    const p = d.plan || {}; const lines = [];
+    if (p.summary) lines.push(p.summary, '');
+    let sec = null;
+    (p.bullets || []).forEach(b => { if (b.section !== sec) { sec = b.section; lines.push(sec.toUpperCase()); } lines.push('- ' + b.revised); });
+    if (p.skills_line) lines.push('', 'SKILLS', p.skills_line);
+    return lines.join('\n');
+  }
+  function renderStats() {
+    const it = items(); const n = it.length, ap = it.filter(d => mark(d.url) === 'approved').length, rj = it.filter(d => mark(d.url) === 'rejected').length, open = n - ap - rj;
+    const hasMaster = ((S.resume || {}).master || '').length >= 200;
+    $('#meta').innerHTML = [n + ' draft' + (n === 1 ? '' : 's'), open + ' to review', ap + ' approved', hasMaster ? 'master resume saved' : 'no master resume yet'].map(esc).join('<span class="sep">·</span>');
+    const stats = [['Drafts', n, 'on file (45 days)', ''], ['To review', open, open ? 'waiting for you' : 'all reviewed', open ? 'ember' : ''], ['Approved', ap, 'ready to build', ap ? 'good' : ''], ['Master', hasMaster ? 'OK' : '—', hasMaster ? 'saved ' + fmt((S.resume.at || '').slice(0, 10)) : 'paste it under Master resume', '']];
+    $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
+  }
+  function render() {
+    renderStats();
+    const it = items(); const c = J.syncCfg();
+    $('#count').textContent = it.length ? it.length + ' draft' + (it.length === 1 ? '' : 's') : '';
+    if (!c) { $('#list').innerHTML = '<div class="empty">Connect sync under Data to load your drafts (they live in your private repo).</div>'; }
+    else if (!DRAFTS) { $('#list').innerHTML = '<div class="empty">Loading drafts…</div>'; }
+    else if (!it.length) { $('#list').innerHTML = `<div class="empty">${((S.resume || {}).master || '').length >= 200 ? 'No drafts yet. The next morning run drafts up to 3 for your strongest fits.' : 'Paste your master resume first (button above); the next morning run drafts from it.'}</div>`; }
+    else $('#list').innerHTML = it.map(d => `<div class="dcard${cur === d.url ? ' on' : ''}" data-url="${esc(d.url)}" tabindex="0"><div class="co">${esc(d.company)}</div><div class="t">${esc(d.title)}</div><div class="m"><span class="st ${esc(mark(d.url))}">${esc(mark(d.url))}</span><span>${esc(d.fit)}</span><span>${esc(fmt(d.generatedAt))}</span>${d.applyBy ? `<span>apply by ${esc(fmt(d.applyBy))}</span>` : ''}</div></div>`).join('');
+    if (cur && !it.some(d => d.url === cur)) cur = null;
+    renderDetail(it.find(d => d.url === cur));
+    const m = $('#master'); if (document.activeElement !== m) m.value = (S.resume || {}).master || '';
+    $('#master-note').textContent = (S.resume || {}).at ? 'Saved ' + fmt((S.resume.at || '').slice(0, 10)) + ' · ' + ((S.resume.master || '').split('\n').length) + ' lines' : 'Not saved yet';
+  }
+  function renderDetail(d) {
+    if (!d) { $('#detail').innerHTML = '<div class="empty">Pick a draft on the left.</div>'; return; }
+    const p = d.plan || {}; const st = mark(d.url);
+    const cov = (p.coverage || []).map(x => `<span class="chip ${x.present ? 'ok' : 'miss'}" title="${esc(x.where || '')}">${esc(x.keyword)}</span>`).join('') || (p.keywords || []).map(k => `<span class="chip">${esc(k)}</span>`).join('');
+    const rows = (p.bullets || []).map(b => `<tr class="${b.revised !== b.original ? 'changed' : ''}"><td class="sec">${esc(b.section)}</td><td>${esc(b.original)}</td><td class="rev">${esc(b.revised)}</td><td class="why">${esc(b.why)}</td></tr>`).join('');
+    $('#detail').innerHTML = `<h3>${esc(d.company)} · <span class="st ${esc(st)}">${esc(st)}</span></h3>
+      <div style="font-size:17px;font-weight:600;letter-spacing:-.01em"><a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(d.title)}</a></div>
+      <div class="dp-note">${esc(d.location || '')}${d.why ? ' · ' + esc(d.why) : ''} · drafted ${esc(fmt(d.generatedAt))} · ${esc(d.model || '')}</div>
+      ${p.summary ? `<h3>Summary line</h3><div>${esc(p.summary)}</div>` : ''}
+      <h3>Posting keywords (green = your master already shows it)</h3><div class="chips">${cov}</div>
+      <h3>Bullets (in the order they should appear)</h3>
+      <table class="diff"><thead><tr><th>Section</th><th>Master</th><th>Tailored</th><th>Why</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="empty">No bullets returned.</td></tr>'}</tbody></table>
+      ${p.skills_line ? `<h3>Skills line</h3><div>${esc(p.skills_line)}</div>` : ''}
+      ${(p.section_order || []).length ? `<h3>Section order</h3><div>${esc(p.section_order.join(' → '))}</div>` : ''}
+      ${(p.gaps || []).length ? `<h3>Gaps (requirements your master does not show)</h3><ul class="gaps">${p.gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul>` : ''}
+      ${p.note ? `<h3>Note</h3><div>${esc(p.note)}</div>` : ''}
+      <div class="acts">
+        <button type="button" class="pbtn${st === 'approved' ? ' on' : ''}" data-mark="approved">✓ Approve</button>
+        <button type="button" class="pbtn${st === 'rejected' ? ' on' : ''}" data-mark="rejected">Reject</button>
+        <button type="button" class="pbtn${st === 'redo' ? ' on' : ''}" data-mark="redo" title="The next morning run drafts this role again">Send back for a redo</button>
+        <button type="button" class="pbtn" id="copy-rev">Copy tailored text</button>
+        <button type="button" class="pbtn" id="dl-rev">Download .md</button>
+      </div>`;
+    $('#detail').querySelectorAll('button[data-mark]').forEach(b => b.addEventListener('click', () => setMark(d.url, st === b.dataset.mark ? 'draft' : b.dataset.mark)));
+    $('#copy-rev').addEventListener('click', async () => { try { await navigator.clipboard.writeText(revisedText(d)); $('#copy-rev').textContent = 'Copied'; setTimeout(() => $('#copy-rev').textContent = 'Copy tailored text', 1200); } catch (e) { alert('Copy failed; select the text instead.'); } });
+    $('#dl-rev').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([revisedText(d)], {type: 'text/markdown'})); a.download = (d.company + ' - ' + d.title).replace(/[^\w.-]+/g, '_') + '.md'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); });
+  }
+  $('#list').addEventListener('click', e => { const c = e.target.closest('.dcard'); if (c) { cur = c.dataset.url; render(); } });
+  $('#list').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.dcard')) { e.preventDefault(); cur = e.target.dataset.url; render(); } });
+  $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); });
+  $('#master-toggle').addEventListener('click', e => { const o = $('#masterpanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); if (!o) $('#master').focus(); });
+  $('#master-save').addEventListener('click', () => { S.resume = {master: $('#master').value.replace(/\r\n/g, '\n').trim(), at: J.nowIso()}; persist(); render(); });
+  render();
+  const c0 = J.syncCfg(); if (c0) { sync.syncNow(); }
+})();
+</script>
+</body>
+</html>

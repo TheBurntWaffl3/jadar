@@ -179,7 +179,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 <body>
 <main>
 <section class="hero">
-  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a></nav>
+  <nav class="topnav mono" aria-label="Pages"><a href="index.html" title="Open roles">Radar</a><span class="sep">·</span><a href="tracker.html" aria-current="page">Tracker</a><span class="sep">·</span><a href="sources.html" title="The boards we scan">Sources</a><span class="sep">·</span><a href="resumes.html" title="Tailored resume drafts">Resumes</a></nav>
   <h1>Tracker.</h1>
   <div class="meta mono" id="meta"></div>
   <div class="who" id="who"></div>
@@ -311,12 +311,13 @@ window.JADAR = (function () {
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
   const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
-  const emptyState = () => ({v: 1, roles: {}, manual: {}, tracker: {connections: [], places: [], at: ''}});
+  const emptyState = () => ({v: 1, roles: {}, manual: {}, resume: {master: '', at: ''}, drafts: {}, tracker: {connections: [], places: [], at: ''}});
   function normState(s) {  // older files have only `roles`; give them the tracker parts
     if (!s || s.v !== 1 || !s.roles || typeof s.roles !== 'object') return null;
     if (!s.manual || typeof s.manual !== 'object') s.manual = {};
     if (!s.tracker || typeof s.tracker !== 'object') s.tracker = {connections: [], places: [], at: ''};
     if (!Array.isArray(s.tracker.connections)) s.tracker.connections = []; if (!Array.isArray(s.tracker.places)) s.tracker.places = [];
+    if (!s.resume || typeof s.resume !== 'object') s.resume = {master: '', at: ''}; if (!s.drafts || typeof s.drafts !== 'object') s.drafts = {};
     return s;
   }
   function loadState() { try { const s = normState(JSON.parse(lsGet(KEY) || 'null')); if (s) return s; } catch (e) {} return emptyState(); }
@@ -327,7 +328,8 @@ window.JADAR = (function () {
     const newer = (x, y) => !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x);
     new Set([...Object.keys(a.roles), ...Object.keys(b.roles)]).forEach(u => { out.roles[u] = newer(a.roles[u], b.roles[u]); });
     new Set([...Object.keys(a.manual), ...Object.keys(b.manual)]).forEach(k => { out.manual[k] = newer(a.manual[k], b.manual[k]); });
-    out.tracker = newer(a.tracker, b.tracker);
+    out.tracker = newer(a.tracker, b.tracker); out.resume = newer(a.resume, b.resume);
+    new Set([...Object.keys(a.drafts), ...Object.keys(b.drafts)]).forEach(u => { out.drafts[u] = newer(a.drafts[u], b.drafts[u]); });
     return out;
   }
   // ---- GitHub Contents API (token stays in this browser; only api.github.com is contacted) ----
@@ -337,6 +339,7 @@ window.JADAR = (function () {
   const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
   const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
   const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
+  const draftsUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'drafts.json');
   async function ghGet(c) {
     const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
     if (r.status === 404) return {state: null, sha: null};
@@ -387,7 +390,7 @@ window.JADAR = (function () {
     reflect();
   }
   return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
-          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, ghGet, ghPut, makeSync, bindSyncPanel};
+          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, draftsUrl, ghGet, ghPut, makeSync, bindSyncPanel};
 })();
 </script>
 <script>
