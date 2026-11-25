@@ -1774,7 +1774,7 @@ __CSS_SHARED__
 <h2>To tailor.</h2>
 <p class="lede">The strongest open fits that still need a tailored resume: saved roles first, then roles naming your graduation year, then other strong fits. Copy the brief into your resume session, build the file, and either upload it to the private repo (it appears below and on the card) or mark the card done.</p>
 <div class="tabsrow">
-  <div class="seg" id="qview" role="group" aria-label="Show"><button type="button" class="ctl small" data-q="todo" aria-pressed="true">To do</button><button type="button" class="ctl small" data-q="done" aria-pressed="false">Done</button><button type="button" class="ctl small" data-q="all" aria-pressed="false">All fits</button></div>
+  <div class="seg" id="qview" role="group" aria-label="Show"><button type="button" class="ctl small" data-q="ready" aria-pressed="false">Ready</button><button type="button" class="ctl small" data-q="todo" aria-pressed="true">To do</button><button type="button" class="ctl small" data-q="done" aria-pressed="false">Done</button><button type="button" class="ctl small" data-q="all" aria-pressed="false">All fits</button></div>
   <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
   <span class="sync-status mono" id="sync-status"></span>
   <span class="count mono" id="count"></span>
@@ -1809,7 +1809,7 @@ __SHARED_JS__
   const D = JSON.parse(document.getElementById('data').textContent);
   const J = window.JADAR; const $ = (s, el) => (el || document).querySelector(s); const esc = J.esc;
   const today = new Date(D.today + 'T00:00:00'); const fmt = iso => J.fmt(iso, today), fmtLong = iso => J.fmtLong(iso), daysTo = iso => J.daysTo(iso, today), isIso = J.isIso;
-  let S = J.loadState(); let FILES = null; let view = 'todo';
+  let S = J.loadState(); let FILES = null; let FILES_ERR = ''; let view = 'todo'; let autoView = true;
   if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
   const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status'), after: c => loadFiles(c)});
   function persist() { J.saveState(S); sync.schedulePush(); }
@@ -1819,9 +1819,11 @@ __SHARED_JS__
   async function loadFiles(c) {
     try {
       const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + dir(c), {headers: J.ghHeaders(c), cache: 'no-store'});
-      if (!r.ok) { FILES = r.status === 404 ? [] : FILES; render(); return; }
-      const j = await r.json(); FILES = Array.isArray(j) ? j.filter(f => f.type === 'file').map(f => ({name: f.name, path: f.path, size: f.size, sha: f.sha})) : []; render();
-    } catch (e) { render(); }
+      if (!r.ok) { FILES = r.status === 404 ? [] : (FILES || []); FILES_ERR = r.status === 404 ? '' : 'GitHub answered ' + r.status + ' listing ' + dir(c) + ' (check the token has Contents read on ' + c.repo + ')'; render(); return; }
+      const j = await r.json(); FILES = Array.isArray(j) ? j.filter(f => f.type === 'file').map(f => ({name: f.name, path: f.path, size: f.size, sha: f.sha})) : []; FILES_ERR = '';
+      if (autoView && FILES.some(f => /\.pdf$/i.test(f.name))) view = 'ready';
+      render();
+    } catch (e) { FILES = FILES || []; FILES_ERR = 'could not reach api.github.com'; render(); }
   }
   async function openFile(f) {  // private repo: fetch the bytes with the token, show them from a blob URL
     const c = J.syncCfg(); if (!c) return;
@@ -1879,14 +1881,14 @@ __SHARED_JS__
   function render() {
     renderStats();
     let q = queue();
-    if (view === 'todo') q = q.filter(r => !isDone(r) && !isSkip(r)); else if (view === 'done') q = q.filter(r => isDone(r) || isSkip(r));
+    if (view === 'ready') q = q.filter(r => !!fileFor(r)); else if (view === 'todo') q = q.filter(r => !isDone(r) && !isSkip(r)); else if (view === 'done') q = q.filter(r => isDone(r) || isSkip(r));
     const shown = showAll ? q : q.slice(0, LIMIT);
     $('#count').textContent = q.length ? (shown.length < q.length ? shown.length + ' of ' : '') + q.length : '';
-    $('#queue').innerHTML = shown.map(card).join('') || `<div class="empty">${view === 'todo' ? 'Nothing waiting. Save a role on the radar to queue it here.' : 'Nothing here yet.'}</div>`;
+    $('#queue').innerHTML = shown.map(card).join('') || `<div class="empty">${view === 'ready' ? (J.syncCfg() ? (FILES == null ? 'Loading your files…' : 'No finished PDFs yet. The cloud build runs daily at 3:07 PM ET.') : 'Connect sync under Data to see finished PDFs.') : view === 'todo' ? 'Nothing waiting. Save a role on the radar to queue it here.' : 'Nothing here yet.'}</div>`;
     $('#more').innerHTML = shown.length < q.length ? `<a href="#" id="showall">Show all ${q.length}</a>` : '';
     document.querySelectorAll('#qview button').forEach(b => b.setAttribute('aria-pressed', b.dataset.q === view));
     const c = J.syncCfg();
-    $('#files').innerHTML = !c ? '<div class="empty">Connect sync under Data to list your files.</div>' : FILES == null ? '<div class="empty">Loading…</div>' : !FILES.length ? '<div class="empty">No files yet. Upload PDFs to the <code>resumes/</code> folder of your private repo.</div>'
+    $('#files').innerHTML = !c ? '<div class="empty">Connect sync under Data to list your files.</div>' : FILES_ERR ? `<div class="empty">${esc(FILES_ERR)}</div>` : FILES == null ? '<div class="empty">Loading…</div>' : !FILES.length ? '<div class="empty">No files yet. Upload PDFs to the <code>resumes/</code> folder of your private repo.</div>'
       : `<table><thead><tr><th>File</th><th>Role</th><th class="n">Size</th></tr></thead><tbody>${FILES.filter(f => !/\.(plan\.json|md)$/i.test(f.name)).map(f => { const r = D.roles.find(x => f.name.toLowerCase().startsWith(slug(x))); return `<tr><td><a href="#" data-open="${esc(f.path)}">${esc(f.name)}</a></td><td>${r ? esc(r.company + ' · ' + r.title) : '<span class="dp-note">not matched to a role</span>'}</td><td class="n">${Math.round(f.size / 1024)} KB</td></tr>`; }).join('')}</tbody></table>`;
   }
   document.addEventListener('click', async e => {
@@ -1896,10 +1898,10 @@ __SHARED_JS__
     const b = e.target.closest('button[data-brief]'); if (b) { try { await navigator.clipboard.writeText(brief(r)); b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy brief', 1200); } catch (err) { alert(brief(r)); } return; }
     const mk = e.target.closest('button[data-mark]'); if (mk) { setMark(r.url, mark(r.url) === mk.dataset.mark ? '' : mk.dataset.mark); }
   });
-  $('#qview').addEventListener('click', e => { const b = e.target.closest('button[data-q]'); if (!b) return; view = b.dataset.q; showAll = false; render(); });
+  $('#qview').addEventListener('click', e => { const b = e.target.closest('button[data-q]'); if (!b) return; view = b.dataset.q; autoView = false; showAll = false; render(); });
   $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); });
   render();
-  if (J.syncCfg()) sync.syncNow();
+  const c0 = J.syncCfg(); if (c0) { loadFiles(c0); sync.syncNow(); }
 })();
 </script>
 </body>
