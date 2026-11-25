@@ -188,6 +188,12 @@ class TrackerTests(unittest.TestCase):
     def setUp(self):
         self.html = build_page.build_tracker("Kevin Kyle", today="2026-11-12")
 
+    def test_applied_evidence(self):
+        # Kevin 2026-11-26: record when Applied was clicked and which resume went with it, both editable in the tracker
+        for needle in ("Resume used</th>", "function resumeCell(", "appliedAt", "uploadResume", "listResumes", "no resume on file", "Upload a PDF"):
+            self.assertIn(needle, self.html, needle)
+        self.assertIn("e.app.appliedAt = now", build_page.build(json.load(open(FIXTURE)), json.load(open(os.path.join(ROOT, "sources.json"))), "K"))
+
     def test_pipeline_board(self):
         # 2026-11-25: Kevin "can't say I've been rejected or moved to first interview" -> a drag-and-drop stage board
         for needle in ("Pipeline.", 'id="board"', 'id="funnel"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "Mark applied"):

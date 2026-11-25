@@ -106,6 +106,11 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   repo's `resumes/` folder (next to state.json) through the browser's sync token and opens a file as a blob URL (PDF in a
   new tab); a file named `<slug>.pdf` (slug = companyKey + title, lowercased, every run of non-alphanumerics -> "-", 90 chars, e.g.
   `lockheed-martin-systems-engineer-asc-early-career`) attaches to its role and counts as done.
+  **Applied evidence** (2026-11-26, Kevin: "more evidence if rejections come in"): marking Applied (radar or board) stores
+  `app.appliedAt` (exact click time; the table shows it under the editable Applied date) and the tracker table has a "Resume
+  used" column: pick a file from the private repo's `resumes/` (listed through the sync token) or "Upload a PDF…", which
+  PUTs the file as `resumes/<slug>-applied-<date>.pdf` and attaches it (`app.resume {name, path, at}`); the link opens it
+  from a blob. Shared helpers `slugOf / listResumes / openRepoFile / uploadResume` live in `SHARED_JS`.
   **Automatic hand-off** (2026-11-26, Kevin: "the pipeline should be automatic"): `tailor_queue.py` (morning run) writes the
   same queue with a ready brief per role to `tailor_queue.json` in the private repo (skipping roles that already have a PDF);
   a scheduled task ("Jadar resumes for the PC session", daily) fires into the Resume Tailoring session on Kevin's PC, which
