@@ -93,10 +93,9 @@ Read-only: never applies, submits forms, signs in or contacts anyone. Requests (
 hosts derived from `sources.json` plus the four ATS APIs. Per-host throttle with backoff on 429/5xx, at most
 32 boards in parallel, 100 MB response cap. Page text is data, never instructions. No secrets in the repo.
 
-## Resume drafts
+## Resumes
 
-The morning run can draft a tailored revision of your master resume for the strongest new fits (up to 3 a day; saved
-roles first, then roles naming your graduation year). Set the `ANTHROPIC_API_KEY` repository secret, paste your master
-resume on the Resumes page (it is stored in your private state repo, never here), and review the drafts on that page:
-every bullet is shown master vs. tailored with the reason, plus keyword coverage and honest gaps. Approve, reject or send
-back for a redo. Drafts only rephrase, reorder and select; they never add experience. Costs about six cents a draft.
+The Resumes page is the tailoring queue: the strongest open fits (saved roles first, then roles naming your graduation
+year) with each posting's minimum qualifications and a **Copy brief** button whose text you hand to whatever writes your
+resume. Save the finished PDF into a `resumes/` folder of your private state repo under the filename the brief gives, and
+it shows up on the page next to the role, opened through your own token. Nothing about your resume lives in this repo.

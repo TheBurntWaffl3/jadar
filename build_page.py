@@ -901,13 +901,13 @@ window.JADAR = (function () {
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
   const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
-  const emptyState = () => ({v: 1, roles: {}, manual: {}, resume: {master: '', at: ''}, drafts: {}, tracker: {connections: [], places: [], at: ''}});
+  const emptyState = () => ({v: 1, roles: {}, manual: {}, tailor: {}, tracker: {connections: [], places: [], at: ''}});
   function normState(s) {  // older files have only `roles`; give them the tracker parts
     if (!s || s.v !== 1 || !s.roles || typeof s.roles !== 'object') return null;
     if (!s.manual || typeof s.manual !== 'object') s.manual = {};
     if (!s.tracker || typeof s.tracker !== 'object') s.tracker = {connections: [], places: [], at: ''};
     if (!Array.isArray(s.tracker.connections)) s.tracker.connections = []; if (!Array.isArray(s.tracker.places)) s.tracker.places = [];
-    if (!s.resume || typeof s.resume !== 'object') s.resume = {master: '', at: ''}; if (!s.drafts || typeof s.drafts !== 'object') s.drafts = {};
+    if (!s.tailor || typeof s.tailor !== 'object') s.tailor = {};
     return s;
   }
   function loadState() { try { const s = normState(JSON.parse(lsGet(KEY) || 'null')); if (s) return s; } catch (e) {} return emptyState(); }
@@ -918,8 +918,8 @@ window.JADAR = (function () {
     const newer = (x, y) => !x ? y : !y ? x : ((y.at || '') > (x.at || '') ? y : x);
     new Set([...Object.keys(a.roles), ...Object.keys(b.roles)]).forEach(u => { out.roles[u] = newer(a.roles[u], b.roles[u]); });
     new Set([...Object.keys(a.manual), ...Object.keys(b.manual)]).forEach(k => { out.manual[k] = newer(a.manual[k], b.manual[k]); });
-    out.tracker = newer(a.tracker, b.tracker); out.resume = newer(a.resume, b.resume);
-    new Set([...Object.keys(a.drafts), ...Object.keys(b.drafts)]).forEach(u => { out.drafts[u] = newer(a.drafts[u], b.drafts[u]); });
+    out.tracker = newer(a.tracker, b.tracker);
+    new Set([...Object.keys(a.tailor), ...Object.keys(b.tailor)]).forEach(u => { out.tailor[u] = newer(a.tailor[u], b.tailor[u]); });
     return out;
   }
   // ---- GitHub Contents API (token stays in this browser; only api.github.com is contacted) ----
@@ -929,7 +929,6 @@ window.JADAR = (function () {
   const ghUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + (c.path || 'state.json');
   const ghHeaders = c => ({'Authorization': 'Bearer ' + c.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'});
   const peopleUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'people.json');
-  const draftsUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + ((c.path || 'state.json').replace(/[^/]*$/, '') + 'drafts.json');
   async function ghGet(c) {
     const r = await fetch(ghUrl(c), {headers: ghHeaders(c), cache: 'no-store'});
     if (r.status === 404) return {state: null, sha: null};
@@ -980,7 +979,7 @@ window.JADAR = (function () {
     reflect();
   }
   return {esc, MON, isIso, fmt, fmtLong, daysTo, nowIso, companyKey, parseDate, KEY, SKEY, lsGet, lsSet, lsDel, emptyState, normState, loadState, saveState, mergeStates,
-          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, draftsUrl, ghGet, ghPut, makeSync, bindSyncPanel};
+          b64enc, b64dec, syncCfg, ghUrl, ghHeaders, peopleUrl, ghGet, ghPut, makeSync, bindSyncPanel};
 })();
 </script>"""
 
@@ -1689,30 +1688,24 @@ RESUMES_TEMPLATE = r"""<!doctype html>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
 <style>
 __CSS_SHARED__
-/* resumes */
+/* resumes: the tailoring queue + finished files */
 .stats.four { grid-template-columns: repeat(4, 1fr); }
-.two { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
-.list { display: flex; flex-direction: column; gap: 8px; }
-.dcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; cursor: pointer; }
-.dcard:hover, .dcard.on { outline: 2px solid var(--ember); outline-offset: -2px; }
-.dcard .co { font-weight: 600; font-size: 13.5px; } .dcard .t { font-size: 13px; } .dcard .m { color: var(--muted); font-size: 11.5px; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+.qlist { display: flex; flex-direction: column; gap: 10px; }
+.q { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.q.done { opacity: .7; } .q .top { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.q .co { font-weight: 600; } .q .t a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); font-weight: 600; } .q .t a:hover { border-color: var(--ink); }
+.q .m { color: var(--muted); font-size: 12.5px; margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.q .req { font-size: 13px; color: var(--ink-2); margin: 8px 0 0; padding: 8px 10px; background: var(--page); border: 1px solid var(--line); border-radius: 10px; white-space: pre-wrap; }
+.q .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+.q .file { font-size: 12.5px; } .q .file a { color: var(--ember); }
 .st { display: inline-block; font: 11px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; border: 1px solid var(--line); }
-.st.approved { color: var(--good); border-color: var(--good); } .st.rejected { color: var(--muted); } .st.redo { color: #b07a00; border-color: #b07a00; } .st.draft { color: var(--ember); border-color: var(--ember); }
-.detail { background: var(--page); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
-.detail h3 { margin: 14px 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.detail h3:first-child { margin-top: 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; } .chip { font-size: 12px; border-radius: 999px; padding: 3px 9px; border: 1px solid var(--line); background: var(--pill); }
-.chip.ok { border-color: var(--good); } .chip.miss { border-color: var(--crit); color: var(--crit); }
-table.diff { border-collapse: collapse; width: 100%; font-size: 13px; } .diff th, .diff td { text-align: left; vertical-align: top; padding: 8px 8px; border-bottom: 1px solid var(--line); }
-.diff th { color: var(--muted); font-weight: 500; } .diff td.sec { white-space: nowrap; color: var(--muted); font-size: 12px; } .diff td.rev { font-weight: 500; } .diff td.why { color: var(--muted); font-size: 12px; }
-.diff tr.changed td.rev { background: color-mix(in srgb, var(--page) 88%, #0ca30c); }
-.acts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
-.lede small { color: var(--muted); }
-textarea.master { width: 100%; min-height: 260px; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--page); color: var(--ink); }
-.gaps li { margin: 3px 0; }
+.st.todo { color: var(--ember); border-color: var(--ember); } .st.done { color: var(--good); border-color: var(--good); } .st.skip { color: var(--muted); } .st.file { color: var(--good); border-color: var(--good); background: color-mix(in srgb, var(--page) 88%, var(--good)); }
+.files { margin-top: 26px; } .files table { border-collapse: collapse; width: 100%; font-size: 13.5px; border-top: 1px solid var(--line); }
+.files th, .files td { text-align: left; vertical-align: top; padding: 9px 8px; border-bottom: 1px solid var(--line); } .files th { color: var(--muted); font-weight: 500; }
+.files td.n { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--muted); } .files a { color: var(--ember); }
 .empty { color: var(--muted); padding: 24px 0; }
 .hidden { display: none !important; }
-@media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--page); }
 @media (max-width: 640px) { main { padding: 12px 16px; } .hero { padding: 28px 20px 22px; border-radius: 20px; } .stats.four { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
 </style>
 </head>
@@ -1727,11 +1720,11 @@ textarea.master { width: 100%; min-height: 260px; font: 13px/1.45 ui-monospace, 
 
 <section class="stats four" id="stats" aria-label="Summary"></section>
 
-<h2>Drafts.</h2>
-<p class="lede">Each morning the radar drafts a tailored revision of your master resume for the strongest new fits: saved roles first, then roles naming 2027. Review, approve or send back. <small>Drafts live in your private state repo; nothing here is on the public page.</small></p>
+<h2>To tailor.</h2>
+<p class="lede">The strongest open fits that still need a tailored resume: saved roles first, then roles naming your graduation year, then other strong fits. Copy the brief into your resume session, build the file, and either upload it to the private repo (it appears below and on the card) or mark the card done.</p>
 <div class="tabsrow">
+  <div class="seg" id="qview" role="group" aria-label="Show"><button type="button" class="ctl small" data-q="todo" aria-pressed="true">To do</button><button type="button" class="ctl small" data-q="done" aria-pressed="false">Done</button><button type="button" class="ctl small" data-q="all" aria-pressed="false">All fits</button></div>
   <button type="button" class="ctl small" id="data-toggle" aria-expanded="false" aria-controls="datapanel">Data</button>
-  <button type="button" class="ctl small" id="master-toggle" aria-expanded="false" aria-controls="masterpanel">Master resume</button>
   <span class="sync-status mono" id="sync-status"></span>
   <span class="count mono" id="count"></span>
 </div>
@@ -1745,21 +1738,18 @@ textarea.master { width: 100%; min-height: 260px; font: 13px/1.45 ui-monospace, 
     <button type="button" class="pbtn" id="sync-disconnect">Disconnect</button>
     <button type="button" class="pbtn" id="sync-now">Sync now</button>
   </div>
-  <div class="dp-note">Same token as the radar and tracker. Drafts are read from drafts.json next to state.json; your approvals are written into state.json.</div>
+  <div class="dp-note">Same token as the radar and tracker. Finished resumes are read from a <code>resumes/</code> folder next to state.json in that repo; Done / Skip marks are written into state.json.</div>
 </div>
-<div id="masterpanel" class="hidden">
-  <div class="dp-head mono">Master resume (the only source of facts for every draft)</div>
-  <div class="dp-note">Paste the full text of your current resume: headings, then one bullet per line. It is stored in your state file (private repo), never on the public page. Update it whenever the real resume changes.</div>
-  <textarea class="master" id="master" aria-label="Master resume text" placeholder="Kevin Kyle&#10;EDUCATION&#10;University of Maryland, College Park — B.S. Aerospace Engineering, expected May 2027&#10;TECHNICAL EXPERIENCE&#10;Rocket Lab — R&D Engineering Intern&#10;- Built LabVIEW DAQ ..."></textarea>
-  <div class="dp-row"><button type="button" class="pbtn on" id="master-save">Save master</button><span class="dp-note" id="master-note"></span></div>
-</div>
+<div class="qlist" id="queue"></div>
+<p class="dp-note" id="more"></p>
 
-<div class="two">
-  <div class="list" id="list"></div>
-  <div class="detail" id="detail"><div class="empty">Pick a draft on the left.</div></div>
-</div>
+<section class="files">
+  <h2>Finished files.</h2>
+  <p class="lede">Everything in the private repo's <code>resumes/</code> folder, opened through your token. Name a file <code>&lt;slug&gt;.pdf</code> (the brief gives the slug) and it attaches to its role above; anything else is listed here.</p>
+  <div id="files"><div class="empty">Connect sync under Data to list your files.</div></div>
+</section>
 
-<footer>Drafts only rephrase, reorder and select from your master resume; they never add experience. Source: <a href="__REPO__">__REPO_SHORT__</a>.</footer>
+<footer>Nothing here is sent to any company; files stay in your private repo. Source: <a href="__REPO__">__REPO_SHORT__</a>.</footer>
 </main>
 <script id="data" type="application/json">__DATA__</script>
 __SHARED_JS__
@@ -1767,95 +1757,111 @@ __SHARED_JS__
 (function () {
   const D = JSON.parse(document.getElementById('data').textContent);
   const J = window.JADAR; const $ = (s, el) => (el || document).querySelector(s); const esc = J.esc;
-  const today = new Date(D.today + 'T00:00:00'); const fmt = iso => J.fmt(iso, today), isIso = J.isIso;
-  let S = J.loadState(); let DRAFTS = null; let cur = null;
+  const today = new Date(D.today + 'T00:00:00'); const fmt = iso => J.fmt(iso, today), fmtLong = iso => J.fmtLong(iso), daysTo = iso => J.daysTo(iso, today), isIso = J.isIso;
+  let S = J.loadState(); let FILES = null; let view = 'todo';
   if (D.profileName) $('#who').textContent = 'For ' + D.profileName;
-  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status'), after: c => loadDrafts(c)});
+  const sync = J.makeSync({get: () => S, set: s => { S = s; render(); }, statusEl: $('#sync-status'), after: c => loadFiles(c)});
   function persist() { J.saveState(S); sync.schedulePush(); }
-  J.bindSyncPanel($, sync, () => { DRAFTS = null; render(); });
-  async function loadDrafts(c) {
+  J.bindSyncPanel($, sync, () => { FILES = null; render(); });
+  const slug = r => (J.companyKey(r.company) + '__' + r.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
+  const dir = c => (c.path || 'state.json').replace(/[^/]*$/, '') + 'resumes';
+  async function loadFiles(c) {
     try {
-      const r = await fetch(J.draftsUrl(c), {headers: J.ghHeaders(c), cache: 'no-store'});
-      if (!r.ok) { DRAFTS = r.status === 404 ? {v: 1, drafts: {}} : DRAFTS; render(); return; }
-      const j = await r.json(); const d = JSON.parse(J.b64dec(j.content || ''));
-      if (d && d.drafts && typeof d.drafts === 'object') { DRAFTS = d; render(); }
+      const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + dir(c), {headers: J.ghHeaders(c), cache: 'no-store'});
+      if (!r.ok) { FILES = r.status === 404 ? [] : FILES; render(); return; }
+      const j = await r.json(); FILES = Array.isArray(j) ? j.filter(f => f.type === 'file').map(f => ({name: f.name, path: f.path, size: f.size, sha: f.sha})) : []; render();
     } catch (e) { render(); }
   }
-  const mark = u => (S.drafts[u] || {}).status || 'draft';
-  function setMark(u, status) { S.drafts[u] = {status, at: J.nowIso()}; persist(); render(); }
-  function items() { return Object.values((DRAFTS || {}).drafts || {}).sort((a, b) => (b.generatedAt || '').localeCompare(a.generatedAt || '')); }
-  function revisedText(d) {
-    const p = d.plan || {}; const lines = [];
-    if (p.summary) lines.push(p.summary, '');
-    let sec = null;
-    (p.bullets || []).forEach(b => { if (b.section !== sec) { sec = b.section; lines.push(sec.toUpperCase()); } lines.push('- ' + b.revised); });
-    if (p.skills_line) lines.push('', 'SKILLS', p.skills_line);
-    return lines.join('\n');
+  async function openFile(f) {  // private repo: fetch the bytes with the token, show them from a blob URL
+    const c = J.syncCfg(); if (!c) return;
+    const r = await fetch('https://api.github.com/repos/' + c.repo + '/contents/' + f.path, {headers: Object.assign(J.ghHeaders(c), {Accept: 'application/vnd.github.raw+json'}), cache: 'no-store'});
+    if (!r.ok) { alert('Could not fetch ' + f.name + ' (' + r.status + ')'); return; }
+    const blob = await r.blob(); const type = /\.pdf$/i.test(f.name) ? 'application/pdf' : blob.type || 'application/octet-stream';
+    const url = URL.createObjectURL(new Blob([await blob.arrayBuffer()], {type}));
+    if (type === 'application/pdf') window.open(url, '_blank'); else { const a = document.createElement('a'); a.href = url; a.download = f.name; a.click(); }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  const mark = u => (S.tailor[u] || {}).status || '';
+  function setMark(u, status) { if (status) S.tailor[u] = {status, at: J.nowIso()}; else delete S.tailor[u]; persist(); render(); }
+  const own = u => (S.roles[u] || {}).status || null;
+  function fileFor(r) { const s = slug(r); return (FILES || []).find(f => f.name.toLowerCase().startsWith(s)) || null; }
+  function queue() {
+    const rows = D.roles.filter(r => { const st = own(r.url); if (st === 'hidden' || st === 'applied') return false; return r.fit === 'Yes' || (st === 'saved' && r.fit === 'Maybe'); });
+    const rank = r => [own(r.url) === 'saved' ? 0 : 1, r.timing === '2027' ? 0 : 1, -(parseInt((r.date || '0').replace(/-/g, ''), 10) || 0)];
+    rows.sort((a, b) => { const x = rank(a), y = rank(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; });
+    return rows;
+  }
+  const isDone = r => mark(r.url) === 'done' || !!fileFor(r), isSkip = r => mark(r.url) === 'skip';
+  function brief(r) {
+    const f = fileFor(r); const lines = [
+      'Tailor my resume for this posting. Read-only: do not apply, sign in or submit anything.',
+      'Company: ' + r.company, 'Role: ' + r.title, 'Link: ' + r.url, r.location ? 'Location: ' + r.location : '',
+      'Radar verdict: ' + r.fit + (r.why ? ' (' + r.why + ')' : ''), r.applyBy ? 'Apply by: ' + fmtLong(r.applyBy) : '', r.salary ? 'Pay listed: ' + r.salary : '',
+      '', 'Minimum qualifications from the posting:', r.reqSnippet || '(none extracted; read the posting)', '',
+      'Start from the master resume and the confirmed facts in CLAUDE.md. Keep one page. Lead with what this posting asks for; rephrase, reorder and select only, never invent.',
+      'Save the PDF to the jadar-state repo as resumes/' + slug(r) + '.pdf (that exact name attaches it to the role on the Resumes page).'];
+    return lines.filter(x => x !== '').join('\n');
+  }
+  function card(r) {
+    const st = own(r.url); const f = fileFor(r); const m = mark(r.url); const done = isDone(r), skip = isSkip(r);
+    const pill = f ? '<span class="st file">PDF ready</span>' : done ? '<span class="st done">done</span>' : skip ? '<span class="st skip">skipped</span>' : '<span class="st todo">to do</span>';
+    const d = isIso(r.applyBy) ? daysTo(r.applyBy) : null;
+    const meta = [r.fit + (r.why ? ' · ' + r.why : ''), r.location || '', r.date ? 'posted ' + fmt(r.date) : '', d != null ? 'apply by ' + fmt(r.applyBy) + (d <= 7 ? ' (' + d + ' d)' : '') : '', st === 'saved' ? '★ saved' : '', r.timing === '2027' ? '2027' : ''].filter(Boolean);
+    return `<article class="q${done || skip ? ' done' : ''}" data-url="${esc(r.url)}">
+      <div class="top"><span class="co">${esc(r.company)}</span><span class="t"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a></span>${pill}</div>
+      <div class="m">${meta.map(x => '<span>' + esc(x) + '</span>').join('')}</div>
+      ${r.reqSnippet ? `<div class="req">${esc(r.reqSnippet)}</div>` : ''}
+      <div class="acts">
+        <button type="button" class="pbtn on" data-brief="1">Copy brief</button>
+        ${f ? `<span class="file"><a href="#" data-open="${esc(f.path)}">${esc(f.name)}</a> · ${Math.round(f.size / 1024)} KB</span>` : `<span class="dp-note">upload as resumes/${esc(slug(r))}.pdf</span>`}
+        <button type="button" class="pbtn${m === 'done' ? ' on' : ''}" data-mark="done">${m === 'done' ? '✓ Done' : 'Mark done'}</button>
+        <button type="button" class="pbtn${m === 'skip' ? ' on' : ''}" data-mark="skip">${m === 'skip' ? 'Skipped' : 'Skip'}</button>
+      </div></article>`;
   }
   function renderStats() {
-    const it = items(); const n = it.length, ap = it.filter(d => mark(d.url) === 'approved').length, rj = it.filter(d => mark(d.url) === 'rejected').length, open = n - ap - rj;
-    const hasMaster = ((S.resume || {}).master || '').length >= 200;
-    $('#meta').innerHTML = [n + ' draft' + (n === 1 ? '' : 's'), open + ' to review', ap + ' approved', hasMaster ? 'master resume saved' : 'no master resume yet'].map(esc).join('<span class="sep">·</span>');
-    const stats = [['Drafts', n, 'on file (45 days)', ''], ['To review', open, open ? 'waiting for you' : 'all reviewed', open ? 'ember' : ''], ['Approved', ap, 'ready to build', ap ? 'good' : ''], ['Master', hasMaster ? 'OK' : '—', hasMaster ? 'saved ' + fmt((S.resume.at || '').slice(0, 10)) : 'paste it under Master resume', '']];
+    const q = queue(); const todo = q.filter(r => !isDone(r) && !isSkip(r)), done = q.filter(isDone), files = (FILES || []).length;
+    $('#meta').innerHTML = [q.length + ' strong fit' + (q.length === 1 ? '' : 's'), todo.length + ' to tailor', done.length + ' done', files + ' file' + (files === 1 ? '' : 's') + ' in the repo'].map(esc).join('<span class="sep">·</span>');
+    const stats = [['To tailor', todo.length, 'saved + 2027 first', todo.length ? 'ember' : ''], ['Done', done.length, 'tailored or file uploaded', done.length ? 'good' : ''], ['Files', files, FILES == null ? 'connect sync to list' : 'in resumes/', ''], ['Strong fits', q.length, 'Yes + saved Maybe, not applied/hidden', '']];
     $('#stats').innerHTML = stats.map(([l, v, s, c]) => `<div class="stat"><div class="label mono">${esc(l)}</div><div class="value ${c}">${esc(v)}</div><div class="sub">${esc(s)}</div></div>`).join('');
   }
+  const LIMIT = 12; let showAll = false;
   function render() {
     renderStats();
-    const it = items(); const c = J.syncCfg();
-    $('#count').textContent = it.length ? it.length + ' draft' + (it.length === 1 ? '' : 's') : '';
-    if (!c) { $('#list').innerHTML = '<div class="empty">Connect sync under Data to load your drafts (they live in your private repo).</div>'; }
-    else if (!DRAFTS) { $('#list').innerHTML = '<div class="empty">Loading drafts…</div>'; }
-    else if (!it.length) { $('#list').innerHTML = `<div class="empty">${((S.resume || {}).master || '').length >= 200 ? 'No drafts yet. The next morning run drafts up to 3 for your strongest fits.' : 'Paste your master resume first (button above); the next morning run drafts from it.'}</div>`; }
-    else $('#list').innerHTML = it.map(d => `<div class="dcard${cur === d.url ? ' on' : ''}" data-url="${esc(d.url)}" tabindex="0"><div class="co">${esc(d.company)}</div><div class="t">${esc(d.title)}</div><div class="m"><span class="st ${esc(mark(d.url))}">${esc(mark(d.url))}</span><span>${esc(d.fit)}</span><span>${esc(fmt(d.generatedAt))}</span>${d.applyBy ? `<span>apply by ${esc(fmt(d.applyBy))}</span>` : ''}</div></div>`).join('');
-    if (cur && !it.some(d => d.url === cur)) cur = null;
-    renderDetail(it.find(d => d.url === cur));
-    const m = $('#master'); if (document.activeElement !== m) m.value = (S.resume || {}).master || '';
-    $('#master-note').textContent = (S.resume || {}).at ? 'Saved ' + fmt((S.resume.at || '').slice(0, 10)) + ' · ' + ((S.resume.master || '').split('\n').length) + ' lines' : 'Not saved yet';
+    let q = queue();
+    if (view === 'todo') q = q.filter(r => !isDone(r) && !isSkip(r)); else if (view === 'done') q = q.filter(r => isDone(r) || isSkip(r));
+    const shown = showAll ? q : q.slice(0, LIMIT);
+    $('#count').textContent = q.length ? (shown.length < q.length ? shown.length + ' of ' : '') + q.length : '';
+    $('#queue').innerHTML = shown.map(card).join('') || `<div class="empty">${view === 'todo' ? 'Nothing waiting. Save a role on the radar to queue it here.' : 'Nothing here yet.'}</div>`;
+    $('#more').innerHTML = shown.length < q.length ? `<a href="#" id="showall">Show all ${q.length}</a>` : '';
+    document.querySelectorAll('#qview button').forEach(b => b.setAttribute('aria-pressed', b.dataset.q === view));
+    const c = J.syncCfg();
+    $('#files').innerHTML = !c ? '<div class="empty">Connect sync under Data to list your files.</div>' : FILES == null ? '<div class="empty">Loading…</div>' : !FILES.length ? '<div class="empty">No files yet. Upload PDFs to the <code>resumes/</code> folder of your private repo.</div>'
+      : `<table><thead><tr><th>File</th><th>Role</th><th class="n">Size</th></tr></thead><tbody>${FILES.map(f => { const r = D.roles.find(x => f.name.toLowerCase().startsWith(slug(x))); return `<tr><td><a href="#" data-open="${esc(f.path)}">${esc(f.name)}</a></td><td>${r ? esc(r.company + ' · ' + r.title) : '<span class="dp-note">not matched to a role</span>'}</td><td class="n">${Math.round(f.size / 1024)} KB</td></tr>`; }).join('')}</tbody></table>`;
   }
-  function renderDetail(d) {
-    if (!d) { $('#detail').innerHTML = '<div class="empty">Pick a draft on the left.</div>'; return; }
-    const p = d.plan || {}; const st = mark(d.url);
-    const cov = (p.coverage || []).map(x => `<span class="chip ${x.present ? 'ok' : 'miss'}" title="${esc(x.where || '')}">${esc(x.keyword)}</span>`).join('') || (p.keywords || []).map(k => `<span class="chip">${esc(k)}</span>`).join('');
-    const rows = (p.bullets || []).map(b => `<tr class="${b.revised !== b.original ? 'changed' : ''}"><td class="sec">${esc(b.section)}</td><td>${esc(b.original)}</td><td class="rev">${esc(b.revised)}</td><td class="why">${esc(b.why)}</td></tr>`).join('');
-    $('#detail').innerHTML = `<h3>${esc(d.company)} · <span class="st ${esc(st)}">${esc(st)}</span></h3>
-      <div style="font-size:17px;font-weight:600;letter-spacing:-.01em"><a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(d.title)}</a></div>
-      <div class="dp-note">${esc(d.location || '')}${d.why ? ' · ' + esc(d.why) : ''} · drafted ${esc(fmt(d.generatedAt))} · ${esc(d.model || '')}</div>
-      ${p.summary ? `<h3>Summary line</h3><div>${esc(p.summary)}</div>` : ''}
-      <h3>Posting keywords (green = your master already shows it)</h3><div class="chips">${cov}</div>
-      <h3>Bullets (in the order they should appear)</h3>
-      <table class="diff"><thead><tr><th>Section</th><th>Master</th><th>Tailored</th><th>Why</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="empty">No bullets returned.</td></tr>'}</tbody></table>
-      ${p.skills_line ? `<h3>Skills line</h3><div>${esc(p.skills_line)}</div>` : ''}
-      ${(p.section_order || []).length ? `<h3>Section order</h3><div>${esc(p.section_order.join(' → '))}</div>` : ''}
-      ${(p.gaps || []).length ? `<h3>Gaps (requirements your master does not show)</h3><ul class="gaps">${p.gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul>` : ''}
-      ${p.note ? `<h3>Note</h3><div>${esc(p.note)}</div>` : ''}
-      <div class="acts">
-        <button type="button" class="pbtn${st === 'approved' ? ' on' : ''}" data-mark="approved">✓ Approve</button>
-        <button type="button" class="pbtn${st === 'rejected' ? ' on' : ''}" data-mark="rejected">Reject</button>
-        <button type="button" class="pbtn${st === 'redo' ? ' on' : ''}" data-mark="redo" title="The next morning run drafts this role again">Send back for a redo</button>
-        <button type="button" class="pbtn" id="copy-rev">Copy tailored text</button>
-        <button type="button" class="pbtn" id="dl-rev">Download .md</button>
-      </div>`;
-    $('#detail').querySelectorAll('button[data-mark]').forEach(b => b.addEventListener('click', () => setMark(d.url, st === b.dataset.mark ? 'draft' : b.dataset.mark)));
-    $('#copy-rev').addEventListener('click', async () => { try { await navigator.clipboard.writeText(revisedText(d)); $('#copy-rev').textContent = 'Copied'; setTimeout(() => $('#copy-rev').textContent = 'Copy tailored text', 1200); } catch (e) { alert('Copy failed; select the text instead.'); } });
-    $('#dl-rev').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([revisedText(d)], {type: 'text/markdown'})); a.download = (d.company + ' - ' + d.title).replace(/[^\w.-]+/g, '_') + '.md'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); });
-  }
-  $('#list').addEventListener('click', e => { const c = e.target.closest('.dcard'); if (c) { cur = c.dataset.url; render(); } });
-  $('#list').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.dcard')) { e.preventDefault(); cur = e.target.dataset.url; render(); } });
+  document.addEventListener('click', async e => {
+    const o = e.target.closest('a[data-open]'); if (o) { e.preventDefault(); const f = (FILES || []).find(x => x.path === o.dataset.open); if (f) openFile(f); return; }
+    const sa = e.target.closest('#showall'); if (sa) { e.preventDefault(); showAll = true; render(); return; }
+    const card = e.target.closest('.q'); if (!card) return; const r = D.roles.find(x => x.url === card.dataset.url); if (!r) return;
+    const b = e.target.closest('button[data-brief]'); if (b) { try { await navigator.clipboard.writeText(brief(r)); b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy brief', 1200); } catch (err) { alert(brief(r)); } return; }
+    const mk = e.target.closest('button[data-mark]'); if (mk) { setMark(r.url, mark(r.url) === mk.dataset.mark ? '' : mk.dataset.mark); }
+  });
+  $('#qview').addEventListener('click', e => { const b = e.target.closest('button[data-q]'); if (!b) return; view = b.dataset.q; showAll = false; render(); });
   $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); });
-  $('#master-toggle').addEventListener('click', e => { const o = $('#masterpanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); if (!o) $('#master').focus(); });
-  $('#master-save').addEventListener('click', () => { S.resume = {master: $('#master').value.replace(/\r\n/g, '\n').trim(), at: J.nowIso()}; persist(); render(); });
   render();
-  const c0 = J.syncCfg(); if (c0) { sync.syncNow(); }
+  if (J.syncCfg()) sync.syncNow();
 })();
 </script>
 </body>
 </html>
 """
 
-def build_resumes(profile_name=None, profile=None, today=None):
-    """Return the HTML string for resumes.html. Embeds nothing personal: drafts come from the private repo through the
-    browser's sync token, the master resume lives in the state file."""
-    data = dict(today=today or dt.date.today().isoformat(), profileName=profile_name or (profile or {}).get("name"))
+QUEUE_KEYS = ("url", "company", "title", "fit", "why", "location", "date", "applyBy", "timing", "salary", "reqSnippet", "discipline")
+
+def build_resumes(out, profile_name=None, profile=None, today=None):
+    """Return the HTML string for resumes.html: the tailoring queue (Yes and saved-Maybe roles with their requirement excerpt)
+    and the finished-file listing. Role data is the same public data as the radar; files and marks stay in the private repo."""
+    roles = [{k: r.get(k) for k in QUEUE_KEYS if r.get(k)} for r in out.get("roles", []) if r.get("fit") in ("Yes", "Maybe")]
+    data = dict(today=today or dt.date.today().isoformat(), profileName=profile_name or (profile or {}).get("name"), roles=roles)
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     short = REPO_URL.replace("https://github.com/", "")
     return (RESUMES_TEMPLATE.replace("__CSS_SHARED__", CSS_SHARED).replace("__SHARED_JS__", SHARED_JS).replace("__DATA__", blob)
@@ -1921,7 +1927,7 @@ def main():
     with open(os.path.join(site, "tracker.html"), "w") as f: f.write(tracker)
     sources = build_sources(out, src, name, profile)
     with open(os.path.join(site, "sources.html"), "w") as f: f.write(sources)
-    resumes = build_resumes(name, profile, today)
+    resumes = build_resumes(out, name, profile, today)
     with open(os.path.join(site, "resumes.html"), "w") as f: f.write(resumes)
     print(f"site/index.html: {len(html) // 1024} KB, {len(out['roles'])} roles; site/tracker.html: {len(tracker) // 1024} KB; site/sources.html: {len(sources) // 1024} KB")
 

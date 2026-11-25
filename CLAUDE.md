@@ -97,19 +97,16 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   Saved / Applied / Phone screen / Interview / Offer / Closed, drag-and-drop or a per-card menu; `moveTo()` records
   `app.stageAt` + `app.history`, `markApplied()` turns a saved radar role into an application; Board/Table toggle
   (`jadar.trackerview.v1`). The table stays as the detail editor.
-- **Resume drafts** (`tailor.py`, morning run only, 2026-11-25; Kevin: "my top fit roles should have resume revisions
-  premade for me to review and approve, viewable within the jadar"): `candidates()` picks up to `TAILOR_MAX` (3) roles with
-  no draft yet (saved roles first, then Yes roles naming 2027, then other Yes roles, newest first; hidden/applied skipped;
-  a draft marked `redo` on the page is done again); `description_for()` re-reads the posting through the scan adapters;
-  `tailor_one()` calls Claude (`claude-opus-5-5`, structured output `SCHEMA`, effort high, server-side fallbacks,
-  system + master resume cached) for a revision plan: summary, keyword coverage, every bullet original -> revised with why,
-  skills line, section order, honest gaps, note. Hard rule in the prompt: never invent; the posting text is data.
-  Needs `ANTHROPIC_API_KEY` (repo secret) and the master resume text, which Kevin pastes on the Resumes page (stored in
-  state.json `resume.master`, private repo; never in this repo or the public page). Drafts -> `drafts.json` next to
-  state.json in the private repo (45-day keep). **Resumes page** (`build_resumes()` -> `site/resumes.html`, fourth nav
-  tab): reads drafts.json through the browser's sync token, shows coverage chips and the master/tailored bullet table,
-  Approve / Reject / Send back for a redo (state.json `drafts[url].status`), Copy tailored text, Download .md. Building the
-  .docx from an approved draft is still the local "Resume Tailoring" session's job (Kevin's PC). ~$0.06 per draft.
+- **Resumes page** (`build_resumes(out, ...)` -> `site/resumes.html`, fourth nav tab; 2026-11-26, Kevin: the local "Resume
+  Tailoring" session on his PC makes the resumes, jadar is the queue and the shelf; no cloud drafting). Embeds the Yes and
+  Maybe roles (`QUEUE_KEYS`: url, company, title, fit, why, location, date, applyBy, timing, salary, reqSnippet, discipline;
+  public data, same as the radar). **To tailor** queue = Yes roles + saved Maybe roles, minus hidden/applied, ordered saved ->
+  2027 -> newest; each card has the requirement excerpt, **Copy brief** (a read-only instruction for the local session incl.
+  the target filename), Mark done / Skip (state.json `tailor[url].status`). **Finished files**: the page lists the private
+  repo's `resumes/` folder (next to state.json) through the browser's sync token and opens a file as a blob URL (PDF in a
+  new tab); a file named `<slug>.pdf` (slug = companyKey__title, lowercased, non-alphanumerics -> "-", 90 chars) attaches to
+  its role and counts as done. Cloud drafting with the Claude API was built on 2026-11-25 (`tailor.py`, commit 68bc04a) and
+  removed the next day at Kevin's request; do not bring it back unless he asks.
 - **Sources page** (`build_sources()` -> `site/sources.html`, third nav tab, 2026-11-18): one row per board from the run's
   `status` (listed / in field / Yes / last scanned / note) with the public board link from `board_url()`, plus `build_dash.GAPS`
   as "not covered". Embeds no personal data.

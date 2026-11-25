@@ -171,14 +171,16 @@ class SourcesTests(unittest.TestCase):
         self.assertIsNone(build_page.board_url({"type": "greenhouse"}))
 
 class ResumesTests(unittest.TestCase):
-    """resumes.html: review page for tailored drafts; embeds nothing personal."""
+    """resumes.html: the tailoring queue for the local resume session + finished files from the private repo."""
     def test_page(self):
-        html = build_page.build_resumes("Kevin Kyle", today="2026-11-25")
-        for needle in ('aria-current="page">Resumes</a>', "Master resume", "draftsUrl", "Approve", "Send back for a redo", "Copy tailored text", 'id="master"'):
+        with open(FIXTURE) as f: out = json.load(f)
+        html = build_page.build_resumes(out, "Kevin Kyle", today="2026-11-26")
+        for needle in ('aria-current="page">Resumes</a>', "To tailor.", "Copy brief", "Finished files.", "Mark done", "resumes/", "function brief("):
             self.assertIn(needle, html, needle)
-        data = embedded(html); self.assertEqual(sorted(data), ["profileName", "today"])
-        self.assertIn("resume: {master: '', at: ''}, drafts: {}", html); self.assertIn("out.resume = newer(a.resume, b.resume)", html)
-        self.assertIn('href="resumes.html"', build_page.build_tracker("K", today="2026-11-25"))
+        data = embedded(html); self.assertEqual(sorted(data), ["profileName", "roles", "today"])
+        self.assertTrue(all(r["fit"] in ("Yes", "Maybe") for r in data["roles"])); self.assertTrue(all("desc" not in r for r in data["roles"]))
+        self.assertIn("tailor: {}", html); self.assertIn("out.tailor[u] = newer(a.tailor[u], b.tailor[u])", html)
+        self.assertNotIn("drafts.json", html); self.assertNotIn("tailor.py", html)
 
 class TrackerTests(unittest.TestCase):
     """tracker.html: second page, same state file, no roles or personal data embedded."""
