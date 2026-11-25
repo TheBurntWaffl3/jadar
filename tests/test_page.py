@@ -192,19 +192,22 @@ class TrackerTests(unittest.TestCase):
 
     def test_applied_evidence(self):
         # Kevin 2026-11-26: record when Applied was clicked and which resume went with it, both editable in the tracker
-        for needle in ("Resume used</th>", "function resumeCell(", "appliedAt", "uploadResume", "listResumes", "no resume on file", "Upload a PDF"):
+        for needle in ("Resume used</th>", "function resumeCell(", "appliedAt", "uploadResume", "listResumes", "no resume", "Upload a PDF"):
             self.assertIn(needle, self.html, needle)
         self.assertIn("e.app.appliedAt = now", build_page.build(json.load(open(FIXTURE)), json.load(open(os.path.join(ROOT, "sources.json"))), "K"))
 
     def test_pipeline_board(self):
         # 2026-11-25: Kevin "can't say I've been rejected or moved to first interview" -> a drag-and-drop stage board
-        for needle in ("Pipeline.", 'id="board"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "Mark applied"):
+        for needle in ("Pipeline.", 'id="board"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "mark applied"):
             self.assertIn(needle, self.html, needle)
         # 2026-11-25, Kevin: "not in love with this layout ... expand the jobs I applied to so I can add resumes or see contacts";
         # "redundant with the applied row and then another applied row tracking stats" -> no tiles, no funnel strip; cards open in place
         for needle in ("function editor(", 'data-exp="1"', 'data-res="1"', 'data-f="contacted"', 'data-f="notes"', 'data-f="appliedOn"', "board.open === key ? null : key", "% reached"):
             self.assertIn(needle, self.html, needle)
         self.assertNotIn('id="funnel"', self.html); self.assertNotIn('id="stats"', self.html)
+        # 2026-11-25, Kevin: "condense these bubbles? I'm expecting over 100 applications" -> three-line cards, scrolling columns
+        for needle in ("function shortPay(", ".card:not(.open) .acts { display: none; }", ".col { max-height: 78vh; overflow-y: auto;", 'data-apply="1" title="Move to Applied">mark applied'):
+            self.assertIn(needle, self.html, needle)
 
     def test_repost_tag(self):
         html = build_page.build(self.out if hasattr(self, 'out') else json.load(open(FIXTURE)), json.load(open(os.path.join(ROOT, 'sources.json'))), 'K')

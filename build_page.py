@@ -1129,10 +1129,17 @@ table.tr { border-collapse: collapse; width: 100%; min-width: 1120px; font-size:
 .col h3 { margin: 0 0 2px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
 .col h3 .cnt { font: 11px ui-monospace, Menlo, Consolas, monospace; background: var(--pill); border-radius: 999px; padding: 2px 8px; color: var(--ink); }
 .col .hint { color: var(--muted); font-size: 12px; }
-.card { background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 9px 10px 8px; box-shadow: inset 3px 0 0 var(--stage, var(--line)); cursor: grab; }
+.card { background: var(--page); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px 6px 10px; box-shadow: inset 3px 0 0 var(--stage, var(--line)); cursor: grab; }
+/* collapsed cards are three short lines (Kevin 2026-11-25: "condense these bubbles, I'm expecting over 100 applications") */
+.card:not(.open) .co, .card:not(.open) .pos, .card:not(.open) .m { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.card:not(.open) .m span { display: inline; } .card:not(.open) .m span + span::before { content: " · "; color: var(--line); }
+.card:not(.open) .acts { display: none; }
+.card .m .ok { color: var(--good); } .card .m .pay { font-variant-numeric: tabular-nums; }
+.col { max-height: 78vh; overflow-y: auto; scrollbar-width: thin; }
+.col h3 { position: sticky; top: -10px; background: var(--card); padding: 10px 0 6px; margin: -10px 0 0; z-index: 1; }
 .card.dragging { opacity: .5; } .card:active { cursor: grabbing; }
-.card .co { font-weight: 600; font-size: 13.5px; } .card .pos { font-size: 13px; margin: 1px 0 4px; } .card .pos a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); }
-.card .m { color: var(--muted); font-size: 11.5px; display: flex; flex-wrap: wrap; gap: 4px 8px; }
+.card .co { font-weight: 600; font-size: 12.5px; line-height: 1.3; } .card .pos { font-size: 12.5px; line-height: 1.3; margin: 0 0 2px; } .card .pos a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); }
+.card .m { color: var(--muted); font-size: 11px; display: flex; flex-wrap: wrap; gap: 4px 8px; line-height: 1.3; }
 .card .m .fu { color: #b07a00; font-weight: 600; } .card .m .due { color: var(--crit); font-weight: 600; }
 .card .acts { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
 .card select.sel { font-size: 12px; padding: 3px 20px 3px 8px; max-width: 100%; }
@@ -1482,19 +1489,22 @@ __SHARED_JS__
     if (it.kind === 'saved') {
       const r = it.snap; const d = isIso(r.applyBy) ? daysTo(r.applyBy) : null;
       const due = d == null ? '' : d < 0 ? '<span class="due">deadline passed</span>' : `<span class="${d <= 7 ? 'due' : ''}">apply by ${esc(fmt(r.applyBy))}</span>`;
-      return `<article class="card stage-saved" draggable="true" data-kind="saved" data-key="${esc(it.key)}"><div class="co">${esc(r.company || '')}</div><div class="pos"><a href="${esc(it.key)}" target="_blank" rel="noopener">${esc(r.title || it.key)}</a></div>`
-           + `<div class="m">${r.fit ? esc(r.fit) : ''}${r.location ? '<span>' + esc(r.location) + '</span>' : ''}${due}</div><div class="acts"><button type="button" class="pbtn tiny" data-apply="1">Mark applied</button></div></article>`;
+      return `<article class="card stage-saved" draggable="true" data-kind="saved" data-key="${esc(it.key)}" title="${esc(r.title || '')}"><div class="co">${esc(r.company || '')}</div><div class="pos"><a href="${esc(it.key)}" target="_blank" rel="noopener">${esc(r.title || it.key)}</a></div>`
+           + `<div class="m">${r.fit ? '<span>' + esc(r.fit) + '</span>' : ''}${due ? '<span>' + due + '</span>' : ''}<span><a href="#" data-apply="1" title="Move to Applied">mark applied</a></span></div></article>`;
     }
     const r = it; const stt = r.app.status || 'applied'; const since = r.app.stageAt || r.get('appliedOn'); const inStage = isIso(since) ? -daysTo(since) : null;
+    const open = board.open === `${r.kind}:${r.key}`;
     const ap = r.get('appliedOn'); const meta = [];
-    if (isIso(ap)) meta.push(`<span>applied ${esc(fmt(ap))}</span>`); if (inStage != null && stt !== 'applied') meta.push(`<span>${inStage} d in stage</span>`);
-    if (r.get('pay')) meta.push(`<span>${esc(r.get('pay'))}</span>`); if (r.get('dates')) meta.push(`<span>next: ${esc(r.get('dates'))}</span>`);
-    if (r.app.resume) meta.push(`<span>resume: ${esc(r.app.resume.name)}</span>`); else if (!CLOSED.has(stt)) meta.push('<span class="src">no resume on file</span>');
+    if (isIso(ap)) meta.push(`<span>${esc(fmt(ap))}</span>`); if (inStage != null && stt !== 'applied') meta.push(`<span>${inStage} d in stage</span>`);
+    if (r.get('pay')) meta.push(`<span class="pay">${esc(open ? r.get('pay') : shortPay(r.get('pay')))}</span>`); if (r.get('dates')) meta.push(`<span>next: ${esc(r.get('dates'))}</span>`);
+    if (r.app.resume) meta.push(open ? `<span>resume: ${esc(r.app.resume.name)}</span>` : `<span class="ok" title="${esc(r.app.resume.name)}">resume ✓</span>`); else if (!CLOSED.has(stt)) meta.push('<span class="src">no resume</span>');
     if (needsFollowUp(r)) meta.push('<span class="fu">follow up</span>'); if (CLOSED.has(stt)) meta.push(`<span>${esc(LABEL[stt].toLowerCase())}</span>`);
     const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position || '(no title)');
     const sel = `<select class="sel" data-move="1" aria-label="Move to stage">${STATUSES.map(x => `<option value="${x}"${x === stt ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
-    const open = board.open === `${r.kind}:${r.key}`;
-    return `<article class="card stage-${CLOSED.has(stt) ? 'closed' : stt}${open ? ' open' : ''}" draggable="${open ? 'false' : 'true'}" data-kind="${r.kind}" data-key="${esc(r.key)}"><button type="button" class="exp" data-exp="1" aria-expanded="${open}" title="${open ? 'Close' : 'Open: resume, contacts, dates, notes'}">${open ? '▴' : '▾'}</button><div class="co">${esc(r.company)}</div><div class="pos">${link}</div><div class="m">${meta.join('')}</div><div class="acts">${sel}</div>${open ? editor(r) : ''}</article>`;
+    return `<article class="card stage-${CLOSED.has(stt) ? 'closed' : stt}${open ? ' open' : ''}" draggable="${open ? 'false' : 'true'}" data-kind="${r.kind}" data-key="${esc(r.key)}" title="${open ? '' : esc(r.position || '')}"><button type="button" class="exp" data-exp="1" aria-expanded="${open}" title="${open ? 'Close' : 'Open: resume, contacts, dates, notes'}">${open ? '▴' : '▾'}</button><div class="co">${esc(r.company)}</div><div class="pos">${link}</div><div class="m">${meta.join('')}</div><div class="acts">${sel}</div>${open ? editor(r) : ''}</article>`;
+  }
+  function shortPay(p) {  // "$58,200–$108,200/yr" -> "$58k–$108k"; "$45–$52/hr" stays
+    return String(p || '').replace(/\$(\d{1,3}(?:,\d{3})+)(?:\.\d+)?/g, (m, n) => '$' + Math.round(parseInt(n.replace(/,/g, ''), 10) / 1000) + 'k').replace(/\/yr$/, '');
   }
   function cardRow(el) { const c = el.closest('.card'); if (!c) return null; if (c.dataset.kind === 'saved') return {kind: 'saved', key: c.dataset.key}; return rowsAll().find(r => r.kind === c.dataset.kind && r.key === c.dataset.key) || null; }
   function dropTo(row, col) {
@@ -1510,7 +1520,7 @@ __SHARED_JS__
   });
   $('#board').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.card .edit input')) { e.preventDefault(); e.target.blur(); } if (e.key === 'Escape' && e.target.closest('.card.open')) { board.open = null; render(); } });
   $('#board').addEventListener('click', e => {
-    const b = e.target.closest('button[data-apply]'); if (b) { const row = cardRow(b); if (row) markApplied(row.key); return; }
+    const b = e.target.closest('[data-apply]'); if (b) { e.preventDefault(); const row = cardRow(b); if (row) markApplied(row.key); return; }
     const op = e.target.closest('a[data-openres]'); if (op) { e.preventDefault(); const c = J.syncCfg(); if (c) J.openRepoFile(c, op.dataset.openres, op.dataset.name); return; }
     const fu = e.target.closest('button[data-fu]'); if (fu) { const row = cardRow(fu); if (row) markFollowedUp(row); return; }
     const rm = e.target.closest('button[data-rm]'); if (rm) { const row = cardRow(rm); if (row) removeManual(row); return; }
