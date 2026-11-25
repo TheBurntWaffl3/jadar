@@ -166,10 +166,13 @@ tr.detail td { padding: 0 10px 16px; background: var(--card); }
 .state-sum { color: var(--muted); }
 .ctl.small { min-height: 32px; padding: 6px 12px; font-size: 13px; }
 .sync-status { color: var(--muted); }
-td.acts { white-space: nowrap; width: 96px; padding-left: 4px; padding-right: 4px; }
-.ic { width: 28px; height: 28px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; vertical-align: middle; }
-.ic:hover, .ic:focus-visible { background: var(--pill); color: var(--ink); outline: none; }
-.ic.on.save { color: var(--ember); } .ic.on.applied { color: var(--good); } .ic.on.hide { color: var(--crit); }
+td.acts { white-space: nowrap; width: 124px; padding-left: 4px; padding-right: 4px; }
+.ic { width: 34px; height: 34px; margin-right: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--pill); color: var(--ink-2); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; vertical-align: middle;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08); transition: transform .08s, background .12s, box-shadow .12s; }
+.ic:hover, .ic:focus-visible { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,.14); outline: none; color: var(--ink); }
+.ic.save:hover { background: var(--tint); border-color: var(--ember); color: var(--ember); } .ic.applied:hover { background: color-mix(in srgb, var(--page) 85%, var(--good)); border-color: var(--good); color: var(--good); } .ic.hide:hover { background: var(--fail-wash); border-color: var(--crit); color: var(--crit); }
+.ic.on.save { background: var(--ember); border-color: var(--ember); color: #fff; } .ic.on.applied { background: var(--good); border-color: var(--good); color: #fff; } .ic.on.hide { background: var(--crit); border-color: var(--crit); color: #fff; }
+.ic.on:hover { filter: brightness(1.08); color: #fff; }
 .tag.closed { background: var(--pill); color: var(--muted); } .tag.status.repost { opacity: .85; } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
 tr.row.dim td .role a, tr.row.dim td.co, tr.row.dim td.why { color: var(--muted); }
 .tag.tasap-hidden { background: var(--pill); color: var(--muted); }
