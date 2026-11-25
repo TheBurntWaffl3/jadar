@@ -179,14 +179,21 @@ ADP (Scaled Composites, Mercury), classic SuccessFactors portal (Embraer), Pheno
 
 Kratos (submit4jobs robots.txt disallows), Sandia (sandia.jobs is a Nuxt app over the jobsyn search API, which only answers requests from the site itself; the sitemap pages carry no job text), Spirit and PNNL (iCIMS robots.txt disallows), Textron (script-rendered pages), General Atomics (BrassRing, no feed), SAIC/Framatome/Argonne (block automated reads), INL (Taleo), ORNL/Kord (cert errors), X-Bow (ApplicantPro), York (Paycor), TAE (UKG), Natura (Gusto), Spectral, AEDC/NAS, Intuitive Machines, NuScale, Type One, Nano Nuclear, Austal USA, Fincantieri, SwRI. USAJOBS was dropped (no API key); the adapter can come back if Kevin gets one.
 
-## Cloud resume export (tested 2026-11-26, not built yet)
+## Cloud resume build (live since 2026-11-26)
 
-LibreOffice (`soffice --headless --convert-to pdf`) is in the cloud container with Carlito (Calibri-metric) fonts; map the
-Aptos theme fonts to Carlito via fontconfig. Kevin's real Lockheed .docx renders as 2 pages because its right-aligned dates
-are pushed with default-stop tabs plus runs of spaces (Word-only layout). `tools/normalize_tabs.py` rewrites each such line
-to one right tab stop at the text width (minus the paragraph's right indent), after which the file renders as one page with
-every date on its line. Never commit Kevin's resume files to this repo; the private jadar-state repo (not yet reachable from
-cloud sessions: the Claude GitHub App must be granted on it) is where they belong.
+Kevin's choice after testing: resumes are built in the cloud, no PC involved. Pieces:
+- Private repo `TheBurntWaffl3/jadar-state` (attached to this session, cloned at /home/user/jadar-state; the Claude GitHub App
+  is granted on it): `master/Kevin_Kyle_Lockheed_Martin_Resume.docx` (the master, uploaded 2026-11-25), `master/FACTS.md`
+  (confirmed facts; `master/CLAUDE.md` / `HANDOFF.md` from the PC session win if pushed), `tailor_queue.json` (written by
+  `tailor_queue.py` each morning), `resumes/<slug>.pdf|.docx|.plan.json` (built), `resumes/NOTES.md` (skips).
+- `tools/build_resume.py`: `dump` (paragraph index/kind/text, "⟶" = right-aligned part), `apply` (plan JSON: set / delete /
+  insert_after / move by original index; keeps pPr, first-run and last-run formatting, bold labels, bullets; every date line
+  gets a real right tab stop), `pdf` (normalize + `soffice --headless`, prints page count). Fonts: Carlito for Calibri, Aptos
+  mapped to Carlito in ~/.config/fontconfig/fonts.conf. The real master renders as 1 page this way (2 pages without the
+  tab-stop rewrite: Word pushes dates with default tabs + spaces).
+- Scheduled task "Jadar cloud resume build" (3:07 PM ET daily, fires into this session): first 3 queue items without a PDF ->
+  plan -> apply -> pdf -> commit PDF + docx + plan to `resumes/` -> one report to Kevin. The two PC-session tasks are
+  disabled, not deleted. Never commit resume files to this (public) repo.
 
 ## Later: friends' versions (on hold)
 

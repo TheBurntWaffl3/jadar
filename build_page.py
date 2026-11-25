@@ -1835,7 +1835,7 @@ __SHARED_JS__
   const mark = u => (S.tailor[u] || {}).status || '';
   function setMark(u, status) { if (status) S.tailor[u] = {status, at: J.nowIso()}; else delete S.tailor[u]; persist(); render(); }
   const own = u => (S.roles[u] || {}).status || null;
-  function fileFor(r) { const s = slug(r); return (FILES || []).find(f => f.name.toLowerCase().startsWith(s)) || null; }
+  function fileFor(r) { const s = slug(r); const hits = (FILES || []).filter(f => f.name.toLowerCase().startsWith(s)); return hits.find(f => /\.pdf$/i.test(f.name)) || hits[0] || null; }
   function queue() {
     const rows = D.roles.filter(r => { const st = own(r.url); if (st === 'hidden' || st === 'applied') return false; return r.fit === 'Yes' || (st === 'saved' && r.fit === 'Maybe'); });
     const rank = r => [own(r.url) === 'saved' ? 0 : 1, r.timing === '2027' ? 0 : 1, -(parseInt((r.date || '0').replace(/-/g, ''), 10) || 0)];
@@ -1887,7 +1887,7 @@ __SHARED_JS__
     document.querySelectorAll('#qview button').forEach(b => b.setAttribute('aria-pressed', b.dataset.q === view));
     const c = J.syncCfg();
     $('#files').innerHTML = !c ? '<div class="empty">Connect sync under Data to list your files.</div>' : FILES == null ? '<div class="empty">Loading…</div>' : !FILES.length ? '<div class="empty">No files yet. Upload PDFs to the <code>resumes/</code> folder of your private repo.</div>'
-      : `<table><thead><tr><th>File</th><th>Role</th><th class="n">Size</th></tr></thead><tbody>${FILES.map(f => { const r = D.roles.find(x => f.name.toLowerCase().startsWith(slug(x))); return `<tr><td><a href="#" data-open="${esc(f.path)}">${esc(f.name)}</a></td><td>${r ? esc(r.company + ' · ' + r.title) : '<span class="dp-note">not matched to a role</span>'}</td><td class="n">${Math.round(f.size / 1024)} KB</td></tr>`; }).join('')}</tbody></table>`;
+      : `<table><thead><tr><th>File</th><th>Role</th><th class="n">Size</th></tr></thead><tbody>${FILES.filter(f => !/\.(plan\.json|md)$/i.test(f.name)).map(f => { const r = D.roles.find(x => f.name.toLowerCase().startsWith(slug(x))); return `<tr><td><a href="#" data-open="${esc(f.path)}">${esc(f.name)}</a></td><td>${r ? esc(r.company + ' · ' + r.title) : '<span class="dp-note">not matched to a role</span>'}</td><td class="n">${Math.round(f.size / 1024)} KB</td></tr>`; }).join('')}</tbody></table>`;
   }
   document.addEventListener('click', async e => {
     const o = e.target.closest('a[data-open]'); if (o) { e.preventDefault(); const f = (FILES || []).find(x => x.path === o.dataset.open); if (f) openFile(f); return; }
