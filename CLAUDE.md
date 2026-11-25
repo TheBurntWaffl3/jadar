@@ -182,8 +182,8 @@ are we missing?". The list had been written from memory plus one 20-company pass
   Xona (57), Telesat, ispace US, Pivotal, Astro Mechanica, Swarm Aero, Machina Labs, Velo3D, Fuse Energy, four nuclear
   utilities (Vistra, Ameren, PSEG, APS, DTE, NextEra), RAND, Jefferson Lab, Elbit America, Ensign-Bickford, Chart, GKN,
   Bombardier, Honda Aircraft, Jacobs, MTSI, Brookhaven. Unreadable finds are in `build_dash.GAPS` with the reason. The
-  agents' raw lists (601 candidates incl. ~250 with ATS "unknown" because the shared WebSearch budget ran out) were in the
-  session scratchpad only; the monthly sweep re-does the unknowns.
+  agents' raw lists (601 candidates incl. ~250 with ATS "unknown" because the shared WebSearch budget ran out) are in
+  `tools/coverage/candidates-2026-11-25.jsonl`; the monthly sweep works through the unknowns.
 - **`discover.py`** (Wed/Sun once a day inside the scan, `discover` input any time; `DISCOVER_MAX` 15 searches): Google via
   SerpApi/Serper over the ATS domains (`site:jobs.ashbyhq.com "propulsion engineer"` etc., 77 queries rotated by a cursor);
   every board id in the result links that is not in sources.json goes to `data/discover.json` as `new` (Greenhouse/Lever/
