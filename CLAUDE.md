@@ -1,6 +1,6 @@
 # Job Radar (jadar)
 
-Daily scan of ~135 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request), systems engineering (added 2026-11-25: Lockheed "Systems Engineer Asc - Early Career" was dropped for lacking a field word). US citizen; no active clearance (can obtain one).
+Daily scan of ~205 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request), systems engineering (added 2026-11-25: Lockheed "Systems Engineer Asc - Early Career" was dropped for lacking a field word). US citizen; no active clearance (can obtain one).
 
 ## Current state (as of 2026-11-12)
 
@@ -170,6 +170,29 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
 - Out of field (dropped): security analyst, health and safety, full-stack, site reliability, IT infrastructure, communication systems, cable harness, etc. Keep: "Mechanical Engineer - Cable Magnets", "Nuclear Safety Analyst", "Flight Safety Analyst", "Fluid Systems Engineer, Starlink Infrastructure".
 
 `tests/test_fit.py` holds these as regression tests. Keep it passing (84 tests across `tests/` as of 2026-11-16).
+
+## Coverage: how the company list is kept complete (since 2026-11-25)
+
+Kevin, 2026-11-25, after Cowboy Space turned out to be missing: "why the fuck was cowboy space not on the list? ... what else
+are we missing?". The list had been written from memory plus one 20-company pass; it is now maintained three ways:
+- **Sweep of 2026-11-25:** five agents, one sector each (space; defense + primes; aviation + propulsion; nuclear + maritime;
+  labs + industrial), candidate lists of 50+ each, every Greenhouse/Lever/Ashby id probed live, other ATSs identified from
+  search-result URLs. Result: 70 boards added (135 -> 205), among them CesiumAstro (387 jobs), AST SpaceMobile (278), Chaos
+  Industries (193), Jensen Hughes (169), Neros (114), Freeform (80), Echodyne (67), The Nuclear Company (63), AEVEX (62),
+  Xona (57), Telesat, ispace US, Pivotal, Astro Mechanica, Swarm Aero, Machina Labs, Velo3D, Fuse Energy, four nuclear
+  utilities (Vistra, Ameren, PSEG, APS, DTE, NextEra), RAND, Jefferson Lab, Elbit America, Ensign-Bickford, Chart, GKN,
+  Bombardier, Honda Aircraft, Jacobs, MTSI, Brookhaven. Unreadable finds are in `build_dash.GAPS` with the reason. The
+  agents' raw lists (601 candidates incl. ~250 with ATS "unknown" because the shared WebSearch budget ran out) were in the
+  session scratchpad only; the monthly sweep re-does the unknowns.
+- **`discover.py`** (Wed/Sun once a day inside the scan, `discover` input any time; `DISCOVER_MAX` 15 searches): Google via
+  SerpApi/Serper over the ATS domains (`site:jobs.ashbyhq.com "propulsion engineer"` etc., 77 queries rotated by a cursor);
+  every board id in the result links that is not in sources.json goes to `data/discover.json` as `new` (Greenhouse/Lever/
+  Ashby ones probed for job count + in-field titles). `discover_ignore.txt` (ats:id + reason) silences boards looked at
+  and declined. The morning audit reviews `new` entries; adding a board to sources.json marks it `added`.
+- **Scheduled task "Jadar monthly company sweep"** (1st of the month, 10:20 ET, fires into this session): reviews
+  discover.json, walks investor/accelerator portfolios and funding news, probes new names, adds boards, dispatches a run.
+- Search box: `qnorm()` collapses corporation/incorporated/laboratory/technologies/company to corp/inc/lab/tech/co on both
+  sides so "aerospace corporation" finds "Aerospace Corp" (2026-11-25).
 
 ## Organizations not covered yet (and why)
 
