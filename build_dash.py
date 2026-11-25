@@ -40,7 +40,7 @@ GAPS = [  # organization, sector, platform, why not covered yet
  ("Rolls-Royce North America", "Primes", "custom (Workday behind)", "sitemap lists no job pages"),
 ]
 KEEP = ["id", "fit", "why", "company", "sector", "title", "location", "discipline", "minYears", "degree", "majorReq", "gpaReq", "startWindow", "applyBy", "gradReq", "startReq",
-        "clearance", "citizenship", "timing", "timingNote", "salary", "salaryMin", "salaryMax", "workMode", "employment", "travel", "relocation", "reqSnippet", "date", "dateKind", "firstSeen", "url", "schoolExpOk", "desc_ok"]
+        "clearance", "citizenship", "timing", "timingNote", "salary", "salaryMin", "salaryMax", "workMode", "employment", "travel", "relocation", "reqSnippet", "date", "dateKind", "firstSeen", "url", "schoolExpOk", "desc_ok", "repost"]
 
 def datasets(out, src):
     """out = parsed radar_out.json, src = parsed sources.json -> (roles, orgs) lists for the dashboard."""

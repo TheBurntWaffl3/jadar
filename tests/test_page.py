@@ -191,6 +191,10 @@ class TrackerTests(unittest.TestCase):
         for needle in ("Pipeline.", 'id="board"', 'id="funnel"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "Mark applied"):
             self.assertIn(needle, self.html, needle)
 
+    def test_repost_tag(self):
+        html = build_page.build(self.out if hasattr(self, 'out') else json.load(open(FIXTURE)), json.load(open(os.path.join(ROOT, 'sources.json'))), 'K')
+        self.assertIn('tag reposted', html); self.assertIn("kv('Reposted'", html)
+
     def test_follow_up_and_up_next(self):
         for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today", 'id="upnext"', "Up next.", "stats five"):
             self.assertIn(needle, self.html, needle)

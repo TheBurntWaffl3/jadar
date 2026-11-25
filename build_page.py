@@ -173,7 +173,7 @@ td.acts { white-space: nowrap; width: 124px; padding-left: 4px; padding-right: 4
 .ic.save:hover { background: var(--tint); border-color: var(--ember); color: var(--ember); } .ic.applied:hover { background: color-mix(in srgb, var(--page) 85%, var(--good)); border-color: var(--good); color: var(--good); } .ic.hide:hover { background: var(--fail-wash); border-color: var(--crit); color: var(--crit); }
 .ic.on.save { background: var(--ember); border-color: var(--ember); color: #fff; } .ic.on.applied { background: var(--good); border-color: var(--good); color: #fff; } .ic.on.hide { background: var(--crit); border-color: var(--crit); color: #fff; }
 .ic.on:hover { filter: brightness(1.08); color: #fff; }
-.tag.closed { background: var(--pill); color: var(--muted); } .tag.status.repost { opacity: .85; } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
+.tag.closed { background: var(--pill); color: var(--muted); } .tag.reposted { background: #fff3cd; color: #7a5600; } :root:not([data-theme="light"]) .tag.reposted { background: #3a2f0a; color: #f0c75e; } .tag.status.repost { opacity: .85; } .tag.status { background: var(--tint); color: var(--ember); } .tag.status.applied { background: rgba(12,163,12,.12); color: var(--good); }
 tr.row.dim td .role a, tr.row.dim td.co, tr.row.dim td.why { color: var(--muted); }
 .tag.tasap-hidden { background: var(--pill); color: var(--muted); }
 .imm-note { color: var(--muted); margin: -4px 0 10px; } .imm-note a { color: var(--ember); text-decoration: none; }
@@ -561,6 +561,7 @@ __SHARED_JS__
     if (st && state.tab !== st && state.tab !== 'saved' && state.tab !== 'applied' && state.tab !== 'hidden')
       t.push(`<span class="tag status ${st}${es.repost ? ' repost' : ''}">${st === 'hidden' ? 'Hidden' : st === 'applied' ? 'Applied' : 'Saved'}${es.repost ? ' (re-post)' : ''}</span>`);
     if (r._dt != null && r._dt >= 0 && r._dt <= 10) t.push(`<span class="tag closing">${r._dt === 0 ? 'Closes today' : 'Closes in ' + r._dt + 'd'}</span>`);
+    if (r.repost) t.push(`<span class="tag reposted" title="${esc(r.repost.redated ? 'Posted date moved from ' + fmtLong(r.repost.redated) : 'Same role closed ' + (r.repost.closedOn ? fmtLong(r.repost.closedOn) : '') + ' and came back under a new link')}${r.repost.firstSeen ? ' · first seen ' + esc(fmtLong(r.repost.firstSeen)) : ''}">Reposted</span>`);
     if (r._timing === '2027') t.push(`<span class="tag t2027" title="${esc(r.timingNote || 'Names 2027 in the grad or start window')}">2027</span>`);
     else if (r._timing === 'window') t.push(`<span class="tag twindow" title="${esc(r.timingNote || 'States a grad/start window')}">window</span>`);
     else if (r._timing === 'immediate') { t.push(`<span class="tag tasap" title="${esc(r.timingNote || 'Wants an immediate start')}">ASAP</span>`);
@@ -673,6 +674,7 @@ __SHARED_JS__
     const yrs = r.minYears == null ? 'not stated' : r.minYears + (r.schoolExpOk ? ' (school/internship counts)' : '');
     const pay = r.salary ? r.salary + (/\/hr$/.test(r.salary) && r.salaryMin != null ? ' · $' + num(r.salaryMin) + (r.salaryMax != null && r.salaryMax !== r.salaryMin ? '–$' + num(r.salaryMax) : '') + ' annualized' : '') : null;
     const left = [kv('Min experience', yrs), kv('Degree', r.degree), kv('Major', r.majorReq), kv('GPA', r.gpaReq), kv('Clearance', r.clearance), kv('Citizenship', r.citizenship),
+      kv('Reposted', r.repost ? (r.repost.redated ? 'date moved from ' + fmtLong(r.repost.redated) : 'closed ' + (r.repost.closedOn ? fmtLong(r.repost.closedOn) : '?') + ', back under a new link') + (r.repost.firstSeen ? ' · first seen ' + fmtLong(r.repost.firstSeen) : '') : null),
       kv('Timing', TIMING_LABEL[r._timing] + (r.timingNote ? ' · ' + r.timingNote : '')), kv('Grad window', r.gradReq), kv('Start', r.startReq), kv('Start window', r.startWindow), kv('Apply by', r.applyBy ? fmtLong(r.applyBy) + (r._dt != null ? ' (' + (r._dt < 0 ? 'passed' : r._dt + ' days') + ')' : '') : null),
       kv('Pay', pay), kv('Work mode', r.workMode), kv('Employment', r.employment), kv('Travel', r.travel), kv('Relocation', r.relocation === true ? 'offered' : r.relocation === false ? 'not offered' : null),
       kv('Posted', r.date ? fmtLong(r.date) + ' (' + r.dateKind + ')' : null), kv('First seen', r.firstSeen ? fmtLong(r.firstSeen) : null), kv('Sector', r.sector)].join('');

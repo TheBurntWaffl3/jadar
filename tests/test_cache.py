@@ -62,6 +62,41 @@ class WeirdTitleTests(unittest.TestCase):
         self.assertEqual([r["title"] for r in out_rows], ["Thermal Engineer I"])
         self.assertEqual({d["title"]: d["reason"] for d in st["dropped"]}, {"Software Engineer": "out-of-field word in title", "Director of Engineering": "management title", "Engineer I": "no field word in title or description"})
 
+class RepostTests(unittest.TestCase):
+    """Kevin 2026-11-26: a role that closed and came back (new URL, same company + title) or whose date jumped gets a Reposted tag."""
+    def test_closed_then_back_under_new_url(self):
+        cache = {"postings": {"https://x/old": {"company": "SpaceX", "title": "Thermal Engineer", "firstSeen": "2026-10-01", "lastSeen": "2026-11-10"}}}
+        scan.record_closed(cache, "SpaceX", {}, "2026-11-11")  # the board no longer lists it
+        self.assertNotIn("https://x/old", cache["postings"]); self.assertEqual(cache["closed"]["SpaceX|thermal engineer"]["closedOn"], "2026-11-11")
+        entries = {"https://x/new": {"company": "SpaceX", "title": "Thermal Engineer", "date": "2026-11-25", "dateKind": "posted"}}
+        rows = [{"url": "https://x/new"}]
+        scan.mark_reposts(cache, "SpaceX", entries, rows, "2026-11-25")
+        self.assertEqual(rows[0]["repost"], {"url": "https://x/old", "firstSeen": "2026-10-01", "closedOn": "2026-11-11"})
+        self.assertEqual(entries["https://x/new"]["repost"]["closedOn"], "2026-11-11")
+
+    def test_same_day_churn_and_other_companies_do_not_count(self):
+        cache = {"postings": {}, "closed": {"SpaceX|thermal engineer": {"url": "https://x/old", "firstSeen": "2026-10-01", "closedOn": "2026-11-25"}}}
+        entries = {"https://x/new": {"company": "SpaceX", "title": "Thermal Engineer", "date": "2026-11-25", "dateKind": "posted"},
+                   "https://y/1": {"company": "Blue Origin", "title": "Thermal Engineer", "date": "2026-11-25", "dateKind": "posted"}}
+        rows = [{"url": "https://x/new"}, {"url": "https://y/1"}]
+        scan.mark_reposts(cache, "SpaceX", entries, rows, "2026-11-25")
+        self.assertTrue(all("repost" not in r for r in rows), "closed and re-listed the same day is a glitch, not a re-post")
+
+    def test_known_url_whose_date_jumps(self):
+        cache = {"postings": {"https://x/1": {"company": "Rocket Lab", "title": "GNC Engineer I", "firstSeen": "2026-09-01", "date": "2026-09-01"}}}
+        entries = {"https://x/1": {"company": "Rocket Lab", "title": "GNC Engineer I", "date": "2026-11-20", "dateKind": "posted"}}
+        rows = [{"url": "https://x/1"}]
+        scan.mark_reposts(cache, "Rocket Lab", entries, rows, "2026-11-25")
+        self.assertEqual(rows[0]["repost"], {"url": "https://x/1", "firstSeen": "2026-09-01", "redated": "2026-09-01"})
+        entries = {"https://x/1": {"company": "Rocket Lab", "title": "GNC Engineer I", "date": "2026-09-05", "dateKind": "posted"}}; rows = [{"url": "https://x/1"}]
+        scan.mark_reposts(cache, "Rocket Lab", entries, rows, "2026-11-25"); self.assertNotIn("repost", rows[0], "a 4-day wobble is not a re-post")
+
+    def test_judge_entry_carries_the_mark(self):
+        s = dict(org="SpaceX", sector="Space", type="greenhouse")
+        e = dict(title="Thermal Engineer", location="Hawthorne, CA", date="2026-11-25", dateKind="posted", desc_ok=True, fieldInDesc=True, firstSeen="2026-11-25",
+                 url="https://x/new", facts=scan.requirements("Bachelor's degree. 0 years."), repost={"url": "https://x/old", "firstSeen": "2026-10-01", "closedOn": "2026-11-11"})
+        self.assertEqual(scan.judge_entry(s, e)["repost"]["url"], "https://x/old")
+
 class CacheTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); d = self.tmp.name

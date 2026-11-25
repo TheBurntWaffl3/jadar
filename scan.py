@@ -764,7 +764,39 @@ def judge_entry(s, e, profile=PROFILE):
     tk, tn = timing(profile, rq, e["title"])
     return dict(company=s["org"], sector=s["sector"], title=e["title"], location=e["location"].strip(), url=e["url"],
                 date=e.get("date"), dateKind=e.get("dateKind"), discipline=disc, **rq, fit=f, why=why, timing=tk, timingNote=tn,
-                desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen"))
+                desc_ok=bool(e.get("desc_ok")), firstSeen=e.get("firstSeen"), repost=e.get("repost"))
+
+CLOSED_DAYS = 120  # how long a closed posting's fingerprint is remembered, to recognize a re-post under a new URL
+REDATE_DAYS = 14   # a posting whose own date jumps forward by this much is a re-post too
+
+def fingerprint(company, title):
+    """Same as alert.fingerprint / the page's fp: company (first alias, no parenthetical) + '|' + normalized title."""
+    c = re.sub(r"\s+", " ", re.sub(r"\s*\(.*?\)\s*", " ", company or "").split(" / ")[0]).strip()
+    return c + "|" + re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", (title or "").lower())).strip()
+
+def record_closed(cache, org, entries, today):
+    """Postings of `org` the board no longer lists: drop them from the cache, remember their fingerprint as closed."""
+    closed = cache.setdefault("closed", {})
+    for u in [u for u, e in cache["postings"].items() if e.get("company") == org and u not in entries]:
+        e = cache["postings"].pop(u)
+        closed[fingerprint(org, e.get("title"))] = dict(url=u, title=e.get("title"), firstSeen=e.get("firstSeen"), closedOn=today)
+
+def mark_reposts(cache, org, entries, rows, today):
+    """Kevin 2026-11-26: tag a posting that came back. A new URL whose fingerprint matches a posting that closed (within
+    CLOSED_DAYS) is a re-post; so is a known URL whose posted date jumped forward REDATE_DAYS+. The mark is kept in the
+    cache entry, so it stays on the row until the posting closes again."""
+    closed = cache.get("closed", {}); by_url = {r["url"]: r for r in rows}
+    for u, e in entries.items():
+        old = cache["postings"].get(u)
+        if old is None:
+            c = closed.get(fingerprint(org, e.get("title")))
+            if c and c.get("url") != u and c.get("closedOn") != today:
+                e["repost"] = dict(url=c["url"], firstSeen=c.get("firstSeen"), closedOn=c.get("closedOn"))
+        elif old.get("date") and e.get("date") and e.get("dateKind") == "posted" and not e.get("repost"):
+            try: gap = (dt.date.fromisoformat(e["date"]) - dt.date.fromisoformat(old["date"])).days
+            except ValueError: gap = 0
+            if gap >= REDATE_DAYS: e["repost"] = dict(url=u, firstSeen=old.get("firstSeen"), redated=old["date"])
+        if e.get("repost") and u in by_url: by_url[u]["repost"] = e["repost"]
 
 URL_SENIOR = re.compile(r"(?i)/(?:[a-z0-9-]*-)?(senior|sr|principal|chief|director)[-_]")  # not staff/lead: MIT LL "Assistant Staff" is entry level, Curtiss-Wright "...-Engineer-Staff" was 0 yrs
 STALE_DAYS = 3  # a board that fails this run keeps its roles from a read within this many days
@@ -830,9 +862,9 @@ def main(argv=None):
     roles, status = [], []
     with ThreadPoolExecutor(32) as ex:
         for s, rows, st, entries in ex.map(lambda s: run_source(s, cache["postings"], bool(full)), srcs):
-            if st["ok"]:  # the board answered: postings it no longer lists are closed
-                for u in [u for u, e in cache["postings"].items() if e.get("company") == s["org"] and u not in entries]:
-                    del cache["postings"][u]
+            if st["ok"]:  # the board answered: postings it no longer lists are closed; re-posts get tagged
+                record_closed(cache, s["org"], entries, TODAY.isoformat())
+                mark_reposts(cache, s["org"], entries, rows, TODAY.isoformat())
             else:  # board down (e.g. Workday's Friday-night maintenance): keep what it listed within STALE_DAYS
                 keep = (TODAY - dt.timedelta(days=STALE_DAYS)).isoformat()
                 rows = [r for r in (judge_entry(s, e) for e in cache["postings"].values()
@@ -843,6 +875,8 @@ def main(argv=None):
     now = TODAY.isoformat()
     stale = (TODAY - dt.timedelta(days=60)).isoformat()
     for u in [u for u, e in cache["postings"].items() if (e.get("lastSeen") or "") < stale]: del cache["postings"][u]
+    gone = (TODAY - dt.timedelta(days=CLOSED_DAYS)).isoformat()
+    cache["closed"] = {k: v for k, v in cache.get("closed", {}).items() if (v.get("closedOn") or "") >= gone}
     recent = {now, (TODAY - dt.timedelta(days=1)).isoformat(), (TODAY - dt.timedelta(days=2)).isoformat()}
     for st in status:
         mine = [r for r in roles if r["company"] == st["org"] and r.get("dateKind") == "posted"]

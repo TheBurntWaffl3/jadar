@@ -141,6 +141,7 @@ def compose(out, today=None, state=None, alerted=None, people=None):
             loc = f" ({r['location']})" if r.get("location") else ""
             terps = people.get(company_key(r["company"]), 0)
             tag = " [2027]" if r.get("timing") == "2027" else " [ASAP]" if r.get("timing") == "immediate" else ""
+            if r.get("repost"): tag += " [re-posted]"
             lines.append(f"- {star(r)}{r['company']}: {r['title']}{tag}{loc} - {r['fit']}, {r['why']}" + (f" ({terps} Terps there)" if terps else "") + f"\n  {r['url']}")
         if len(new) > MAX_NEW: lines.append(f"  ... and {len(new) - MAX_NEW} more on the page")
     else:

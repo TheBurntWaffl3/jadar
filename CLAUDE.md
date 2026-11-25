@@ -123,6 +123,12 @@ Daily scan of ~135 organizations' own job boards for entry-level roles that fit 
   Coverage audit 2026-11-18 (per-board `status` has total/fetched/matches): "Los Alamos, New Mexico" matched NON_US
   (`mexico`) with no US hint, so LANL's 134 in-field pages all dropped; spelled-out state names are now US hints. Shield AI
   moved from Lever to Ashby (`shield`); JetZero's Greenhouse board is genuinely empty ("no current openings").
+- **Re-posts** (2026-11-26, Kevin: "one of the roles was reposted... add a reposted tag"): `record_closed()` keeps the
+  fingerprint (company|normalized title) of every posting a board stopped listing in `cache["closed"]` (120 days);
+  `mark_reposts()` tags a new URL whose fingerprint matches a closed posting (not the same day) or a known URL whose posted
+  date jumped 14+ days, as `repost {url, firstSeen, closedOn | redated}` on the cache entry and the row (`judge_entry()`
+  carries it). Page: amber "Reposted" pill + detail line; digest adds "[re-posted]". Different from the state-based
+  "(re-post)" tag, which means a hidden/applied role came back.
 - **Date quality** (in `main()`): placeholder dates (>=5 roles, >=80% one date, >90 days old -> treated as undated; e.g. Joby/Calspan 2024-11-11); bulk imports (>=10 roles and >=30% on one non-recent date -> "on or before"; Castelion 2026-09-07, Firefly); daily re-posters (>=15 roles, >=60% within 3 days -> "refreshed"; Aerospace Corp). Undated roles use first-seen date. Only `dateKind == "posted"` counts as "New".
 
 ## Fit rules (each exists because of a real bug; keep the regression cases)
