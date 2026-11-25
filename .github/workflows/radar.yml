@@ -28,6 +28,13 @@ on:
         description: Set by the "Jadar scan dispatch" task; treat this run like a cron run (digest per ALERTS, finder on)
         type: boolean
         default: false
+      discover:
+        description: Also run the board discovery (Google over the ATS domains; 15 SerpApi searches)
+        type: boolean
+        default: false
+      discover_max:
+        description: Max discovery searches this run (blank = 15)
+        default: ""
   push:
     paths: ["**.py", "sources.json", "profiles/**", ".github/workflows/radar.yml"]
 
@@ -126,6 +133,18 @@ jobs:
           STATE_REPO: ${{ vars.STATE_REPO }}
           STATE_TOKEN: ${{ secrets.STATE_TOKEN }}
         run: python3 -I finder.py
+
+      - name: Discover job boards not in sources.json (Sundays and Wednesdays; data/discover.json, reviewed by the audit)
+        if: steps.scan.outcome == 'success' && inputs.only == '' && (inputs.discover == true || github.event_name == 'schedule' || inputs.scheduled == true)
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          RADAR_DATA: data
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          SERPER_KEY: ${{ secrets.SERPER_KEY }}
+          DISCOVER_MAX: ${{ inputs.discover_max }}
+          DISCOVER_FORCE: ${{ inputs.discover == true && '1' || '' }}
+        run: python3 -I discover.py
 
       - name: Write the tailoring queue for the resume build (private tailor_queue.json)
         if: steps.scan.outcome == 'success' && inputs.only == ''

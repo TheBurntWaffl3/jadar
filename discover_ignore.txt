@@ -1,0 +1,4 @@
+# Boards found by discover.py that are not wanted (ats:id, one per line, # comments). Keep the reason.
+ashby:pivotal   # London policy org, not the eVTOL company (lever:pivotal is)
+greenhouse:eve  # SaaS, not Eve Air Mobility
+greenhouse:axon # Dedrone sits inside a 463-job Axon board; 11 counter-UAS titles, low yield
