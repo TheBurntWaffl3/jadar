@@ -387,7 +387,7 @@ class TestUSStates(unittest.TestCase):
         # had no US hint, so all 134 in-field LANL roles were dropped as non-US
         for loc in ("Los Alamos, New Mexico", "Albuquerque, New Mexico", "Huntsville, Alabama", "Washington, District of Columbia"):
             self.assertFalse(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
-        for loc in ("Mexico City, Mexico", "Guadalajara, Mexico"):
+        for loc in ("Mexico City, Mexico", "Guadalajara, Mexico", "Brossard", "Québec City, QC"):  # GE Vernova Brossard slipped in 2026-11-25
             self.assertTrue(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
 
 class TestSystems(unittest.TestCase):
