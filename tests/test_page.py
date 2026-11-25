@@ -198,7 +198,7 @@ class TrackerTests(unittest.TestCase):
 
     def test_pipeline_board(self):
         # 2026-11-25: Kevin "can't say I've been rejected or moved to first interview" -> a drag-and-drop stage board
-        for needle in ("Pipeline.", 'id="board"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "mark applied"):
+        for needle in ('id="board"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "mark applied"):
             self.assertIn(needle, self.html, needle)
         # 2026-11-25, Kevin: "not in love with this layout ... expand the jobs I applied to so I can add resumes or see contacts";
         # "redundant with the applied row and then another applied row tracking stats" -> no tiles, no funnel strip; cards open in place
@@ -206,6 +206,9 @@ class TrackerTests(unittest.TestCase):
             self.assertIn(needle, self.html, needle)
         self.assertNotIn('id="funnel"', self.html); self.assertNotIn('id="stats"', self.html)
         # 2026-11-25, Kevin: "condense these bubbles? I'm expecting over 100 applications" -> three-line cards, scrolling columns
+        # 2026-11-25, Kevin: "why is there this massive gap? have table toggle default, and sort default by oldest top to newest bottom"
+        for needle in ("let view = (J.lsGet(VKEY) === 'board') ? 'board' : 'table'", "const state = {sort: 'applied', dir: 'asc'", 'td.ed .clamp { display: -webkit-box; -webkit-line-clamp: 4;', '<span class="clamp"'):
+            self.assertIn(needle, self.html, needle)
         for needle in ("function shortPay(", ".card:not(.open) .acts { display: none; }", ".col { max-height: 78vh; overflow-y: auto;", 'data-apply="1" title="Move to Applied">mark applied'):
             self.assertIn(needle, self.html, needle)
 
@@ -214,8 +217,12 @@ class TrackerTests(unittest.TestCase):
         self.assertIn('tag reposted', html); self.assertIn("kv('Reposted'", html)
 
     def test_follow_up_and_up_next(self):
-        for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today", 'id="upnext"', "Up next."):
+        for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today"):
             self.assertIn(needle, self.html, needle)
+        # 2026-11-25, Kevin: "we dont need the pipeline or up next headline. just put the applications first. you dont even need applications header"
+        for gone in ("<h2>Pipeline.</h2>", "<h2>Up next.</h2>", "<h2>Applications.</h2>", 'id="upnext"'):
+            self.assertNotIn(gone, self.html, gone)
+        self.assertLess(self.html.index('id="view"'), self.html.index('id="board"')); self.assertLess(self.html.index('id="tableview"'), self.html.index("<h2>Connections.</h2>"))
 
     def test_main_writes_both_pages(self):
         with tempfile.TemporaryDirectory() as d:

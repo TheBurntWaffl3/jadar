@@ -104,6 +104,11 @@ Daily scan of ~200 organizations' own job boards for entry-level roles that fit 
   the table), expected/first response, next dates, pay, contacted (+ "Followed up today"), notes, benefits; manual rows
   also edit company/position/link and can be removed. Fields save on change/blur (`setApp`), the open card stays open
   (`board.open`), its column widens, Esc closes. The table view is unchanged.
+  **Tracker page order** (2026-11-25, Kevin: "we dont need the pipeline or up next headline. just put the applications
+  first. you dont even need applications header"): hero -> Table/Board toggle (table is the default; `jadar.trackerview.v1`
+  remembers) -> table (oldest application first) or board -> Connections / Places. No Pipeline, Up next or Applications
+  headings; "Up next" is gone (the radar's to-do column covers deadlines). Long cells (Contacted, Notes) are 200-320 px
+  wide and clamped to 4 lines until clicked: a 334-character Contacted note in a 96 px column had made one row 600 px tall.
   **Follow-up queue** (2026-11-17): `needsFollowUp()` = status applied, no first response, no `app.followedUp` within 14 days,
   and (expected date passed or applied 14+ days ago); tile + "Needs follow-up" filter + per-row "Followed up today" button
   (sets `app.followedUp`, appends to Contacted). `alert.tracker_summary()` applies the same rule to the state file
