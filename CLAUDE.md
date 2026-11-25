@@ -1,6 +1,6 @@
 # Job Radar (jadar)
 
-Daily scan of ~205 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request), systems engineering (added 2026-11-25: Lockheed "Systems Engineer Asc - Early Career" was dropped for lacking a field word). US citizen; no active clearance (can obtain one).
+Daily scan of ~200 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request), systems engineering (added 2026-11-25: Lockheed "Systems Engineer Asc - Early Career" was dropped for lacking a field word). US citizen; no active clearance (can obtain one).
 
 ## Current state (as of 2026-11-12)
 
@@ -91,6 +91,13 @@ Daily scan of ~205 organizations' own job boards for entry-level roles that fit 
   fields live in the same state (`app{...}` on applied role entries, `manual{}` rows, `tracker{connections, places}`),
   merged by `at`; marking Applied on the radar seeds `app.appliedOn/pay/posted`; a manual row whose link matches a live
   posting is adopted by the radar page (`adoptManual()`). The page embeds no roles data.
+  **Board cards open in place** (2026-11-25, Kevin: "not in love with this layout. I want to be able to expand the jobs I
+  applied to so I can add resumes or see contacts ... redundant with the applied row and then another applied row tracking
+  stats"): the stat tiles and the funnel strip are gone (the hero line keeps the counts; stage columns show "N% reached");
+  clicking a card (or its ▾) opens `editor(r)` inside it: applied date (+ click time), resume used (same picker/upload as
+  the table), expected/first response, next dates, pay, contacted (+ "Followed up today"), notes, benefits; manual rows
+  also edit company/position/link and can be removed. Fields save on change/blur (`setApp`), the open card stays open
+  (`board.open`), its column widens, Esc closes. The table view is unchanged.
   **Follow-up queue** (2026-11-17): `needsFollowUp()` = status applied, no first response, no `app.followedUp` within 14 days,
   and (expected date passed or applied 14+ days ago); tile + "Needs follow-up" filter + per-row "Followed up today" button
   (sets `app.followedUp`, appends to Contacted). `alert.tracker_summary()` applies the same rule to the state file
@@ -177,13 +184,16 @@ Kevin, 2026-11-25, after Cowboy Space turned out to be missing: "why the fuck wa
 are we missing?". The list had been written from memory plus one 20-company pass; it is now maintained three ways:
 - **Sweep of 2026-11-25:** five agents, one sector each (space; defense + primes; aviation + propulsion; nuclear + maritime;
   labs + industrial), candidate lists of 50+ each, every Greenhouse/Lever/Ashby id probed live, other ATSs identified from
-  search-result URLs. Result: 70 boards added (135 -> 205), among them CesiumAstro (387 jobs), AST SpaceMobile (278), Chaos
+  search-result URLs. Result: 70 boards added, 63 kept after the first run (135 -> 198; seven whose feed pattern did not match went to GAPS: Elbit, Day & Zimmermann, Bombardier, Honda Aircraft, Jacobs, MTSI, Brookhaven), among them CesiumAstro (387 jobs), AST SpaceMobile (278), Chaos
   Industries (193), Jensen Hughes (169), Neros (114), Freeform (80), Echodyne (67), The Nuclear Company (63), AEVEX (62),
   Xona (57), Telesat, ispace US, Pivotal, Astro Mechanica, Swarm Aero, Machina Labs, Velo3D, Fuse Energy, four nuclear
   utilities (Vistra, Ameren, PSEG, APS, DTE, NextEra), RAND, Jefferson Lab, Elbit America, Ensign-Bickford, Chart, GKN,
   Bombardier, Honda Aircraft, Jacobs, MTSI, Brookhaven. Unreadable finds are in `build_dash.GAPS` with the reason. The
   agents' raw lists (601 candidates incl. ~250 with ATS "unknown" because the shared WebSearch budget ran out) are in
   `tools/coverage/candidates-2026-11-25.jsonl`; the monthly sweep works through the unknowns.
+- **Search quota:** SerpApi's free 250/month ran out on 2026-11-25 ("Your account has run out of searches"), which stops
+  both the finder and discover.py until the 1st; a Serper key (`SERPER_KEY`, 2,500 free credits) is the fallback both
+  modules already support. Ask Kevin to add it as a repo secret.
 - **`discover.py`** (Wed/Sun once a day inside the scan, `discover` input any time; `DISCOVER_MAX` 15 searches): Google via
   SerpApi/Serper over the ATS domains (`site:jobs.ashbyhq.com "propulsion engineer"` etc., 77 queries rotated by a cursor);
   every board id in the result links that is not in sources.json goes to `data/discover.json` as `new` (Greenhouse/Lever/
