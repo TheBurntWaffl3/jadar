@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-25T04:31:52.330571+00:00",
+ "scanned": "2026-11-25T04:37:47.352216+00:00",
  "profile": "kevin",
  "rulesVersion": "2026-11-18.2",
  "fullRead": null,
@@ -38815,12 +38815,12 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Manufacturing Engineering Technologist (Engineering Technologist 1/2)",
+   "title": "Mechanical Design Engineer - Space Hardware (R&D Engineer 1/2)",
    "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/manufacturing-engineering-technologist-engineering-technologist-12/b99416e8-9a24-4240-ba85-5e06d29d68c4",
+   "url": "https://lanl.jobs/search/jobdetails/mechanical-design-engineer---space-hardware-rd-engineer-12/2fa117d9-299a-4f39-acf3-3da7697f3c7f",
    "date": "2026-11-23",
    "dateKind": "posted",
-   "discipline": "Other",
+   "discipline": "Mechanical",
    "minYears": 2,
    "schoolExpOk": false,
    "degree": "BS",
@@ -38834,18 +38834,18 @@
    "salary": null,
    "salaryMin": null,
    "salaryMax": null,
-   "workMode": "On-site",
+   "workMode": "Remote",
    "employment": null,
    "travel": null,
    "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Engineering Experience \u00b7 General familiarity with manufacturing processes, material selection, tooling development, welding, machining, and inspection. \u00b7 Working knowledge of CAD/CAM software, preferably CREO and Mastercam. \u00b7 Working knowledge applying engineering practices and principles to support capability development within a manufacturing environment and experience facilitating the manufacturing of products that meet the technical and quality standards set forth in\u2026",
+   "reqSnippet": "Job Requirements: \u00b7 Candidates that meet the degree requirement, but do not meet the 2-year minimum experience requirement are encouraged to apply and may be considered for hire through an exception process. Experience developing designs in Creo, SOLIDWORKS, or similar CAD tools. \u00b7 Experience with drafting/engineering drawings including knowledge of geometric dimensioning and tolerancing standards \u00b7 Knowledge of mechanical and thermal environments relevant to flight hardware, such as launch\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "2+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
-   "firstSeen": "2026-11-23",
+   "firstSeen": "2026-11-24",
    "id": "r1079"
   },
   {
@@ -38887,12 +38887,12 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Mechanical Design Engineer - Space Hardware (R&D Engineer 1/2)",
+   "title": "Manufacturing Engineering Technologist (Engineering Technologist 1/2)",
    "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/mechanical-design-engineer---space-hardware-rd-engineer-12/2fa117d9-299a-4f39-acf3-3da7697f3c7f",
+   "url": "https://lanl.jobs/search/jobdetails/manufacturing-engineering-technologist-engineering-technologist-12/b99416e8-9a24-4240-ba85-5e06d29d68c4",
    "date": "2026-11-23",
    "dateKind": "posted",
-   "discipline": "Mechanical",
+   "discipline": "Other",
    "minYears": 2,
    "schoolExpOk": false,
    "degree": "BS",
@@ -38906,18 +38906,18 @@
    "salary": null,
    "salaryMin": null,
    "salaryMax": null,
-   "workMode": "Remote",
+   "workMode": "On-site",
    "employment": null,
    "travel": null,
    "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Candidates that meet the degree requirement, but do not meet the 2-year minimum experience requirement are encouraged to apply and may be considered for hire through an exception process. Experience developing designs in Creo, SOLIDWORKS, or similar CAD tools. \u00b7 Experience with drafting/engineering drawings including knowledge of geometric dimensioning and tolerancing standards \u00b7 Knowledge of mechanical and thermal environments relevant to flight hardware, such as launch\u2026",
+   "reqSnippet": "Job Requirements: \u00b7 Engineering Experience \u00b7 General familiarity with manufacturing processes, material selection, tooling development, welding, machining, and inspection. \u00b7 Working knowledge of CAD/CAM software, preferably CREO and Mastercam. \u00b7 Working knowledge applying engineering practices and principles to support capability development within a manufacturing environment and experience facilitating the manufacturing of products that meet the technical and quality standards set forth in\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "2+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
-   "firstSeen": "2026-11-24",
+   "firstSeen": "2026-11-23",
    "id": "r1081"
   },
   {
@@ -58723,42 +58723,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Beam Instrumentation Engineer (R&D Engineer 2/3)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/beam-instrumentation-engineer-rd-engineer-23/a27c561e-6d08-4f20-93b1-ab3cac1ce883",
-   "date": "2026-11-17",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 4,
-   "schoolExpOk": false,
-   "degree": "MS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Clearance (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "Remote",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Demonstrated experience with advanced design & analysis tools, such as schematic capture tools, analog or digital simulation tools, and signal integrity analysis tools; \u00b7 Demonstrated knowledge of digital signal processing, including filtering, spectral analysis, and time domain techniques; \u00b7 Demonstrated experience debugging & troubleshooting complex hardware systems; \u00b7 Demonstrated design experience in one or more of the following electrical engineering focus areas:\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "MS required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r1632"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Engineering Technologist 4",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/engineering-technologist-4/0f4eac67-904c-4a8c-b69b-de4e103049a1",
@@ -58786,6 +58750,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "12+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r1632"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Beam Instrumentation Engineer (R&D Engineer 2/3)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/beam-instrumentation-engineer-rd-engineer-23/a27c561e-6d08-4f20-93b1-ab3cac1ce883",
+   "date": "2026-11-17",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 4,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Clearance (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "Remote",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Demonstrated experience with advanced design & analysis tools, such as schematic capture tools, analog or digital simulation tools, and signal integrity analysis tools; \u00b7 Demonstrated knowledge of digital signal processing, including filtering, spectral analysis, and time domain techniques; \u00b7 Demonstrated experience debugging & troubleshooting complex hardware systems; \u00b7 Demonstrated design experience in one or more of the following electrical engineering focus areas:\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -65203,42 +65203,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "R&D Engineer 2/3",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/rd-engineer-23/c724dc4f-0467-4e7e-b7d8-c535b1661031",
-   "date": "2026-11-16",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 4,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Demonstrated knowledge of and experience in an engineering discipline. \u00b7 Comprehensive knowledge of designing, planning, and executing research and development projects. \u00b7 Experience with CNC machine tools, inspection equipment, or experience in a high-precision environment. \u00b7 Familiarity working with hazardous materials e.g., radioactive, pyrophoric, or toxic substances. \u00b7 Strong troubleshooting skills. \u00b7 Awareness of 3D CAD/CAM software (e.g., Creo, SolidWorks) and ASME\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "4+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r1812"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Science/Engineering Project Leader 1/2",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/scienceengineering-project-leader-12/ad4c94b8-d667-4279-9ccb-85c8b9ac524c",
@@ -65266,6 +65230,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "5+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r1812"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "R&D Engineer 2/3",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/rd-engineer-23/c724dc4f-0467-4e7e-b7d8-c535b1661031",
+   "date": "2026-11-16",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 4,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Demonstrated knowledge of and experience in an engineering discipline. \u00b7 Comprehensive knowledge of designing, planning, and executing research and development projects. \u00b7 Experience with CNC machine tools, inspection equipment, or experience in a high-precision environment. \u00b7 Familiarity working with hazardous materials e.g., radioactive, pyrophoric, or toxic substances. \u00b7 Strong troubleshooting skills. \u00b7 Awareness of 3D CAD/CAM software (e.g., Creo, SolidWorks) and ASME\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "4+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -71863,42 +71863,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Manufacturing Engineer (R&D Engineer 1/2)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/manufacturing-engineer-rd-engineer-12/cd4a6917-1ed9-4095-a7a9-3709e01d530f",
-   "date": "2026-11-12",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 2,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Engineering Experience \u00b7 General familiarity with manufacturing processes, material selection, tooling development, welding, machining, and inspection. \u00b7 Working knowledge of CAD/CAM software, preferably CREO and Mastercam. \u00b7 Working knowledge applying engineering practices and principles to support capability development within a manufacturing environment and experience facilitating the manufacturing of products that meet the technical and quality standards set forth in\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "2+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r1997"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Data Integration Architect (Solutions Architect 3/4)",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/data-integration-architect-solutions-architect-34/8654f9f3-c81e-4b24-ab94-42a96d1157fd",
@@ -71926,6 +71890,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "8+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r1997"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Manufacturing Engineer (R&D Engineer 1/2)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/manufacturing-engineer-rd-engineer-12/cd4a6917-1ed9-4095-a7a9-3709e01d530f",
+   "date": "2026-11-12",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 2,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Engineering Experience \u00b7 General familiarity with manufacturing processes, material selection, tooling development, welding, machining, and inspection. \u00b7 Working knowledge of CAD/CAM software, preferably CREO and Mastercam. \u00b7 Working knowledge applying engineering practices and principles to support capability development within a manufacturing environment and experience facilitating the manufacturing of products that meet the technical and quality standards set forth in\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "2+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -77299,42 +77299,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Science/Engineering Project Leader 3",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/scienceengineering-project-leader-3/b67d2e7e-f0a0-4369-b016-75538f217ca8",
-   "date": "2026-11-10",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 8,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Demonstrated experience independently managing complex technical, manufacturing, or production projects \u00b7 Advanced ability to develop integrated project plans, work breakdown structures, and executable production work packages \u00b7 Experience coordinating across engineering, manufacturing, quality, safety, and program organizations \u00b7 Proven ability to identify, assess, and mitigate production and schedule risks \u00b7 Strong stakeholder management and communication skills\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "8+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2148"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Test Lead/Device Engineer (R&D Engineer 1)",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/test-leaddevice-engineer-rd-engineer-1/b43e8fee-9580-4969-b4aa-515af79fb772",
@@ -77366,7 +77330,79 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-18",
+   "id": "r2148"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Test Engineer (R&D Engineer 3)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/test-engineer-rd-engineer-3/ed457d9b-bd13-4682-b000-99415cc34d62",
+   "date": "2026-11-10",
+   "dateKind": "posted",
+   "discipline": "Test",
+   "minYears": 6,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Fundamental knowledge of electrical, mechanical, or related engineering principles and their application to experimental hardware. \u00b7 Ability to interpret technical requirements, engineering drawings, schematics, and procedures. \u00b7 Hands-on experience through coursework, research, internships, or employment assembling, testing, or troubleshooting technical equipment. \u00b7 Ability to collect and analyze experimental data and document results clearly. \u00b7 Ability to contribute to\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
    "id": "r2149"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Science/Engineering Project Leader 3",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/scienceengineering-project-leader-3/b67d2e7e-f0a0-4369-b016-75538f217ca8",
+   "date": "2026-11-10",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 8,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Demonstrated experience independently managing complex technical, manufacturing, or production projects \u00b7 Advanced ability to develop integrated project plans, work breakdown structures, and executable production work packages \u00b7 Experience coordinating across engineering, manufacturing, quality, safety, and program organizations \u00b7 Proven ability to identify, assess, and mitigate production and schedule risks \u00b7 Strong stakeholder management and communication skills\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "8+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2150"
   },
   {
    "company": "LANL",
@@ -77402,7 +77438,7 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-18",
-   "id": "r2150"
+   "id": "r2151"
   },
   {
    "company": "LANL",
@@ -77431,42 +77467,6 @@
    "travel": null,
    "relocation": true,
    "reqSnippet": "Job Requirements: \u00b7 Technical expertise: Advanced knowledge in one or more relevant areas, such as machine learning systems, high-performance computing, computer architecture, distributed systems, accelerated computing, cloud-native platforms, inference instracture or scientific software infrastructure. \u00b7 Systems development and integration: Demonstrated experience developing, integrating, or evaluating complex computing systems in Linux environments, including multiple layers such as compute,\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "MS required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2151"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
-   "title": "Test Engineer (R&D Engineer 3)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/test-engineer-rd-engineer-3/ed457d9b-bd13-4682-b000-99415cc34d62",
-   "date": "2026-11-10",
-   "dateKind": "posted",
-   "discipline": "Test",
-   "minYears": 6,
-   "schoolExpOk": false,
-   "degree": "MS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Fundamental knowledge of electrical, mechanical, or related engineering principles and their application to experimental hardware. \u00b7 Ability to interpret technical requirements, engineering drawings, schematics, and procedures. \u00b7 Hands-on experience through coursework, research, internships, or employment assembling, testing, or troubleshooting technical equipment. \u00b7 Ability to collect and analyze experimental data and document results clearly. \u00b7 Ability to contribute to\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "MS required",
@@ -79639,42 +79639,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Quality Assurance Analyst 2 (Early-mid career)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/quality-assurance-analyst-2-early-mid-career/6df26ec7-7af0-49d1-99f1-ae31ab56554b",
-   "date": "2026-11-09",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 5,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Quality Assurance Experience \u00b7 Demonstrated knowledge and experience in editorial review to include: proofreading, grammar, spelling, punctuation, accuracy, and attention to detail with a high level of accuracy when reviewing technical documents, diagrams, drawing, and parts-lists and helping to ensure final documentation meets engineering requirements specific to each project. Creating and storing templates for group i.e. project execution plans, final test reports, status\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "5+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2213"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "R&D Engineer 1/2",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/rd-engineer-12/24932d58-e956-4b4b-853e-b9c67331cf3a",
@@ -79702,6 +79666,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "2+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2213"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Quality Assurance Analyst 2 (Early-mid career)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/quality-assurance-analyst-2-early-mid-career/6df26ec7-7af0-49d1-99f1-ae31ab56554b",
+   "date": "2026-11-09",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 5,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Quality Assurance Experience \u00b7 Demonstrated knowledge and experience in editorial review to include: proofreading, grammar, spelling, punctuation, accuracy, and attention to detail with a high level of accuracy when reviewing technical documents, diagrams, drawing, and parts-lists and helping to ensure final documentation meets engineering requirements specific to each project. Creating and storing templates for group i.e. project execution plans, final test reports, status\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "5+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -85651,42 +85651,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Space Hardware Mechanical Engineer (R&D Engineer 3)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/space-hardware-mechanical-engineer-rd-engineer-3/3a0ffd1c-9e83-4920-a7be-21a6602049f1",
-   "date": "2026-11-05",
-   "dateKind": "posted",
-   "discipline": "Mechanical",
-   "minYears": 6,
-   "schoolExpOk": false,
-   "degree": "MS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Clearance (obtain)",
-   "citizenship": null,
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "Remote",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Experience translating program requirements, launch environments, and mission constraints into actionable criteria. \u00b7 Demonstrated use of engineering fundamentals to support design decisions. \u00b7 Experience leading mechanical engineering and design for complex hardware and systems. \u00b7 Demonstrated and continued professional development of early-career engineers and students in mechanical design, analysis and testing, documentation, and engineering judgment. \u00b7 Proficiency in CAD\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "MS required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2380"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Structural Dynamics Engineer (R&D Engineer 2/3)",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/structural-dynamics-engineer-rd-engineer-23/979a7cee-0388-4557-89d8-1bfb8a813186",
@@ -85711,6 +85675,42 @@
    "travel": null,
    "relocation": true,
    "reqSnippet": "Job Requirements: \u00b7 Engineering \u00b7 Knowledge of structural dynamics and dynamic testing. Ability to leverage science and engineering fundamentals to develop new skills. \u00b7 Test-Analysis Correlation \u00b7 Application experience analyzing test data (especially multi-dimensional test data), and experience correlating models to test data. \u00b7 Communication and Teamwork \u00b7 Demonstrated, successful experience working in an integrated team environment; demonstrated ability to manage multiple tasks in an\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2380"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Space Hardware Mechanical Engineer (R&D Engineer 3)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/space-hardware-mechanical-engineer-rd-engineer-3/3a0ffd1c-9e83-4920-a7be-21a6602049f1",
+   "date": "2026-11-05",
+   "dateKind": "posted",
+   "discipline": "Mechanical",
+   "minYears": 6,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Clearance (obtain)",
+   "citizenship": null,
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "Remote",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Experience translating program requirements, launch environments, and mission constraints into actionable criteria. \u00b7 Demonstrated use of engineering fundamentals to support design decisions. \u00b7 Experience leading mechanical engineering and design for complex hardware and systems. \u00b7 Demonstrated and continued professional development of early-career engineers and students in mechanical design, analysis and testing, documentation, and engineering judgment. \u00b7 Proficiency in CAD\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "MS required",
@@ -85795,42 +85795,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Quality Product Verifier (Quality Engineer 1/2)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/quality-product-verifier-quality-engineer-12/7b276ee5-6678-483b-bef5-a8cef03541ce",
-   "date": "2026-11-05",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 5,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Quality Engineer 1: Position requires a bachelor's degree in engineering, QE, or Industrial Systems Engineering or a related field and 2 years of related experience; or an equivalent combination of education and experience directly related to the occupation. \u00b7 Quality Engineer 2: Position requires a bachelor's degree in engineering, QE / Quality Assurance (QA), or Industrial Systems Engineering or a related field and 5 year of related experience; or, an equivalent combination of education and\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "5+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2384"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Engineered Systems Tec 3/4",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/engineered-systems-tec-34/11b5f81e-3722-4505-94cd-b78a13f810af",
@@ -85855,6 +85819,42 @@
    "travel": null,
    "relocation": true,
    "reqSnippet": "Job Requirements: \u00b7 Ability to work with hazardous materials (Be, rad) and willingness to adheare to safety protocols \u00b7 Willingness to be enrolled in LANL's Beryllium surveillance program, including but not limited to Phase I and Phase II testing and yearly blood draws \u00b7 Experience with various hand tools and working with complex assemblies and/or diagnostics \u00b7 Ability to perform mechanical tests and maintain and troubleshoot mechanical and/or test equipment \u00b7 Ability to acquire and maintain a\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "5+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2384"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Quality Product Verifier (Quality Engineer 1/2)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/quality-product-verifier-quality-engineer-12/7b276ee5-6678-483b-bef5-a8cef03541ce",
+   "date": "2026-11-05",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 5,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Quality Engineer 1: Position requires a bachelor's degree in engineering, QE, or Industrial Systems Engineering or a related field and 2 years of related experience; or an equivalent combination of education and experience directly related to the occupation. \u00b7 Quality Engineer 2: Position requires a bachelor's degree in engineering, QE / Quality Assurance (QA), or Industrial Systems Engineering or a related field and 5 year of related experience; or, an equivalent combination of education and\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "5+ yrs required",
@@ -87631,6 +87631,42 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
+   "title": "Neutron, Gamma, and Particle Sensing Systems Engineer (R&D Engineer 4)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/neutron-gamma-and-particle-sensing-systems-engineer-rd-engineer-4/09ea04ae-e50f-4836-992b-4154eec74fd0",
+   "date": "2026-11-04",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 12,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "Remote",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Demonstrated systems engineering leadership roles in major development efforts spanning the full systems engineering \"V\" including concept development; requirements solicitation, decomposition, and flowdown; integration and test; delivery; and operations \u00b7 Proven ability to work and interact effectively in a dynamic team environment, to build and lead cross-organizational collaborations and teams, and to motivate colleagues through common goals and objectives \u00b7 Strong verbal\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2435"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
    "title": "R&D Engineer 2/3",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/rd-engineer-23/338cfbe6-9e03-48bf-9b6d-24faebb61776",
@@ -87658,42 +87694,6 @@
    "majorReq": null,
    "fit": "No",
    "why": "MS required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2435"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
-   "title": "Freedom of Information Act (FOIA) Analyst 4 (Classification Analyst 4)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/freedom-of-information-act-foia-analyst-4-classification-analyst-4/69553912-3f8d-4133-b5e8-31247ced1f0a",
-   "date": "2026-11-04",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 12,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Demonstrated experience processing complex FOIA or other information requests or performing closely related document collection, review, analysis, and document production work \u00b7 Demonstrated familiarity with federal and state statutes, regulations, and exemptions or experience interpreting and applying Code of Federal Regulations (CFR) \u00b7 Demonstrated strong written communication and analytical skills \u00b7 Proven ability to work securely while managing multiple priorities and\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "12+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -87739,15 +87739,15 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Neutron, Gamma, and Particle Sensing Systems Engineer (R&D Engineer 4)",
+   "title": "Freedom of Information Act (FOIA) Analyst 4 (Classification Analyst 4)",
    "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/neutron-gamma-and-particle-sensing-systems-engineer-rd-engineer-4/09ea04ae-e50f-4836-992b-4154eec74fd0",
+   "url": "https://lanl.jobs/search/jobdetails/freedom-of-information-act-foia-analyst-4-classification-analyst-4/69553912-3f8d-4133-b5e8-31247ced1f0a",
    "date": "2026-11-04",
    "dateKind": "posted",
    "discipline": "Other",
    "minYears": 12,
    "schoolExpOk": false,
-   "degree": "MS",
+   "degree": "BS",
    "gpaReq": null,
    "startWindow": null,
    "applyBy": null,
@@ -87758,14 +87758,14 @@
    "salary": null,
    "salaryMin": null,
    "salaryMax": null,
-   "workMode": "Remote",
+   "workMode": "On-site",
    "employment": null,
    "travel": null,
    "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Demonstrated systems engineering leadership roles in major development efforts spanning the full systems engineering \"V\" including concept development; requirements solicitation, decomposition, and flowdown; integration and test; delivery; and operations \u00b7 Proven ability to work and interact effectively in a dynamic team environment, to build and lead cross-organizational collaborations and teams, and to motivate colleagues through common goals and objectives \u00b7 Strong verbal\u2026",
+   "reqSnippet": "Job Requirements: \u00b7 Demonstrated experience processing complex FOIA or other information requests or performing closely related document collection, review, analysis, and document production work \u00b7 Demonstrated familiarity with federal and state statutes, regulations, and exemptions or experience interpreting and applying Code of Federal Regulations (CFR) \u00b7 Demonstrated strong written communication and analytical skills \u00b7 Proven ability to work securely while managing multiple priorities and\u2026",
    "majorReq": null,
    "fit": "No",
-   "why": "MS required",
+   "why": "12+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -87811,42 +87811,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "R&D Engineer 4 (Welding Engineer)",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/rd-engineer-4-welding-engineer/9541729b-0b79-463c-8cd9-ca4d0e29b7ff",
-   "date": "2026-11-04",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 12,
-   "schoolExpOk": false,
-   "degree": "MS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (active req.)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Applies and interprets, on a broad basis, specialized, state-of-the-art engineering and scientific principles, techniques, methods and tools to provide solutions for an extensive and diverse range of complex and/or ambiguous problems where analysis of situations or data requires in-depth evaluation of variable factors. \u00b7 Leads the research, design, testing, analysis, verification, and validation of novel engineering and technology solutions in support of R&D initiatives.\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "MS required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2440"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Mechanical Engineer (R&D Engineer 2)",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/mechanical-engineer-rd-engineer-2/aef0cf1e-87ae-4ebc-87b2-d9ba00c502ff",
@@ -87878,7 +87842,7 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-18",
-   "id": "r2441"
+   "id": "r2440"
   },
   {
    "company": "LANL",
@@ -87910,6 +87874,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "4+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2441"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "R&D Engineer 4 (Welding Engineer)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/rd-engineer-4-welding-engineer/9541729b-0b79-463c-8cd9-ca4d0e29b7ff",
+   "date": "2026-11-04",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 12,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (active req.)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Applies and interprets, on a broad basis, specialized, state-of-the-art engineering and scientific principles, techniques, methods and tools to provide solutions for an extensive and diverse range of complex and/or ambiguous problems where analysis of situations or data requires in-depth evaluation of variable factors. \u00b7 Leads the research, design, testing, analysis, verification, and validation of novel engineering and technology solutions in support of R&D initiatives.\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -90295,42 +90295,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "MBSE Systems Engineering R&D Engineer 1/2",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/mbse-systems-engineering-rd-engineer-12/ddd016e4-ae72-4e3d-9b40-239d25788059",
-   "date": "2026-11-03",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 2,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 R&D Engineer 1 $96,600 - $158,000 \u00b7 Ideal applicants will have experience in the following areas: \u00b7 Developing and maintaining SysML-based models that capture system requirements, behavior, structure, interfaces, and verification relationships \u00b7 Supporting systems engineering activities including requirements analysis, architecture development, interface management, and technical baseline development \u00b7 Applying MBSE methodologies and best practices to improve engineering\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "2+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2509"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Systems R&D Engineer 2/3",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/systems-rd-engineer-23/a0aba2e2-f3f4-4c75-a03b-0d55862a795b",
@@ -90362,43 +90326,7 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-18",
-   "id": "r2510"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
-   "title": "R&D Engineer 2/3",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/rd-engineer-23/21cfb0a7-d263-44be-9219-6d0c3d37f9c1",
-   "date": "2026-11-03",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 4,
-   "schoolExpOk": false,
-   "degree": "MS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Weapon Engineering Experience \u00b7 Experience and knowledge of nuclear weapon system design and development; which may include experience with testing, qualification, requirements, assembly, component development, production, and/or surveillance \u00b7 Engineering Experience \u00b7 Demonstrated experience with one or more of the following areas: engineering design, development, qualification, assembly/production, or testing. Demonstrated knowledge of systems engineering principles (e.g.,\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "MS required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2511"
+   "id": "r2509"
   },
   {
    "company": "LANL",
@@ -90434,26 +90362,26 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-18",
-   "id": "r2512"
+   "id": "r2510"
   },
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Scientist (Scientist 3/4)",
+   "title": "MBSE Systems Engineering R&D Engineer 1/2",
    "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/scientist-scientist-34/f1c0faf5-a569-426a-84d7-ab4953de1d52",
+   "url": "https://lanl.jobs/search/jobdetails/mbse-systems-engineering-rd-engineer-12/ddd016e4-ae72-4e3d-9b40-239d25788059",
    "date": "2026-11-03",
    "dateKind": "posted",
    "discipline": "Other",
-   "minYears": 12,
+   "minYears": 2,
    "schoolExpOk": false,
-   "degree": "MS",
+   "degree": "BS",
    "gpaReq": null,
    "startWindow": null,
    "applyBy": null,
    "gradReq": null,
    "startReq": null,
-   "clearance": "TS/SCI (obtain)",
+   "clearance": "DOE Q/L (obtain)",
    "citizenship": "US citizen",
    "salary": null,
    "salaryMin": null,
@@ -90462,15 +90390,15 @@
    "employment": null,
    "travel": null,
    "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Ability to obtain Q and SCI clearances; this requires US citizenship. \u00b7 Thorough knowledge and experience in one or more technical research disciplines related to A-2's mission. \u00b7 Thorough knowledge and experience in the US intelligence and/or counterintelligence communities. \u00b7 Thorough knowledge and experience in developing and implementing technical research and development projects, including the formulation and testing of hypotheses, investigation of alternative\u2026",
+   "reqSnippet": "Job Requirements: \u00b7 R&D Engineer 1 $96,600 - $158,000 \u00b7 Ideal applicants will have experience in the following areas: \u00b7 Developing and maintaining SysML-based models that capture system requirements, behavior, structure, interfaces, and verification relationships \u00b7 Supporting systems engineering activities including requirements analysis, architecture development, interface management, and technical baseline development \u00b7 Applying MBSE methodologies and best practices to improve engineering\u2026",
    "majorReq": null,
    "fit": "No",
-   "why": "MS required",
+   "why": "2+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-18",
-   "id": "r2513"
+   "id": "r2511"
   },
   {
    "company": "LANL",
@@ -90502,6 +90430,78 @@
    "majorReq": null,
    "fit": "No",
    "why": "8+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2512"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "R&D Engineer 2/3",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/rd-engineer-23/21cfb0a7-d263-44be-9219-6d0c3d37f9c1",
+   "date": "2026-11-03",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 4,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Weapon Engineering Experience \u00b7 Experience and knowledge of nuclear weapon system design and development; which may include experience with testing, qualification, requirements, assembly, component development, production, and/or surveillance \u00b7 Engineering Experience \u00b7 Demonstrated experience with one or more of the following areas: engineering design, development, qualification, assembly/production, or testing. Demonstrated knowledge of systems engineering principles (e.g.,\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2513"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Scientist (Scientist 3/4)",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/scientist-scientist-34/f1c0faf5-a569-426a-84d7-ab4953de1d52",
+   "date": "2026-11-03",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 12,
+   "schoolExpOk": false,
+   "degree": "MS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "TS/SCI (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Ability to obtain Q and SCI clearances; this requires US citizenship. \u00b7 Thorough knowledge and experience in one or more technical research disciplines related to A-2's mission. \u00b7 Thorough knowledge and experience in the US intelligence and/or counterintelligence communities. \u00b7 Thorough knowledge and experience in developing and implementing technical research and development projects, including the formulation and testing of hypotheses, investigation of alternative\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "MS required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -92203,42 +92203,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Engineering Technologist 3/4",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/engineering-technologist-34/e59ec28c-8938-4714-966d-5f3dc0f34cc1",
-   "date": "2026-11-02",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 12,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 Demonstrated adept knowledge of construction engineering principles. \u00b7 Demonstrated experience reading, interpreting, and understanding complex engineering design documents, drawings, specifications, and project documentation to assess completeness, constructability, and field applicability. \u00b7 Demonstrated experience interpreting construction industry specifications, construction means and methods, and national construction codes and standards. \u00b7 Experience effectively\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "12+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r2562"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "R&D Engineer 2/3",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/rd-engineer-23/3179ca08-dab7-4cf4-a603-94ac23e279b6",
@@ -92266,6 +92230,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "MS required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r2562"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Engineering Technologist 3/4",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/engineering-technologist-34/e59ec28c-8938-4714-966d-5f3dc0f34cc1",
+   "date": "2026-11-02",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 12,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 Demonstrated adept knowledge of construction engineering principles. \u00b7 Demonstrated experience reading, interpreting, and understanding complex engineering design documents, drawings, specifications, and project documentation to assess completeness, constructability, and field applicability. \u00b7 Demonstrated experience interpreting construction industry specifications, construction means and methods, and national construction codes and standards. \u00b7 Experience effectively\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "12+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -113911,42 +113911,6 @@
   {
    "company": "LANL",
    "sector": "Labs & FFRDCs",
-   "title": "Industrial Control Systems (ICS) Engineer 2/3",
-   "location": "Los Alamos, New Mexico",
-   "url": "https://lanl.jobs/search/jobdetails/industrial-control-systems-ics-engineer-23/775833a4-bfbc-40b6-b2de-a24ad16cd07a",
-   "date": "2026-10-14",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 3,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "DOE Q/L (obtain)",
-   "citizenship": "US citizen",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": true,
-   "reqSnippet": "Job Requirements: \u00b7 We're looking for an engineer who combines strong control systems fundamentals with practical, hands-on experience. \u00b7 PLC & RTU Skills \u00b7 Hands-on experience programming PLCs and/or RTUs used in utility or industrial environments \u00b7 Familiarity with industrial protocols such as Modbus, DNP3, Ethernet/IP, and related field communications \u00b7 Experience with control system testing, commissioning, and troubleshooting \u00b7 ICS & OT Foundations \u00b7 Understanding of industrial control\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "3+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-18",
-   "id": "r3165"
-  },
-  {
-   "company": "LANL",
-   "sector": "Labs & FFRDCs",
    "title": "Analytical Scientist 2/3",
    "location": "Los Alamos, New Mexico",
    "url": "https://lanl.jobs/search/jobdetails/analytical-scientist-23/31056b70-c255-429b-8833-d4b03c0663de",
@@ -113974,6 +113938,42 @@
    "majorReq": null,
    "fit": "No",
    "why": "MS required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-18",
+   "id": "r3165"
+  },
+  {
+   "company": "LANL",
+   "sector": "Labs & FFRDCs",
+   "title": "Industrial Control Systems (ICS) Engineer 2/3",
+   "location": "Los Alamos, New Mexico",
+   "url": "https://lanl.jobs/search/jobdetails/industrial-control-systems-ics-engineer-23/775833a4-bfbc-40b6-b2de-a24ad16cd07a",
+   "date": "2026-10-14",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 3,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "DOE Q/L (obtain)",
+   "citizenship": "US citizen",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": true,
+   "reqSnippet": "Job Requirements: \u00b7 We're looking for an engineer who combines strong control systems fundamentals with practical, hands-on experience. \u00b7 PLC & RTU Skills \u00b7 Hands-on experience programming PLCs and/or RTUs used in utility or industrial environments \u00b7 Familiarity with industrial protocols such as Modbus, DNP3, Ethernet/IP, and related field communications \u00b7 Experience with control system testing, commissioning, and troubleshooting \u00b7 ICS & OT Foundations \u00b7 Understanding of industrial control\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "3+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -168787,7 +168787,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 36
+   "secs": 22
   },
   {
    "org": "Castelion",
@@ -168814,7 +168814,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 3
   },
   {
    "org": "Ursa Major",
@@ -168827,7 +168827,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 12
   },
   {
    "org": "Epirus",
@@ -168840,7 +168840,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "Mach Industries",
@@ -168853,7 +168853,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 14
+   "secs": 9
   },
   {
    "org": "Divergent",
@@ -168866,7 +168866,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 10
   },
   {
    "org": "Zone 5",
@@ -168879,7 +168879,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 5
   },
   {
    "org": "JetZero",
@@ -168892,7 +168892,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Electra",
@@ -168905,7 +168905,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 7
   },
   {
    "org": "SpaceX",
@@ -168918,7 +168918,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 35
+   "secs": 11
   },
   {
    "org": "Rocket Lab",
@@ -168931,7 +168931,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 17
+   "secs": 18
   },
   {
    "org": "Relativity Space",
@@ -168944,7 +168944,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 12
   },
   {
    "org": "Stoke Space",
@@ -168957,7 +168957,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "Varda",
@@ -168970,7 +168970,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 11
   },
   {
    "org": "Vast",
@@ -168983,7 +168983,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 12
+   "secs": 9
   },
   {
    "org": "Astranis",
@@ -168996,7 +168996,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 10
   },
   {
    "org": "True Anomaly",
@@ -169009,7 +169009,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 9
   },
   {
    "org": "Inversion Space",
@@ -169035,7 +169035,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 2
   },
   {
    "org": "Momentus",
@@ -169048,7 +169048,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Planet",
@@ -169061,7 +169061,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "Portal Space",
@@ -169087,7 +169087,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Hawkeye 360",
@@ -169100,7 +169100,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "Albedo",
@@ -169113,7 +169113,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Voyager / Astrobotic-adjacent",
@@ -169126,7 +169126,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Kairos Power",
@@ -169139,7 +169139,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 8
   },
   {
    "org": "Oklo",
@@ -169152,7 +169152,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "TerraPower",
@@ -169165,7 +169165,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Valar Atomics",
@@ -169178,7 +169178,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 10
+   "secs": 11
   },
   {
    "org": "Deep Fission",
@@ -169191,7 +169191,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 5
   },
   {
    "org": "General Matter",
@@ -169204,7 +169204,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 7
   },
   {
    "org": "Pacific Fusion",
@@ -169217,7 +169217,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "Standard Nuclear",
@@ -169243,7 +169243,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Hermeus",
@@ -169256,7 +169256,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Venus Aerospace",
@@ -169269,7 +169269,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 7
   },
   {
    "org": "Shield AI",
@@ -169282,7 +169282,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 10
   },
   {
    "org": "Merlin Labs",
@@ -169295,7 +169295,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "CX2",
@@ -169308,7 +169308,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 1
   },
   {
    "org": "Last Energy",
@@ -169347,7 +169347,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Exowatt",
@@ -169373,7 +169373,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Radiant",
@@ -169386,7 +169386,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Antares",
@@ -169426,7 +169426,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 8
   },
   {
    "org": "HavocAI",
@@ -169439,7 +169439,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Reliable Robotics",
@@ -169465,7 +169465,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 6
   },
   {
    "org": "Picogrid",
@@ -169478,7 +169478,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Integrate",
@@ -169517,7 +169517,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Starfish Space",
@@ -169543,7 +169543,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 6
   },
   {
    "org": "Blue Origin",
@@ -169556,7 +169556,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 33
+   "secs": 30
   },
   {
    "org": "Sierra Space",
@@ -169595,7 +169595,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 49
+   "secs": 48
   },
   {
    "org": "Aerospace Corp",
@@ -169608,7 +169608,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 28,
+   "secs": 24,
    "bulkImport": "2026-11-16"
   },
   {
@@ -169622,7 +169622,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 20
   },
   {
    "org": "Boeing",
@@ -169635,7 +169635,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 39
+   "secs": 34
   },
   {
    "org": "RTX (Raytheon, Pratt & Whitney, Collins)",
@@ -169648,7 +169648,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 31
+   "secs": 24
   },
   {
    "org": "GE Aerospace",
@@ -169661,7 +169661,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 20
+   "secs": 19
   },
   {
    "org": "Firefly Aerospace",
@@ -169687,7 +169687,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 16
   },
   {
    "org": "AeroVironment",
@@ -169700,7 +169700,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 19
   },
   {
    "org": "Curtiss-Wright",
@@ -169713,7 +169713,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 24
+   "secs": 22
   },
   {
    "org": "Axiom Space",
@@ -169726,7 +169726,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 21
+   "secs": 19
   },
   {
    "org": "GE Vernova (incl. GE-Hitachi)",
@@ -169739,7 +169739,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 25
+   "secs": 20
   },
   {
    "org": "Draper",
@@ -169752,7 +169752,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 17
   },
   {
    "org": "NASA JPL",
@@ -169765,7 +169765,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 14
   },
   {
    "org": "L3Harris (incl. Aerojet Rocketdyne)",
@@ -169778,7 +169778,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 3
   },
   {
    "org": "HII (Newport News, Ingalls)",
@@ -169804,7 +169804,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "NASSCO",
@@ -169817,7 +169817,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 0
   },
   {
    "org": "ULA",
@@ -169843,7 +169843,7 @@
    "error": null,
    "detailErrors": 19,
    "detailErr": "HTTP Error 404: Not Found",
-   "secs": 18
+   "secs": 7
   },
   {
    "org": "LANL",
@@ -169856,7 +169856,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 2
   },
   {
    "org": "GTRI",
@@ -169869,7 +169869,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 1
   },
   {
    "org": "Redwire",
@@ -169936,20 +169936,20 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Oceaneering",
    "type": "oracle",
    "ok": true,
-   "total": 202,
+   "total": 201,
    "matches": 19,
    "fetched": 0,
    "cached": 21,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 6
   },
   {
    "org": "Zap Energy",
@@ -169988,7 +169988,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "JHU APL",
@@ -170001,7 +170001,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 3
   },
   {
    "org": "Lockheed Martin",
@@ -170009,12 +170009,12 @@
    "ok": true,
    "total": 519,
    "matches": 141,
-   "fetched": 3,
-   "cached": 138,
+   "fetched": 0,
+   "cached": 141,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 92
+   "secs": 83
   },
   {
    "org": "Northrop Grumman",
@@ -170027,7 +170027,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 75
+   "secs": 74
   },
   {
    "org": "BAE Systems",
@@ -170035,12 +170035,12 @@
    "ok": true,
    "total": 1982,
    "matches": 102,
-   "fetched": 4,
-   "cached": 98,
+   "fetched": 0,
+   "cached": 102,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 11
+   "secs": 3
   },
   {
    "org": "BWXT",
@@ -170131,7 +170131,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 12
   },
   {
    "org": "Bath Iron Works",
@@ -170171,13 +170171,13 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 13
   },
   {
    "org": "Honeywell Aerospace",
    "type": "oracle",
    "ok": true,
-   "total": 288,
+   "total": 289,
    "matches": 1,
    "fetched": 0,
    "cached": 13,
@@ -170197,7 +170197,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 5
   },
   {
    "org": "K2 Space",
@@ -170210,7 +170210,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 6
   },
   {
    "org": "Beta Technologies",
@@ -170223,7 +170223,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2,
+   "secs": 3,
    "bulkImport": "2026-04-08"
   },
   {
@@ -170237,7 +170237,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Agile Space Industries",
@@ -170250,7 +170250,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Naval Nuclear Laboratory",
@@ -170276,7 +170276,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Zipline",
@@ -170289,7 +170289,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 5
   },
   {
    "org": "Gravitics",
@@ -170354,7 +170354,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Long Wall (formerly ABL Space)",
@@ -170367,7 +170367,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Turion Space",
@@ -170380,7 +170380,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Vantor (formerly Maxar)",
@@ -170393,7 +170393,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 13
   },
   {
    "org": "Woodward",
@@ -170406,7 +170406,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 13
   },
   {
    "org": "Teledyne",
@@ -170419,7 +170419,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 18
   },
   {
    "org": "Duke Energy (nuclear)",
@@ -170432,7 +170432,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 14
+   "secs": 12
   },
   {
    "org": "Amentum",
@@ -170445,7 +170445,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 14
   },
   {
    "org": "Southern Company (nuclear)",
@@ -170471,7 +170471,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 3
   },
   {
    "org": "Leonardo DRS",
@@ -170484,7 +170484,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 6
   },
   {
    "org": "Triumph Group",
@@ -170497,7 +170497,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 2
   },
   {
    "org": "Dominion Energy (nuclear)",
@@ -170510,7 +170510,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 2
   },
   {
    "org": "Entergy (nuclear)",
@@ -170523,7 +170523,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 5
   }
  ]
 }
