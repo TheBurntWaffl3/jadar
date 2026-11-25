@@ -21,7 +21,8 @@
     "Naval",
     "Aero",
     "Mechanical",
-    "GNC"
+    "GNC",
+    "Systems"
   ],
   "citizenship": "US",
   "clearance": {

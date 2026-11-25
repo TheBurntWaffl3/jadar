@@ -390,6 +390,15 @@ class TestUSStates(unittest.TestCase):
         for loc in ("Mexico City, Mexico", "Guadalajara, Mexico"):
             self.assertTrue(scan.NON_US.search(loc) and not scan.US_HINT.search(loc), loc)
 
+class TestSystems(unittest.TestCase):
+    def test_systems_engineering_is_a_field(self):
+        # Lockheed "Systems Engineer Asc - Early Career" (Orlando, 2026-11-25) was dropped: no field word in the title on a
+        # non-generic board. Systems engineering is now a field (Kevin applies to these).
+        for t in ("Systems Engineer Asc - Early Career", "Systems Integration/Test Engineer Asc - Early Career", "System Test Engineer I"):
+            self.assertTrue(scan.in_scope(t), t)
+        self.assertEqual(scan.discipline("Systems Engineer Asc - Early Career"), "Systems"); self.assertIn("Systems", scan.PROFILE["fields"])
+        self.assertFalse(scan.in_scope("Systems Administrator"))
+
 class TestGNC(unittest.TestCase):
     def test_gnc_is_a_field(self):
         # Kevin 2026-11-17: entry-level GNC roles are wanted too

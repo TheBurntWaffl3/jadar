@@ -1,6 +1,6 @@
 # Job Radar (jadar)
 
-Daily scan of ~135 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request). US citizen; no active clearance (can obtain one).
+Daily scan of ~135 organizations' own job boards for entry-level roles that fit **Kevin Kyle**: UMD aerospace engineering BS, graduating **May 2027** (commencement May 24, 2027), available ~June 2027. Fields: thermal/aerothermal, structures, test, propulsion, aero, mechanical, nuclear, naval, GNC (added 2026-11-17 at Kevin's request), systems engineering (added 2026-11-25: Lockheed "Systems Engineer Asc - Early Career" was dropped for lacking a field word). US citizen; no active clearance (can obtain one).
 
 ## Current state (as of 2026-11-12)
 
