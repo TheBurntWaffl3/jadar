@@ -198,15 +198,20 @@ class TrackerTests(unittest.TestCase):
 
     def test_pipeline_board(self):
         # 2026-11-25: Kevin "can't say I've been rejected or moved to first interview" -> a drag-and-drop stage board
-        for needle in ("Pipeline.", 'id="board"', 'id="funnel"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "Mark applied"):
+        for needle in ("Pipeline.", 'id="board"', "function moveTo(", "function markApplied(", "app.history", "data-view=\"table\"", "stage-interview", "Mark applied"):
             self.assertIn(needle, self.html, needle)
+        # 2026-11-25, Kevin: "not in love with this layout ... expand the jobs I applied to so I can add resumes or see contacts";
+        # "redundant with the applied row and then another applied row tracking stats" -> no tiles, no funnel strip; cards open in place
+        for needle in ("function editor(", 'data-exp="1"', 'data-res="1"', 'data-f="contacted"', 'data-f="notes"', 'data-f="appliedOn"', "board.open === key ? null : key", "% reached"):
+            self.assertIn(needle, self.html, needle)
+        self.assertNotIn('id="funnel"', self.html); self.assertNotIn('id="stats"', self.html)
 
     def test_repost_tag(self):
         html = build_page.build(self.out if hasattr(self, 'out') else json.load(open(FIXTURE)), json.load(open(os.path.join(ROOT, 'sources.json'))), 'K')
         self.assertIn('tag reposted', html); self.assertIn("kv('Reposted'", html)
 
     def test_follow_up_and_up_next(self):
-        for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today", 'id="upnext"', "Up next.", "stats five"):
+        for needle in ("Needs follow-up", "needsFollowUp", "FU_DAYS = 14", "Followed up today", 'id="upnext"', "Up next."):
             self.assertIn(needle, self.html, needle)
 
     def test_main_writes_both_pages(self):

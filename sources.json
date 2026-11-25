@@ -190,18 +190,11 @@
 {"tenant":"ameren","wd":1,"site":"External","org":"Ameren (Callaway)","sector":"Nuclear & fusion","type":"workday"},
 {"tenant":"rand","wd":5,"site":"External_Career_Site","org":"RAND","sector":"Labs & FFRDCs","type":"workday"},
 {"tenant":"ebi","wd":5,"site":"ebadcareers","org":"Ensign-Bickford Aerospace & Defense","sector":"Hypersonics & defense tech","type":"workday"},
-{"id":"ElbitSystemsOfAmerica","org":"Elbit America","sector":"Primes","type":"smartrecruiters"},
 {"base":"https://jobs.pseg.com","org":"PSEG (Salem / Hope Creek)","sector":"Nuclear & fusion","type":"rmk","terms":["nuclear","engineer"]},
 {"base":"https://careers.aps.com","org":"APS (Palo Verde)","sector":"Nuclear & fusion","type":"rmk","terms":["nuclear","engineer"]},
 {"base":"https://careers.dteenergy.com","org":"DTE Energy (Fermi 2)","sector":"Nuclear & fusion","type":"rmk","terms":["nuclear","engineer"]},
 {"base":"https://jobs.nexteraenergy.com","org":"NextEra Energy (nuclear)","sector":"Nuclear & fusion","type":"rmk","terms":["nuclear","engineer"]},
 {"base":"https://jobs.chartindustries.com","org":"Chart Industries","sector":"Industrial & manufacturing","type":"rmk"},
 {"base":"https://jobs.jlab.org","org":"Jefferson Lab","sector":"Labs & FFRDCs","type":"rmk"},
-{"base":"https://jobs.dayzim.com","org":"Day & Zimmermann","sector":"Hypersonics & defense tech","type":"rmk"},
-{"base":"https://careers.gknaerospace.com","org":"GKN Aerospace","sector":"Aviation & propulsion","type":"rmk"},
-{"base":"https://jobs.bombardier.com","org":"Bombardier (US)","sector":"Aviation & propulsion","type":"rmk"},
-{"base":"https://careers.honda.com","org":"Honda Aircraft","sector":"Aviation & propulsion","type":"rmk","terms":["aircraft","Greensboro"]},
-{"sitemaps":["https://careers.jacobs.com/sitemap.xml"],"jobrx":"/job/","org":"Jacobs","sector":"Primes","type":"sitemap"},
-{"sitemaps":["https://careers.mtsi-va.com/sitemap.xml"],"jobrx":"/job/","org":"MTSI","sector":"Hypersonics & defense tech","type":"sitemap"},
-{"sitemaps":["https://jobs.bnl.gov/sitemap.xml"],"jobrx":"/job/","org":"Brookhaven National Laboratory","sector":"Labs & FFRDCs","type":"sitemap"}
+{"base":"https://careers.gknaerospace.com","org":"GKN Aerospace","sector":"Aviation & propulsion","type":"rmk"}
 ]
