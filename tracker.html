@@ -121,6 +121,31 @@ table.tr { border-collapse: collapse; width: 100%; min-width: 1120px; font-size:
 .tr td.pos a { font-weight: 600; text-decoration: none; } .tr td.pos a:hover { text-decoration: underline; }
 .tr td.pos { min-width: 180px; }
 .stats.five { grid-template-columns: repeat(5, 1fr); }
+/* pipeline board */
+.funnel { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; margin: 0 0 14px; }
+.funnel .step { flex: 1 1 120px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; min-width: 120px; }
+.funnel .step .n { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.funnel .step .l { color: var(--muted); font-size: 12px; } .funnel .step .r { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+.funnel .step.closed { border-style: dashed; }
+.viewrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
+.board { display: grid; grid-template-columns: repeat(6, minmax(190px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+.col { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px; min-height: 160px; display: flex; flex-direction: column; gap: 8px; }
+.col.over { outline: 2px solid var(--ember); outline-offset: -2px; }
+.col h3 { margin: 0 0 2px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+.col h3 .cnt { font: 11px ui-monospace, Menlo, Consolas, monospace; background: var(--pill); border-radius: 999px; padding: 2px 8px; color: var(--ink); }
+.col .hint { color: var(--muted); font-size: 12px; }
+.card { background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 9px 10px 8px; box-shadow: inset 3px 0 0 var(--stage, var(--line)); cursor: grab; }
+.card.dragging { opacity: .5; } .card:active { cursor: grabbing; }
+.card .co { font-weight: 600; font-size: 13.5px; } .card .pos { font-size: 13px; margin: 1px 0 4px; } .card .pos a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); }
+.card .m { color: var(--muted); font-size: 11.5px; display: flex; flex-wrap: wrap; gap: 4px 8px; }
+.card .m .fu { color: #b07a00; font-weight: 600; } .card .m .due { color: var(--crit); font-weight: 600; }
+.card .acts { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.card select.sel { font-size: 12px; padding: 3px 20px 3px 8px; max-width: 100%; }
+.card .pbtn.tiny { margin: 0; }
+.stage-saved { --stage: #9a9aa0; } .stage-applied { --stage: var(--ember); } .stage-screen { --stage: #f0b400; } .stage-interview { --stage: #f08a00; } .stage-offer { --stage: #0ca30c; } .stage-closed { --stage: #d03b3b; }
+.col.stage-closed { background: color-mix(in srgb, var(--card) 92%, #d03b3b); }
+.hidden { display: none !important; }
+@media (max-width: 900px) { .board { grid-template-columns: repeat(6, 230px); } }
 tr.fu td:first-child { box-shadow: inset 3px 0 0 #f0b400; }
 .pbtn.tiny { font-size: 11.5px; padding: 3px 9px; min-height: 0; margin-top: 4px; }
 #upnext { margin: 0 0 26px; } #upnext .sm-table td.n { white-space: nowrap; } .due-soon { color: var(--crit); font-weight: 600; }
@@ -162,6 +187,15 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 
 <section class="stats five" id="stats" aria-label="Summary"></section>
 
+<h2>Pipeline.</h2>
+<p class="lede">Drag a card to the stage it reached, or use the menu on the card. Saved roles become applications when you mark them applied.</p>
+<div class="funnel" id="funnel" aria-label="Funnel"></div>
+<div class="viewrow">
+  <div class="seg" id="view" role="group" aria-label="View"><button type="button" class="ctl small" data-view="board" aria-pressed="true">Board</button><button type="button" class="ctl small" data-view="table" aria-pressed="false">Table</button></div>
+  <span class="dp-note">Stages: Applied → Phone screen → Interview → Offer. Rejected, closed and withdrawn go to the last column.</span>
+</div>
+<div class="board" id="board"></div>
+
 <section id="upnext" hidden>
 <h2>Up next.</h2>
 <p class="lede">Roles you saved on the radar that have a deadline, soonest first.</p>
@@ -169,6 +203,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 <p class="dp-note" id="next-note"></p>
 </section>
 
+<div id="tableview">
 <h2>Applications.</h2>
 <p class="lede">Every role you marked applied on the radar, plus anything you add here. Click a cell to edit; it saves on Enter or when you click away.</p>
 <div class="tabsrow">
@@ -231,6 +266,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
     <tbody id="rows"></tbody>
   </table>
 </div>
+</div>
 
 <div class="sub2">
   <section>
@@ -249,7 +285,7 @@ textarea.tsv { width: 100%; min-height: 120px; font: 12.5px/1.4 ui-monospace, Me
 
 <footer>Nothing here is sent to any company. Source: <a href="https://github.com/TheBurntWaffl3/jadar">TheBurntWaffl3/jadar</a>.</footer>
 </main>
-<script id="data" type="application/json">{"today":"2026-11-24","profileName":"Kevin Kyle"}</script>
+<script id="data" type="application/json">{"today":"2026-11-25","profileName":"Kevin Kyle"}</script>
 <script>
 window.JADAR = (function () {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -365,6 +401,8 @@ window.JADAR = (function () {
   const STATUSES = ['applied', 'screen', 'interview', 'offer', 'rejected', 'closed', 'withdrawn'];
   const LABEL = {applied: 'Applied', screen: 'Phone screen', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', closed: 'Closed', withdrawn: 'Withdrawn'};
   const RANK = {offer: 0, interview: 1, screen: 2, applied: 3, withdrawn: 4, closed: 5, rejected: 6};
+  const CLOSED = new Set(['rejected', 'closed', 'withdrawn']); const STAGES = ['applied', 'screen', 'interview', 'offer'];
+  const VKEY = 'jadar.trackerview.v1'; let view = (J.lsGet(VKEY) === 'table') ? 'table' : 'board';
   const APP_FIELDS = ['benefits', 'appliedOn', 'posted', 'pay', 'expected', 'firstResponse', 'dates', 'contacted', 'notes'];
   const FU_DAYS = 14;  // no reply after this many days -> nudge; a follow-up resets the clock
   function needsFollowUp(r) {
@@ -404,6 +442,25 @@ window.JADAR = (function () {
     if (DATE_FIELDS.has(field)) { const iso = J.parseDate(value, YEAR); value = iso || value; }
     if (value) t.app[field] = value; else delete t.app[field];
     t.app.updatedAt = J.nowIso(); stamp(t); persist(); render();
+  }
+  // a stage change is remembered (history + stageAt) so the board can show time in stage and the funnel can count what each
+  // application reached, even after it is rejected
+  function moveTo(row, status) {
+    const t = target(row); if (!t || !STATUSES.includes(status)) return; t.app = t.app || {};
+    if ((t.app.status || 'applied') === status) return;
+    t.app.status = status; t.app.stageAt = D.today; t.app.history = (t.app.history || []).concat([{status, at: D.today}]).slice(-20);
+    t.app.updatedAt = J.nowIso(); stamp(t); persist(); render();
+  }
+  function markApplied(url) {  // a saved radar role becomes an application (same shape the radar page writes)
+    const e = S.roles[url]; if (!e) return; const sn = e.snap || {}; const now = J.nowIso();
+    e.status = 'applied'; e.at = now; e.app = Object.assign({}, e.app || {}, {status: 'applied', appliedOn: D.today, stageAt: D.today, history: [{status: 'applied', at: D.today}], updatedAt: now});
+    if (!e.app.pay && sn.salary) e.app.pay = sn.salary; if (!e.app.posted && sn.date) e.app.posted = sn.date;
+    persist(); render();
+  }
+  function furthest(row) {  // the best stage this application ever reached (for the funnel)
+    const st = row.app.status || 'applied'; let best = CLOSED.has(st) ? 3 : RANK[st];
+    (row.app.history || []).forEach(h => { if (h.status in RANK && !CLOSED.has(h.status)) best = Math.min(best, RANK[h.status]); });
+    return best;  // 0 offer .. 3 applied
   }
   function setManualField(row, field, value) { const t = S.manual[row.key]; if (!t) return; t[field] = (value || '').trim(); stamp(t); persist(); render(); }
   function removeManual(row) { if (!S.manual[row.key]) return; if (!confirm('Remove this row?')) return; delete S.manual[row.key]; persist(); render(); }
@@ -465,8 +522,60 @@ window.JADAR = (function () {
       return `<tr class="st-${esc(st)}${needsFollowUp(r) ? ' fu' : ''}" data-kind="${r.kind}" data-key="${esc(r.key)}">${coCell}${posCell}${cell(r, 'benefits', 'text')}${cell(r, 'appliedOn', 'date')}${cell(r, 'posted', 'date')}${cell(r, 'pay', 'text')}${cell(r, 'expected', 'date')}${cell(r, 'firstResponse', 'date')}${cell(r, 'dates', 'text')}${cell(r, 'contacted', 'text')}<td>${sel}</td>${cell(r, 'notes', 'long')}<td>${manual ? `<button type="button" class="rm" data-rm="1" title="Remove row" aria-label="Remove row">✕</button>` : `<span class="src" title="Un-apply it on the radar to remove this row">radar</span>`}</td></tr>`;
     }).join('');
     if (state.editing) { const el = $('#rows td.editing input, #rows td.editing textarea'); if (el) { el.focus({preventScroll: true}); if (el.select && el.type !== 'date') el.select(); } }
-    renderSide(); renderNext();
+    renderSide(); renderNext(); renderBoard();
   }
+  // ---- pipeline board ----
+  function renderBoard() {
+    const rows = rowsAll(); const st = r => r.app.status || 'applied';
+    const saved = Object.entries(S.roles).filter(([u, e]) => e.status === 'saved').map(([u, e]) => Object.assign({url: u}, e.snap || {}));
+    const reached = i => rows.filter(r => furthest(r) <= i).length; const n = rows.length;
+    const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '';
+    const steps = [['Applied', n, n ? 'all applications' : 'nothing yet', 'applied'], ['Phone screen', reached(2), n ? pct(reached(2), n) + ' of applied' : '', 'screen'],
+                   ['Interview', reached(1), reached(2) ? pct(reached(1), reached(2)) + ' of screens' : '', 'interview'], ['Offer', reached(0), reached(1) ? pct(reached(0), reached(1)) + ' of interviews' : '', 'offer'],
+                   ['Closed', rows.filter(r => CLOSED.has(st(r))).length, 'rejected / closed / withdrawn', 'closed']];
+    $('#funnel').innerHTML = steps.map(([l, v, r, k]) => `<div class="step ${k === 'closed' ? 'closed' : ''} stage-${k}" style="box-shadow: inset 0 3px 0 var(--stage)"><div class="n">${v}</div><div class="l">${esc(l)}</div><div class="r">${esc(r)}</div></div>`).join('');
+    const cols = [['saved', 'Saved', 'Saved on the radar, not applied yet', saved.map(r => ({kind: 'saved', key: r.url, snap: r}))],
+                  ['applied', 'Applied', 'Waiting to hear back', rows.filter(r => st(r) === 'applied')], ['screen', 'Phone screen', '', rows.filter(r => st(r) === 'screen')],
+                  ['interview', 'Interview', '', rows.filter(r => st(r) === 'interview')], ['offer', 'Offer', '', rows.filter(r => st(r) === 'offer')],
+                  ['closed', 'Closed', 'Rejected, closed or withdrawn', rows.filter(r => CLOSED.has(st(r)))]];
+    const byDate = (a, b) => cmpStr(b.app ? (b.app.stageAt || b.get('appliedOn')) : (b.snap.applyBy || ''), a.app ? (a.app.stageAt || a.get('appliedOn')) : (a.snap.applyBy || ''));
+    $('#board').innerHTML = cols.map(([k, title, hint, items]) => {
+      const cards = items.sort(k === 'saved' ? (a, b) => cmpStr(a.snap.applyBy || '9', b.snap.applyBy || '9') : byDate).map(it => card(k, it)).join('');
+      return `<section class="col stage-${k}" data-col="${k}" aria-label="${esc(title)}"><h3>${esc(title)}<span class="cnt">${items.length}</span></h3>${cards || (hint ? `<div class="hint">${esc(hint)}</div>` : '')}</section>`;
+    }).join('');
+  }
+  function card(col, it) {
+    if (it.kind === 'saved') {
+      const r = it.snap; const d = isIso(r.applyBy) ? daysTo(r.applyBy) : null;
+      const due = d == null ? '' : d < 0 ? '<span class="due">deadline passed</span>' : `<span class="${d <= 7 ? 'due' : ''}">apply by ${esc(fmt(r.applyBy))}</span>`;
+      return `<article class="card stage-saved" draggable="true" data-kind="saved" data-key="${esc(it.key)}"><div class="co">${esc(r.company || '')}</div><div class="pos"><a href="${esc(it.key)}" target="_blank" rel="noopener">${esc(r.title || it.key)}</a></div>`
+           + `<div class="m">${r.fit ? esc(r.fit) : ''}${r.location ? '<span>' + esc(r.location) + '</span>' : ''}${due}</div><div class="acts"><button type="button" class="pbtn tiny" data-apply="1">Mark applied</button></div></article>`;
+    }
+    const r = it; const stt = r.app.status || 'applied'; const since = r.app.stageAt || r.get('appliedOn'); const inStage = isIso(since) ? -daysTo(since) : null;
+    const ap = r.get('appliedOn'); const meta = [];
+    if (isIso(ap)) meta.push(`applied ${esc(fmt(ap))}`); if (inStage != null && stt !== 'applied') meta.push(`${inStage} d in stage`);
+    if (r.get('pay')) meta.push(esc(r.get('pay'))); if (r.get('dates')) meta.push('next: ' + esc(r.get('dates')));
+    if (needsFollowUp(r)) meta.push('<span class="fu">follow up</span>'); if (CLOSED.has(stt)) meta.push(esc(LABEL[stt].toLowerCase()));
+    const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.position || r.link)}</a>` : esc(r.position || '(no title)');
+    const sel = `<select class="sel" data-move="1" aria-label="Move to stage">${STATUSES.map(x => `<option value="${x}"${x === stt ? ' selected' : ''}>${LABEL[x]}</option>`).join('')}</select>`;
+    return `<article class="card stage-${CLOSED.has(stt) ? 'closed' : stt}" draggable="true" data-kind="${r.kind}" data-key="${esc(r.key)}"><div class="co">${esc(r.company)}</div><div class="pos">${link}</div><div class="m">${meta.join('')}</div><div class="acts">${sel}</div></article>`;
+  }
+  function cardRow(el) { const c = el.closest('.card'); if (!c) return null; if (c.dataset.kind === 'saved') return {kind: 'saved', key: c.dataset.key}; return rowsAll().find(r => r.kind === c.dataset.kind && r.key === c.dataset.key) || null; }
+  function dropTo(row, col) {
+    if (!row) return; if (row.kind === 'saved') { if (col !== 'saved') markApplied(row.key); return; }
+    if (col === 'saved') return; moveTo(row, col === 'closed' ? (CLOSED.has(row.app.status) ? row.app.status : 'rejected') : col);
+  }
+  $('#board').addEventListener('change', e => { if (e.target.matches('select[data-move]')) { const row = cardRow(e.target); if (row && row.kind !== 'saved') moveTo(row, e.target.value); } });
+  $('#board').addEventListener('click', e => { const b = e.target.closest('button[data-apply]'); if (b) { const row = cardRow(b); if (row) markApplied(row.key); } });
+  $('#board').addEventListener('dragstart', e => { const c = e.target.closest('.card'); if (!c) return; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', c.dataset.kind + '|' + c.dataset.key); });
+  $('#board').addEventListener('dragend', e => { const c = e.target.closest('.card'); if (c) c.classList.remove('dragging'); document.querySelectorAll('.col.over').forEach(x => x.classList.remove('over')); });
+  $('#board').addEventListener('dragover', e => { const col = e.target.closest('.col'); if (!col) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; document.querySelectorAll('.col.over').forEach(x => x !== col && x.classList.remove('over')); col.classList.add('over'); });
+  $('#board').addEventListener('dragleave', e => { const col = e.target.closest('.col'); if (col && !col.contains(e.relatedTarget)) col.classList.remove('over'); });
+  $('#board').addEventListener('drop', e => { const col = e.target.closest('.col'); if (!col) return; e.preventDefault(); const [kind, key] = (e.dataTransfer.getData('text/plain') || '|').split('|');
+    const row = kind === 'saved' ? {kind: 'saved', key} : rowsAll().find(r => r.kind === kind && r.key === key); dropTo(row, col.dataset.col); });
+  function applyView() { $('#board').classList.toggle('hidden', view !== 'board'); $('#tableview').classList.toggle('hidden', view !== 'table'); document.querySelectorAll('#view button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === view)); }
+  $('#view').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (!b) return; view = b.dataset.view; J.lsSet(VKEY, view); applyView(); });
+  applyView();
   // ---- up next: saved radar roles with a deadline (from their snapshots; nothing embedded in the page) ----
   function renderNext() {
     const saved = Object.entries(S.roles).filter(([u, e]) => e.status === 'saved').map(([u, e]) => Object.assign({url: u}, e.snap || {}));
@@ -501,7 +610,7 @@ window.JADAR = (function () {
     else if (e.key === 'Enter' && e.target.matches('textarea') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); commit(e.target); }
   });
   $('#rows').addEventListener('focusout', e => { if (e.target.matches('td.editing input, td.editing textarea')) setTimeout(() => { if (state.editing && document.activeElement !== e.target) commit(e.target); }, 0); });
-  $('#rows').addEventListener('change', e => { if (e.target.matches('select[data-f="status"]')) { const row = rowFromEl(e.target); if (row) setApp(row, 'status', e.target.value); } });
+  $('#rows').addEventListener('change', e => { if (e.target.matches('select[data-f="status"]')) { const row = rowFromEl(e.target); if (row) moveTo(row, e.target.value); } });
   document.querySelectorAll('#apps th.sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.sort; state.dir = state.sort === k ? (state.dir === 'asc' ? 'desc' : 'asc') : DEFAULT_DIR[k]; state.sort = k; render(); }));
 
   // ---- add row ----
