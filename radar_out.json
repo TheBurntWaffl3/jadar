@@ -1,5 +1,5 @@
 {
- "scanned": "2026-11-25T06:24:24.631279+00:00",
+ "scanned": "2026-11-25T06:33:55.362307+00:00",
  "profile": "kevin",
  "rulesVersion": "2026-11-18.2",
  "fullRead": null,
@@ -3004,43 +3004,6 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
-   "title": "Supplier Performance Engineer - Early Career Leadership Development Program",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Supplier-Performance-Engineer-Early-Career-Leadership-Development-Program-NC/1452207500/",
-   "date": "2026-11-19",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 0,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": "$85,000/yr",
-   "salaryMin": 85000,
-   "salaryMax": 85000,
-   "workMode": "Hybrid",
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Hold a Bachelor's Degree in Engineering by May 2027 \u00b7 0+ years of experience \u00b7 Above average academic achievement detailed on resume \u00b7 Demonstrated leadership capabilities, clearly defined on resume \u00b7 We are committed to transparency and equity in all of our people practices. The base salary for this position, which is dependent upon experience, qualifications and skills, will be $85,000 per year. \u00b7 LI-Hybrid \u00b7 Why Westinghouse? \u00b7 Our benefits package is tailored to meet the diverse needs of\u2026",
-   "majorReq": null,
-   "fit": "Yes",
-   "why": "new-grad / entry title",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-19",
-   "repost": null,
-   "id": "r0082"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
    "title": "Mechanical Engineer I",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/New-Stanton-Mechanical-Engineer-I-PA-15672/1442290900/",
@@ -3072,6 +3035,43 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-12",
+   "repost": null,
+   "id": "r0082"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
+   "title": "Supplier Performance Engineer - Early Career Leadership Development Program",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Supplier-Performance-Engineer-Early-Career-Leadership-Development-Program-NC/1452207500/",
+   "date": "2026-11-19",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 0,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": "$85,000/yr",
+   "salaryMin": 85000,
+   "salaryMax": 85000,
+   "workMode": "Hybrid",
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Hold a Bachelor's Degree in Engineering by May 2027 \u00b7 0+ years of experience \u00b7 Above average academic achievement detailed on resume \u00b7 Demonstrated leadership capabilities, clearly defined on resume \u00b7 We are committed to transparency and equity in all of our people practices. The base salary for this position, which is dependent upon experience, qualifications and skills, will be $85,000 per year. \u00b7 LI-Hybrid \u00b7 Why Westinghouse? \u00b7 Our benefits package is tailored to meet the diverse needs of\u2026",
+   "majorReq": null,
+   "fit": "Yes",
+   "why": "new-grad / entry title",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-19",
    "repost": null,
    "id": "r0083"
   },
@@ -96133,43 +96133,6 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
-   "title": "Linux Systems Engineer",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Linux-Systems-Engineer-NC/1432154500/",
-   "date": "2026-11-18",
-   "dateKind": "posted",
-   "discipline": "Systems",
-   "minYears": 6,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": "$103,200\u2013$129,000/yr",
-   "salaryMin": 103200,
-   "salaryMax": 129000,
-   "workMode": "Hybrid",
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor's Degree in the following disciplines: Computer Science, Information Systems, Computer Engineering, or another related field \u00b7 Linux Expertise: \u00b7 6+ years of Linux Administration experience (preferable SUSE\u2122) \u00b7 Have a mindset for independently identifying, analyzing, and efficiently solving variety of system related problems \u00b7 Practical experience with: \u00b7 Networking and Network File Systems (NFS) \u00b7 Disk [RAID] configuration \u00b7 BIOS/UEFI and iLO \u00b7 Multiple user authentication methods and\u2026",
-   "majorReq": "related: computer engineering, computer science, systems",
-   "fit": "No",
-   "why": "6+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-25",
-   "repost": null,
-   "id": "r2599"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
    "title": "Senior Mechanical Engineer - Design Interfaces and Hazards",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Senior-Mechanical-Engineer-Design-Interfaces-and-Hazards-NC/1247362600/",
@@ -96201,6 +96164,43 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-12",
+   "repost": null,
+   "id": "r2599"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
+   "title": "Linux Systems Engineer",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Linux-Systems-Engineer-NC/1432154500/",
+   "date": "2026-11-18",
+   "dateKind": "posted",
+   "discipline": "Systems",
+   "minYears": 6,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": "$103,200\u2013$129,000/yr",
+   "salaryMin": 103200,
+   "salaryMax": 129000,
+   "workMode": "Hybrid",
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor's Degree in the following disciplines: Computer Science, Information Systems, Computer Engineering, or another related field \u00b7 Linux Expertise: \u00b7 6+ years of Linux Administration experience (preferable SUSE\u2122) \u00b7 Have a mindset for independently identifying, analyzing, and efficiently solving variety of system related problems \u00b7 Practical experience with: \u00b7 Networking and Network File Systems (NFS) \u00b7 Disk [RAID] configuration \u00b7 BIOS/UEFI and iLO \u00b7 Multiple user authentication methods and\u2026",
+   "majorReq": "related: computer engineering, computer science, systems",
+   "fit": "No",
+   "why": "6+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-25",
    "repost": null,
    "id": "r2600"
   },
@@ -115040,43 +115040,6 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
-   "title": "Senior Mechanical Engineer - Balance of Plant (BOP)",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Rock-Hill-Senior-Mechanical-Engineer-Balance-of-Plant-%28BOP%29-SC-29730/1411467700/",
-   "date": "2026-11-15",
-   "dateKind": "posted",
-   "discipline": "Mechanical",
-   "minYears": 5,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": "$85,200\u2013$106,500/yr",
-   "salaryMin": 85200,
-   "salaryMax": 106500,
-   "workMode": "Hybrid",
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor of Science (B.S.) degree in Mechanical (preferred), Civil, Chemical, or Industrial Engineering. \u00b7 5+ years of experience. \u00b7 Power industry (e.g., nuclear power plant) experience. \u00b7 Ability to work in an international team environment. \u00b7 Ability to travel for site visits, short-term, or long-term assignments. \u00b7 Beneficial: \u00b7 Engineering in Training (EIT) license. \u00b7 Professional Engineer license (in any state) or ability to obtain within 5 years of onboarding. \u00b7 Proficiency on other\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "5+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "repost": null,
-   "id": "r3110"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
    "title": "Project Assurance & Integration Engineer",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Project-Assurance-&amp;-Integration-Engineer-NC/1427418000/",
@@ -115104,6 +115067,43 @@
    "majorReq": null,
    "fit": "No",
    "why": "3+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "repost": null,
+   "id": "r3110"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
+   "title": "Senior Mechanical Engineer - Balance of Plant (BOP)",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/Rock-Hill-Senior-Mechanical-Engineer-Balance-of-Plant-%28BOP%29-SC-29730/1411467700/",
+   "date": "2026-11-15",
+   "dateKind": "posted",
+   "discipline": "Mechanical",
+   "minYears": 5,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": "$85,200\u2013$106,500/yr",
+   "salaryMin": 85200,
+   "salaryMax": 106500,
+   "workMode": "Hybrid",
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor of Science (B.S.) degree in Mechanical (preferred), Civil, Chemical, or Industrial Engineering. \u00b7 5+ years of experience. \u00b7 Power industry (e.g., nuclear power plant) experience. \u00b7 Ability to work in an international team environment. \u00b7 Ability to travel for site visits, short-term, or long-term assignments. \u00b7 Beneficial: \u00b7 Engineering in Training (EIT) license. \u00b7 Professional Engineer license (in any state) or ability to obtain within 5 years of onboarding. \u00b7 Proficiency on other\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "5+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -135686,43 +135686,6 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
-   "title": "Senior Quality Engineer - Mechanical Components",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/V%C3%A4ster%C3%A5s-Senior-Quality-Engineer-Mechanical-Components/1300682500/",
-   "date": "2026-11-08",
-   "dateKind": "posted",
-   "discipline": "Mechanical",
-   "minYears": 10,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Clearance (obtain)",
-   "citizenship": "US person (ITAR)",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": null,
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Bachelor's degree in engineering; mechanical-, materials- or quality management, or equivalent. \u00b7 10+ year of experience working with quality management, assurance and control from the manufacturing industry. \u00b7 Experience of interpretation of standards. \u00b7 Full professional proficiency in Swedish and English, both spoken and written. \u00b7 Meritorious \u00b7 Experience from the nuclear industry. \u00b7 Experience working with standards such as ISO 9001, ISO 3834-2, PAKT, KBM, TBM, YVL, KTA 1401 and ASME III.\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "10+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "repost": null,
-   "id": "r3668"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
    "title": "LEU+ Mechanical Engineer",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/Hopkins-LEU%2B-Mechanical-Engineer-SC-29061/1419304800/",
@@ -135750,6 +135713,43 @@
    "majorReq": null,
    "fit": "No",
    "why": "7+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "repost": null,
+   "id": "r3668"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
+   "title": "Senior Quality Engineer - Mechanical Components",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/V%C3%A4ster%C3%A5s-Senior-Quality-Engineer-Mechanical-Components/1300682500/",
+   "date": "2026-11-08",
+   "dateKind": "posted",
+   "discipline": "Mechanical",
+   "minYears": 10,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Clearance (obtain)",
+   "citizenship": "US person (ITAR)",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": null,
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Bachelor's degree in engineering; mechanical-, materials- or quality management, or equivalent. \u00b7 10+ year of experience working with quality management, assurance and control from the manufacturing industry. \u00b7 Experience of interpretation of standards. \u00b7 Full professional proficiency in Swedish and English, both spoken and written. \u00b7 Meritorious \u00b7 Experience from the nuclear industry. \u00b7 Experience working with standards such as ISO 9001, ISO 3834-2, PAKT, KBM, TBM, YVL, KTA 1401 and ASME III.\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "10+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -139647,7 +139647,7 @@
    "sector": "Nuclear & fusion",
    "title": "Engineer - Nuclear- Remote",
    "location": "",
-   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/OTHER-Engineer-Nuclear-Remote-MA-0/1383537300/",
+   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/OTHER-Engineer-Nuclear-Remote-MA-0/1383542900/",
    "date": "2026-11-06",
    "dateKind": "posted",
    "discipline": "Nuclear",
@@ -139721,7 +139721,7 @@
    "sector": "Nuclear & fusion",
    "title": "Engineer - Nuclear- Remote",
    "location": "",
-   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/OTHER-Engineer-Nuclear-Remote-MA-0/1383542900/",
+   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/OTHER-Engineer-Nuclear-Remote-MA-0/1383537300/",
    "date": "2026-11-06",
    "dateKind": "posted",
    "discipline": "Nuclear",
@@ -143641,9 +143641,9 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
-   "title": "Transport Packaging Engineer",
+   "title": "APX Project Engineer II",
    "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/V%C3%A4ster%C3%A5s-Transport-Packaging-Engineer/1448046800/",
+   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-APX-Project-Engineer-II-NC/1448359400/",
    "date": "2026-11-05",
    "dateKind": "posted",
    "discipline": "Other",
@@ -143655,16 +143655,16 @@
    "applyBy": null,
    "gradReq": null,
    "startReq": null,
-   "clearance": "Clearance (obtain)",
+   "clearance": null,
    "citizenship": "US person (ITAR)",
-   "salary": null,
-   "salaryMin": null,
-   "salaryMax": null,
-   "workMode": "On-site",
+   "salary": "$69,200\u2013$86,500/yr",
+   "salaryMin": 69200,
+   "salaryMax": 86500,
+   "workMode": "Hybrid",
    "employment": null,
-   "travel": null,
+   "travel": "up to 10%",
    "relocation": null,
-   "reqSnippet": "Bachelor's degree in Engineering. Preferably with focus on mechanical engineering, maintenance engineering, production engineering, logistic or similar technical field. \u00b7 3+ years experience in technical management, maintenance, production-related engineering or a similar technical role. \u00b7 Experience with technical documentation. \u00b7 Experience with information management and document control systems. \u00b7 Professional proficiency in Swedish and English, both written and spoken. \u00b7 Meritorious\u2026",
+   "reqSnippet": "Bachelor's degree in engineering required (Mechanical, Electrical, Nuclear, or Chemical) \u00b7 3 +years of applicable experience required \u00b7 Previous experience on AP1000 or AP300 is beneficial \u00b7 Ability to travel internationally as projects require (up to 10% for peak times) \u00b7 Cognizance in at least one of the following technical areas: \u00b7 Design & Analysis: NSSS components, piping, electrical, and civil/structural \u00b7 Systems Engineering: Nuclear systems, turbine island, plant layout \u00b7 We are\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "3+ yrs required",
@@ -143715,9 +143715,9 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
-   "title": "APX Project Engineer II",
+   "title": "Transport Packaging Engineer",
    "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-APX-Project-Engineer-II-NC/1448359400/",
+   "url": "https://careers.westinghousenuclear.com/job/V%C3%A4ster%C3%A5s-Transport-Packaging-Engineer/1448046800/",
    "date": "2026-11-05",
    "dateKind": "posted",
    "discipline": "Other",
@@ -143729,16 +143729,16 @@
    "applyBy": null,
    "gradReq": null,
    "startReq": null,
-   "clearance": null,
+   "clearance": "Clearance (obtain)",
    "citizenship": "US person (ITAR)",
-   "salary": "$69,200\u2013$86,500/yr",
-   "salaryMin": 69200,
-   "salaryMax": 86500,
-   "workMode": "Hybrid",
+   "salary": null,
+   "salaryMin": null,
+   "salaryMax": null,
+   "workMode": "On-site",
    "employment": null,
-   "travel": "up to 10%",
+   "travel": null,
    "relocation": null,
-   "reqSnippet": "Bachelor's degree in engineering required (Mechanical, Electrical, Nuclear, or Chemical) \u00b7 3 +years of applicable experience required \u00b7 Previous experience on AP1000 or AP300 is beneficial \u00b7 Ability to travel internationally as projects require (up to 10% for peak times) \u00b7 Cognizance in at least one of the following technical areas: \u00b7 Design & Analysis: NSSS components, piping, electrical, and civil/structural \u00b7 Systems Engineering: Nuclear systems, turbine island, plant layout \u00b7 We are\u2026",
+   "reqSnippet": "Bachelor's degree in Engineering. Preferably with focus on mechanical engineering, maintenance engineering, production engineering, logistic or similar technical field. \u00b7 3+ years experience in technical management, maintenance, production-related engineering or a similar technical role. \u00b7 Experience with technical documentation. \u00b7 Experience with information management and document control systems. \u00b7 Professional proficiency in Swedish and English, both written and spoken. \u00b7 Meritorious\u2026",
    "majorReq": null,
    "fit": "No",
    "why": "3+ yrs required",
@@ -151855,6 +151855,43 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
+   "title": "I&C Systems Engineer II",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/Warrendale-I&amp;C-Systems-Engineer-II-OR/1436829900/",
+   "date": "2026-11-03",
+   "dateKind": "posted",
+   "discipline": "Systems",
+   "minYears": 2,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": "$69,200\u2013$86,500/yr",
+   "salaryMin": 69200,
+   "salaryMax": 86500,
+   "workMode": "Hybrid",
+   "employment": null,
+   "travel": null,
+   "relocation": false,
+   "reqSnippet": "Bachelor's degree in Engineering from an accredited college or university. \u00b7 Two or more years of relevant engineering experience. \u00b7 Working knowledge of engineering and systems engineering principles. \u00b7 Experience analyzing technical requirements or engineering information. \u00b7 Requirements-management experience. \u00b7 Configuration-management or engineering-change experience. \u00b7 System architecture or interface-management experience. \u00b7 Verification and validation experience. \u00b7 Experience with IBM\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "2+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-25",
+   "repost": null,
+   "id": "r4105"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
    "title": "Senior Fluid Systems Engineer",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Senior-Fluid-Systems-Engineer-NC/1399123800/",
@@ -151887,7 +151924,7 @@
    "desc_ok": true,
    "firstSeen": "2026-11-12",
    "repost": null,
-   "id": "r4105"
+   "id": "r4106"
   },
   {
    "company": "Westinghouse",
@@ -151923,43 +151960,6 @@
    "timingNote": null,
    "desc_ok": true,
    "firstSeen": "2026-11-12",
-   "repost": null,
-   "id": "r4106"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
-   "title": "I&C Systems Engineer II",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Warrendale-I&amp;C-Systems-Engineer-II-OR/1436829900/",
-   "date": "2026-11-03",
-   "dateKind": "posted",
-   "discipline": "Systems",
-   "minYears": 2,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": "$69,200\u2013$86,500/yr",
-   "salaryMin": 69200,
-   "salaryMax": 86500,
-   "workMode": "Hybrid",
-   "employment": null,
-   "travel": null,
-   "relocation": false,
-   "reqSnippet": "Bachelor's degree in Engineering from an accredited college or university. \u00b7 Two or more years of relevant engineering experience. \u00b7 Working knowledge of engineering and systems engineering principles. \u00b7 Experience analyzing technical requirements or engineering information. \u00b7 Requirements-management experience. \u00b7 Configuration-management or engineering-change experience. \u00b7 System architecture or interface-management experience. \u00b7 Verification and validation experience. \u00b7 Experience with IBM\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "2+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-25",
    "repost": null,
    "id": "r4107"
   },
@@ -155407,6 +155407,43 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
+   "title": "Engineer, Nuclear Level 4 Lead",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/Norwell-Engineer%2C-Nuclear-Level-4-Lead-MA-02061/1357020600/",
+   "date": "2026-11-02",
+   "dateKind": "posted",
+   "discipline": "Nuclear",
+   "minYears": 15,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": "$60/hr",
+   "salaryMin": 124800,
+   "salaryMax": 124800,
+   "workMode": "Remote",
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "Cookies \u00b7 These cookies are required to use this website and can't be turned off. \u00b7 Required Cookies \u00b7 Show More Details \u00b7 Required Cookies \u00b7 Provider \u00b7 Description \u00b7 Enabled \u00b7 SAP as service provider \u00b7 We use the following session cookies, which are all required to enable the website to function: \u00b7 route\" is used for session stickiness \u00b7 careerSiteCompanyId\" is used to send the request to the correct data center \u00b7 JSESSIONID\" is placed on the visitor's device during the session so the server\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "15+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "repost": null,
+   "id": "r4201"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
    "title": "I&C Senior Systems Engineer",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/Prague-I&amp;C-Senior-Systems-Engineer/1446662000/",
@@ -155439,7 +155476,7 @@
    "desc_ok": true,
    "firstSeen": "2026-11-12",
    "repost": null,
-   "id": "r4201"
+   "id": "r4202"
   },
   {
    "company": "Westinghouse",
@@ -155471,43 +155508,6 @@
    "majorReq": null,
    "fit": "No",
    "why": "12+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "repost": null,
-   "id": "r4202"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
-   "title": "Engineer, Nuclear Level 4 Lead",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Norwell-Engineer%2C-Nuclear-Level-4-Lead-MA-02061/1357020600/",
-   "date": "2026-11-02",
-   "dateKind": "posted",
-   "discipline": "Nuclear",
-   "minYears": 15,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": "$60/hr",
-   "salaryMin": 124800,
-   "salaryMax": 124800,
-   "workMode": "Remote",
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "Cookies \u00b7 These cookies are required to use this website and can't be turned off. \u00b7 Required Cookies \u00b7 Show More Details \u00b7 Required Cookies \u00b7 Provider \u00b7 Description \u00b7 Enabled \u00b7 SAP as service provider \u00b7 We use the following session cookies, which are all required to enable the website to function: \u00b7 route\" is used for session stickiness \u00b7 careerSiteCompanyId\" is used to send the request to the correct data center \u00b7 JSESSIONID\" is placed on the visitor's device during the session so the server\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "15+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -157553,6 +157553,43 @@
   {
    "company": "Westinghouse",
    "sector": "Nuclear & fusion",
+   "title": "Senior Engineer - Application Integration",
+   "location": "",
+   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Senior-Engineer-Application-Integration-NC/1436241600/",
+   "date": "2026-10-31",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 4,
+   "schoolExpOk": false,
+   "degree": null,
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": null,
+   "citizenship": "US person (ITAR)",
+   "salary": "$85,200\u2013$106,500/yr",
+   "salaryMin": 85200,
+   "salaryMax": 106500,
+   "workMode": "Hybrid",
+   "employment": null,
+   "travel": null,
+   "relocation": false,
+   "reqSnippet": "4+ years of experience supporting complex enterprise applications in a production environment. \u00b7 Experience with application configuration, deployment, troubleshooting, and support for commercial off-the-shelf (COTS) and custom-developed applications. \u00b7 Expert-level troubleshooting for critical application, database, networking and system administration issues \u00b7 Experience supporting Windows operating systems, web and application server technologies (IIS, Apache Tomcat, Oracle WebLogic, and IBM\u2026",
+   "majorReq": null,
+   "fit": "No",
+   "why": "4+ yrs required",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-12",
+   "repost": null,
+   "id": "r4259"
+  },
+  {
+   "company": "Westinghouse",
+   "sector": "Nuclear & fusion",
    "title": "Senior Turbine Control Engineer",
    "location": "",
    "url": "https://careers.westinghousenuclear.com/job/Sofia-Senior-Turbine-Control-Engineer-1766/1426296300/",
@@ -157585,7 +157622,7 @@
    "desc_ok": true,
    "firstSeen": "2026-11-12",
    "repost": null,
-   "id": "r4259"
+   "id": "r4260"
   },
   {
    "company": "Westinghouse",
@@ -157622,7 +157659,7 @@
    "desc_ok": true,
    "firstSeen": "2026-11-12",
    "repost": null,
-   "id": "r4260"
+   "id": "r4261"
   },
   {
    "company": "Westinghouse",
@@ -157654,43 +157691,6 @@
    "majorReq": null,
    "fit": "No",
    "why": "3+ yrs required",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-12",
-   "repost": null,
-   "id": "r4261"
-  },
-  {
-   "company": "Westinghouse",
-   "sector": "Nuclear & fusion",
-   "title": "Senior Engineer - Application Integration",
-   "location": "",
-   "url": "https://careers.westinghousenuclear.com/job/Cranberry-Township-Senior-Engineer-Application-Integration-NC/1436241600/",
-   "date": "2026-10-31",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 4,
-   "schoolExpOk": false,
-   "degree": null,
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": null,
-   "citizenship": "US person (ITAR)",
-   "salary": "$85,200\u2013$106,500/yr",
-   "salaryMin": 85200,
-   "salaryMax": 106500,
-   "workMode": "Hybrid",
-   "employment": null,
-   "travel": null,
-   "relocation": false,
-   "reqSnippet": "4+ years of experience supporting complex enterprise applications in a production environment. \u00b7 Experience with application configuration, deployment, troubleshooting, and support for commercial off-the-shelf (COTS) and custom-developed applications. \u00b7 Expert-level troubleshooting for critical application, database, networking and system administration issues \u00b7 Experience supporting Windows operating systems, web and application server technologies (IIS, Apache Tomcat, Oracle WebLogic, and IBM\u2026",
-   "majorReq": null,
-   "fit": "No",
-   "why": "4+ yrs required",
    "timing": "unstated",
    "timingNote": null,
    "desc_ok": true,
@@ -167027,7 +167027,7 @@
    "sector": "Nuclear & fusion",
    "title": "Control Systems Engineer",
    "location": "",
-   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/Warrendale-Control-Systems-Engineer-OR/1435039300/",
+   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/Warrendale-Control-Systems-Engineer-OR/1435041800/",
    "date": "2026-10-28",
    "dateKind": "posted",
    "discipline": "Systems",
@@ -167064,7 +167064,7 @@
    "sector": "Nuclear & fusion",
    "title": "Control Systems Engineer",
    "location": "",
-   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/Warrendale-Control-Systems-Engineer-OR/1435041800/",
+   "url": "https://careers.westinghousenuclear.com/WECTEC_Staffing/job/Warrendale-Control-Systems-Engineer-OR/1435039300/",
    "date": "2026-10-28",
    "dateKind": "posted",
    "discipline": "Systems",
@@ -251459,43 +251459,6 @@
   {
    "company": "Curtiss-Wright",
    "sector": "Primes",
-   "title": "Lead Hardware Engineer - Onsite position",
-   "location": "US-VA-Ashburn",
-   "url": "https://curtisswright.wd1.myworkdayjobs.com/en-US/CW_External_Career_Site/job/US-VA-Ashburn/Lead-Hardware-Engineer---Onsite-position_JR12426-1",
-   "date": "2026-08-14",
-   "dateKind": "posted",
-   "discipline": "Other",
-   "minYears": 8,
-   "schoolExpOk": false,
-   "degree": "BS",
-   "gpaReq": null,
-   "startWindow": null,
-   "applyBy": null,
-   "gradReq": null,
-   "startReq": null,
-   "clearance": "Clearance (obtain)",
-   "citizenship": "US citizen",
-   "salary": "$108,900\u2013$150,000/yr",
-   "salaryMin": 108900,
-   "salaryMax": 150000,
-   "workMode": "On-site",
-   "employment": null,
-   "travel": null,
-   "relocation": null,
-   "reqSnippet": "8 years of experience in DoD embedded systems and hardware design, including SBC, FPGA, switch, and I/O card development. \u00b7 Extensive experience designing mixed-signal, high-speed digital, analog, and low-power, high-current circuits in high-reliability environments. \u00b7 Strong experience designing high-density interconnect (HDI) PCBs, including complex multi-layer designs, multi-lamination processes, blind/buried vias, and uVia structures. \u00b7 Hands-on experience with Siemens Expedition DX\u2026",
-   "majorReq": "only: electrical engineering",
-   "fit": "No",
-   "why": "degree must be electrical engineering",
-   "timing": "unstated",
-   "timingNote": null,
-   "desc_ok": true,
-   "firstSeen": "2026-11-25",
-   "repost": null,
-   "id": "r6797"
-  },
-  {
-   "company": "Curtiss-Wright",
-   "sector": "Primes",
    "title": "Lead Hardware Engineer - Remote",
    "location": "US-NH-Remote Work",
    "url": "https://curtisswright.wd1.myworkdayjobs.com/en-US/CW_External_Career_Site/job/US-NH-Remote-Work/Lead-Hardware-Engineer---Remote_JR12427-1",
@@ -251520,6 +251483,43 @@
    "travel": null,
    "relocation": null,
    "reqSnippet": "8 years of experience in \u00a0 DoD embedded systems \u00a0 and hardware design, including SBC, FPGA, switch, and I/O card development. \u00b7 Extensive experience designing mixed-signal, high-speed digital, analog, and low-power, high-current circuits in high-reliability environments. \u00b7 Strong experience designing high-density interconnect (HDI) PCBs, including complex multi-layer designs, multi-lamination processes, blind/buried vias, and uVia structures. \u00b7 Hands-on experience with \u00a0 Siemens Expedition DX\u2026",
+   "majorReq": "only: electrical engineering",
+   "fit": "No",
+   "why": "degree must be electrical engineering",
+   "timing": "unstated",
+   "timingNote": null,
+   "desc_ok": true,
+   "firstSeen": "2026-11-25",
+   "repost": null,
+   "id": "r6797"
+  },
+  {
+   "company": "Curtiss-Wright",
+   "sector": "Primes",
+   "title": "Lead Hardware Engineer - Onsite position",
+   "location": "US-VA-Ashburn",
+   "url": "https://curtisswright.wd1.myworkdayjobs.com/en-US/CW_External_Career_Site/job/US-VA-Ashburn/Lead-Hardware-Engineer---Onsite-position_JR12426-1",
+   "date": "2026-08-14",
+   "dateKind": "posted",
+   "discipline": "Other",
+   "minYears": 8,
+   "schoolExpOk": false,
+   "degree": "BS",
+   "gpaReq": null,
+   "startWindow": null,
+   "applyBy": null,
+   "gradReq": null,
+   "startReq": null,
+   "clearance": "Clearance (obtain)",
+   "citizenship": "US citizen",
+   "salary": "$108,900\u2013$150,000/yr",
+   "salaryMin": 108900,
+   "salaryMax": 150000,
+   "workMode": "On-site",
+   "employment": null,
+   "travel": null,
+   "relocation": null,
+   "reqSnippet": "8 years of experience in DoD embedded systems and hardware design, including SBC, FPGA, switch, and I/O card development. \u00b7 Extensive experience designing mixed-signal, high-speed digital, analog, and low-power, high-current circuits in high-reliability environments. \u00b7 Strong experience designing high-density interconnect (HDI) PCBs, including complex multi-layer designs, multi-lamination processes, blind/buried vias, and uVia structures. \u00b7 Hands-on experience with Siemens Expedition DX\u2026",
    "majorReq": "only: electrical engineering",
    "fit": "No",
    "why": "degree must be electrical engineering",
@@ -293762,7 +293762,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 39
+   "secs": 61
   },
   {
    "org": "Castelion",
@@ -293775,7 +293775,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2,
+   "secs": 5,
    "bulkImport": "2026-09-07"
   },
   {
@@ -293789,7 +293789,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 5
   },
   {
    "org": "Ursa Major",
@@ -293802,7 +293802,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 15
   },
   {
    "org": "Epirus",
@@ -293815,7 +293815,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 8
   },
   {
    "org": "Mach Industries",
@@ -293828,7 +293828,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 20
   },
   {
    "org": "Divergent",
@@ -293841,7 +293841,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 16
   },
   {
    "org": "Zone 5",
@@ -293854,7 +293854,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 5
   },
   {
    "org": "JetZero",
@@ -293867,7 +293867,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Electra",
@@ -293880,7 +293880,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 6
   },
   {
    "org": "SpaceX",
@@ -293893,7 +293893,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 37
+   "secs": 55
   },
   {
    "org": "Rocket Lab",
@@ -293906,7 +293906,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 31
   },
   {
    "org": "Relativity Space",
@@ -293919,7 +293919,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 16
+   "secs": 27
   },
   {
    "org": "Stoke Space",
@@ -293932,7 +293932,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 11
   },
   {
    "org": "Varda",
@@ -293945,7 +293945,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 15
   },
   {
    "org": "Vast",
@@ -293958,7 +293958,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 18
   },
   {
    "org": "Astranis",
@@ -293971,7 +293971,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 13
   },
   {
    "org": "True Anomaly",
@@ -293984,7 +293984,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 14
+   "secs": 23
   },
   {
    "org": "Inversion Space",
@@ -293997,7 +293997,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 3
   },
   {
    "org": "Muon Space",
@@ -294010,7 +294010,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 8
   },
   {
    "org": "Momentus",
@@ -294036,7 +294036,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 12
   },
   {
    "org": "Portal Space",
@@ -294049,7 +294049,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 2
   },
   {
    "org": "Rendezvous Robotics",
@@ -294062,7 +294062,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 3
   },
   {
    "org": "Hawkeye 360",
@@ -294075,7 +294075,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 4
   },
   {
    "org": "Albedo",
@@ -294088,7 +294088,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 6
   },
   {
    "org": "Voyager / Astrobotic-adjacent",
@@ -294101,7 +294101,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 16
   },
   {
    "org": "Kairos Power",
@@ -294114,7 +294114,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 8
   },
   {
    "org": "Oklo",
@@ -294127,7 +294127,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 8
   },
   {
    "org": "TerraPower",
@@ -294140,7 +294140,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 7
   },
   {
    "org": "Valar Atomics",
@@ -294153,7 +294153,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 10
+   "secs": 14
   },
   {
    "org": "Deep Fission",
@@ -294166,7 +294166,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 0
   },
   {
    "org": "General Matter",
@@ -294179,7 +294179,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 4
   },
   {
    "org": "Pacific Fusion",
@@ -294192,7 +294192,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Standard Nuclear",
@@ -294205,7 +294205,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 3
   },
   {
    "org": "Regent",
@@ -294218,7 +294218,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 1
   },
   {
    "org": "Hermeus",
@@ -294231,7 +294231,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Venus Aerospace",
@@ -294257,7 +294257,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 11
+   "secs": 18
   },
   {
    "org": "Merlin Labs",
@@ -294283,7 +294283,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "Last Energy",
@@ -294296,7 +294296,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 13
   },
   {
    "org": "Commonwealth Fusion",
@@ -294322,7 +294322,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 2
   },
   {
    "org": "Exowatt",
@@ -294348,7 +294348,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Radiant",
@@ -294361,7 +294361,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 7
   },
   {
    "org": "Antares",
@@ -294374,7 +294374,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4,
+   "secs": 7,
    "bulkImport": "2026-11-18"
   },
   {
@@ -294388,7 +294388,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "Saronic",
@@ -294401,7 +294401,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 13
   },
   {
    "org": "HavocAI",
@@ -294414,7 +294414,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Reliable Robotics",
@@ -294427,7 +294427,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 5
   },
   {
    "org": "Skydio",
@@ -294440,7 +294440,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 10
   },
   {
    "org": "Picogrid",
@@ -294453,7 +294453,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 5
   },
   {
    "org": "Integrate",
@@ -294466,7 +294466,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 4
   },
   {
    "org": "Hadrian",
@@ -294479,7 +294479,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 5
+   "secs": 10
   },
   {
    "org": "Northwood Space",
@@ -294492,7 +294492,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 5
   },
   {
    "org": "Starfish Space",
@@ -294505,7 +294505,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Apex Space",
@@ -294518,7 +294518,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 9
   },
   {
    "org": "Blue Origin",
@@ -294531,7 +294531,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 30
+   "secs": 38
   },
   {
    "org": "Sierra Space",
@@ -294544,7 +294544,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 18
   },
   {
    "org": "X-energy",
@@ -294557,7 +294557,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 23
   },
   {
    "org": "Leidos",
@@ -294570,7 +294570,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 48
+   "secs": 54
   },
   {
    "org": "Aerospace Corp",
@@ -294583,7 +294583,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 25,
+   "secs": 31,
    "bulkImport": "2026-11-16"
   },
   {
@@ -294597,7 +294597,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 20
+   "secs": 25
   },
   {
    "org": "Boeing",
@@ -294605,25 +294605,25 @@
    "ok": true,
    "total": 334,
    "matches": 158,
-   "fetched": 2,
-   "cached": 181,
+   "fetched": 0,
+   "cached": 183,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 34
+   "secs": 38
   },
   {
    "org": "RTX (Raytheon, Pratt & Whitney, Collins)",
    "type": "workday",
    "ok": true,
-   "total": 373,
+   "total": 374,
    "matches": 87,
    "fetched": 0,
    "cached": 93,
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 26
+   "secs": 35
   },
   {
    "org": "GE Aerospace",
@@ -294636,7 +294636,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 17
+   "secs": 23
   },
   {
    "org": "Firefly Aerospace",
@@ -294649,7 +294649,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 21
   },
   {
    "org": "Sierra Nevada Corp",
@@ -294662,7 +294662,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 14
+   "secs": 19
   },
   {
    "org": "AeroVironment",
@@ -294675,7 +294675,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 23
   },
   {
    "org": "Curtiss-Wright",
@@ -294688,7 +294688,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 21
+   "secs": 25
   },
   {
    "org": "Axiom Space",
@@ -294701,7 +294701,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 19
+   "secs": 23
   },
   {
    "org": "GE Vernova (incl. GE-Hitachi)",
@@ -294714,7 +294714,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 22
+   "secs": 27
   },
   {
    "org": "Draper",
@@ -294727,7 +294727,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 20
   },
   {
    "org": "NASA JPL",
@@ -294740,7 +294740,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 17
   },
   {
    "org": "L3Harris (incl. Aerojet Rocketdyne)",
@@ -294753,7 +294753,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 4
   },
   {
    "org": "HII (Newport News, Ingalls)",
@@ -294792,7 +294792,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "ULA",
@@ -294818,7 +294818,7 @@
    "error": null,
    "detailErrors": 130,
    "detailErr": "HTTP Error 404: Not Found",
-   "secs": 25
+   "secs": 61
   },
   {
    "org": "LANL",
@@ -294831,7 +294831,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "GTRI",
@@ -294844,7 +294844,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Redwire",
@@ -294857,7 +294857,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Electric Boat",
@@ -294870,7 +294870,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Calspan",
@@ -294883,7 +294883,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0,
+   "secs": 1,
    "placeholderDate": "2024-11-22"
   },
   {
@@ -294897,7 +294897,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0,
+   "secs": 1,
    "bulkImport": "2024-11-22"
   },
   {
@@ -294911,7 +294911,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3,
+   "secs": 4,
    "bulkImport": "2026-11-20"
   },
   {
@@ -294938,7 +294938,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Aalo Atomics",
@@ -294990,7 +294990,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 89
+   "secs": 169
   },
   {
    "org": "Northrop Grumman",
@@ -295003,7 +295003,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 74
+   "secs": 75
   },
   {
    "org": "BAE Systems",
@@ -295016,7 +295016,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "BWXT",
@@ -295029,7 +295029,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 8
+   "secs": 10
   },
   {
    "org": "Impulse Space",
@@ -295042,7 +295042,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Boom Supersonic",
@@ -295055,7 +295055,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Saildrone",
@@ -295081,7 +295081,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "Specter Aerospace",
@@ -295094,7 +295094,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "MIT Lincoln Lab",
@@ -295107,7 +295107,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 9
+   "secs": 12
   },
   {
    "org": "Bath Iron Works",
@@ -295120,7 +295120,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0
+   "secs": 1
   },
   {
    "org": "MITRE",
@@ -295147,7 +295147,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 15
+   "secs": 18
   },
   {
    "org": "Honeywell Aerospace",
@@ -295160,7 +295160,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 7
   },
   {
    "org": "Centrus",
@@ -295173,7 +295173,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "K2 Space",
@@ -295186,7 +295186,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 6
+   "secs": 9
   },
   {
    "org": "Beta Technologies",
@@ -295199,7 +295199,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2,
+   "secs": 4,
    "bulkImport": "2026-04-08"
   },
   {
@@ -295226,7 +295226,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 0,
+   "secs": 1,
    "bulkImport": "2026-11-18"
   },
   {
@@ -295240,7 +295240,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 21
+   "secs": 26
   },
   {
    "org": "Archer Aviation",
@@ -295253,7 +295253,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 1
+   "secs": 2
   },
   {
    "org": "Zipline",
@@ -295266,7 +295266,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 4
+   "secs": 6
   },
   {
    "org": "Gravitics",
@@ -295331,7 +295331,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 9
   },
   {
    "org": "Long Wall (formerly ABL Space)",
@@ -295370,7 +295370,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 13
+   "secs": 15
   },
   {
    "org": "Woodward",
@@ -295396,7 +295396,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 20
+   "secs": 22
   },
   {
    "org": "Duke Energy (nuclear)",
@@ -295409,7 +295409,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 12
+   "secs": 15
   },
   {
    "org": "Amentum",
@@ -295422,7 +295422,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 18
+   "secs": 23
   },
   {
    "org": "Southern Company (nuclear)",
@@ -295448,7 +295448,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 3
+   "secs": 4
   },
   {
    "org": "Leonardo DRS",
@@ -295461,7 +295461,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 11
   },
   {
    "org": "Triumph Group",
@@ -295474,7 +295474,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Dominion Energy (nuclear)",
@@ -295487,7 +295487,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 2
+   "secs": 3
   },
   {
    "org": "Entergy (nuclear)",
@@ -295500,7 +295500,7 @@
    "error": null,
    "detailErrors": 0,
    "detailErr": null,
-   "secs": 7
+   "secs": 8
   }
  ]
 }
