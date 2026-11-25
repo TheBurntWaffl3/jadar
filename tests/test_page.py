@@ -181,6 +181,8 @@ class ResumesTests(unittest.TestCase):
         self.assertTrue(all(r["fit"] in ("Yes", "Maybe") for r in data["roles"])); self.assertTrue(all("desc" not in r for r in data["roles"]))
         self.assertIn("tailor: {}", html); self.assertIn("out.tailor[u] = newer(a.tailor[u], b.tailor[u])", html)
         self.assertNotIn("drafts.json", html); self.assertNotIn("tailor.py", html)
+        self.assertNotIn('<div id="datapanel" class="hidden">', html)  # 2026-11-26: the Data button could not open the panel (shared CSS uses .open)
+        self.assertIn("$('#datapanel').classList.toggle('open')", html)
 
 class TrackerTests(unittest.TestCase):
     """tracker.html: second page, same state file, no roles or personal data embedded."""

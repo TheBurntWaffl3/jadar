@@ -1779,7 +1779,7 @@ __CSS_SHARED__
   <span class="sync-status mono" id="sync-status"></span>
   <span class="count mono" id="count"></span>
 </div>
-<div id="datapanel" class="hidden">
+<div id="datapanel">
   <div class="dp-head mono">Sync with GitHub</div>
   <div class="dp-row">
     <input type="text" id="sync-repo" placeholder="owner/name" value="TheBurntWaffl3/jadar-state" aria-label="Repository">
@@ -1899,7 +1899,7 @@ __SHARED_JS__
     const mk = e.target.closest('button[data-mark]'); if (mk) { setMark(r.url, mark(r.url) === mk.dataset.mark ? '' : mk.dataset.mark); }
   });
   $('#qview').addEventListener('click', e => { const b = e.target.closest('button[data-q]'); if (!b) return; view = b.dataset.q; autoView = false; showAll = false; render(); });
-  $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('hidden'); e.target.setAttribute('aria-expanded', !o); });
+  $('#data-toggle').addEventListener('click', e => { const o = $('#datapanel').classList.toggle('open'); e.target.setAttribute('aria-expanded', o); });
   render();
   const c0 = J.syncCfg(); if (c0) { loadFiles(c0); sync.syncNow(); }
 })();
