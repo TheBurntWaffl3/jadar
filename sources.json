@@ -38,6 +38,7 @@
 {"id":"hermeus","org":"Hermeus","sector":"Hypersonics & defense tech","type":"lever"},
 {"id":"venusaero","org":"Venus Aerospace","sector":"Hypersonics & defense tech","type":"lever"},
 {"id":"shield","org":"Shield AI","sector":"Hypersonics & defense tech","type":"ashby"},
+{"id":"cowboyspace","org":"Cowboy Space","sector":"Space","type":"ashby"},
 {"id":"merlinlabs","org":"Merlin Labs","sector":"Hypersonics & defense tech","type":"lever"},
 {"id":"cx2","org":"CX2","sector":"Hypersonics & defense tech","type":"lever"},
 {"id":"last-energy","org":"Last Energy","sector":"Nuclear & fusion","type":"lever"},
